@@ -26,3 +26,6 @@ if __name__ == '__main__':
     print "before MainLoop"
     app.MainLoop()  #2 进入主事件循环
     print "after MainLoop"
+    
+    
+    wx.Treebook
