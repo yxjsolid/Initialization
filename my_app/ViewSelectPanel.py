@@ -5,7 +5,7 @@ import images
 import string
 
 
-class MyTreeCtrl1(wx.TreeCtrl):
+class MyTreeCtrl(wx.TreeCtrl):
     def __init__(self, parent, id, pos, size, style, log):
         wx.TreeCtrl.__init__(self, parent, id, pos, size, style)
         self.log = log
@@ -20,19 +20,24 @@ class MyTreeCtrl1(wx.TreeCtrl):
 
 class ViewSelectPanel(wx.Panel):
     i = 0
+    root = 0
+    deviceViewNode = 0
+    defaultViewNode = 0
+    
     
     def __init__( self, parent, container, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL ):
-        
         
         # Use the WANTS_CHARS style so the panel doesn't eat the Return key.
         wx.Panel.__init__(self, container, -1, style=wx.WANTS_CHARS)
         self.Bind(wx.EVT_SIZE, self.OnSize)
         self.parent = parent
+        
+        wx.GetApp().SetAppViewSelectPanel(self)
 
         #self.log = log
         tID = wx.NewId()
 
-        self.tree = MyTreeCtrl1(self, tID, wx.DefaultPosition, wx.DefaultSize,
+        self.tree = MyTreeCtrl(self, tID, wx.DefaultPosition, wx.DefaultSize,
                                wx.TR_DEFAULT_STYLE
                                #wx.TR_HAS_BUTTONS
                                #| wx.TR_EDIT_LABELS
@@ -60,9 +65,15 @@ class ViewSelectPanel(wx.Panel):
         self.tree.SetItemImage(self.root, self.fldridx, wx.TreeItemIcon_Normal)
         self.tree.SetItemImage(self.root, self.fldropenidx, wx.TreeItemIcon_Expanded)
 
-
        
+        
+        self.defaultViewNode = self.AddViewOption("æ€»è§ˆ")
+        self.deviceViewNode = self.AddViewOption("è®¾å¤‡")
         self.tree.Expand(self.root)
+        
+        self.AddDeviceNode("çš®å¸¦æœº1")
+       
+       
         self.Bind(wx.EVT_TREE_ITEM_EXPANDED, self.OnItemExpanded, self.tree)
         self.Bind(wx.EVT_TREE_ITEM_COLLAPSED, self.OnItemCollapsed, self.tree)
         self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelChanged, self.tree)
@@ -75,8 +86,7 @@ class ViewSelectPanel(wx.Panel):
         self.tree.Bind(wx.EVT_RIGHT_UP, self.OnRightUp)
         
         
-        self.AddViewOption("×ÜÀÀ")
-        self.AddViewOption("Éè±¸")
+       
     
         
     def OnRightDown(self, event):
@@ -172,10 +182,8 @@ class ViewSelectPanel(wx.Panel):
             
 #           self.parent.ViewPanelSetDsp()
             
-           
-
-
-            self.parent.ViewPanelSetDsp(self.tree.GetItemText(self.item), self.i)
+        
+            self.ViewPanelSetDsp(self.parent, self.tree.GetItemText(self.item), self.i)
             
             if wx.Platform == '__WXMSW__':
                 self.log.WriteText("BoundingRect: %s\n" %
@@ -194,4 +202,37 @@ class ViewSelectPanel(wx.Panel):
         self.tree.SetPyData(child, None)
         self.tree.SetItemImage(child, self.fldridx, wx.TreeItemIcon_Normal)
         self.tree.SetItemImage(child, self.fldropenidx, wx.TreeItemIcon_Expanded)
+        return child
 
+    def getDeviceViewNode(self):
+        return self.deviceViewNode
+
+    def AddDeviceNode(self, name):
+        child = self.tree.AppendItem(self.getDeviceViewNode(), name)
+        self.tree.SetPyData(child, None)
+        self.tree.SetItemImage(child, self.fldridx, wx.TreeItemIcon_Normal)
+        self.tree.SetItemImage(child, self.fldropenidx, wx.TreeItemIcon_Expanded)
+
+    def ViewPanelSetDsp(self, parent, txt, i):
+        
+        container = parent.viewPanel
+        
+        container.DestroyChildren()
+        
+        sizer = wx.BoxSizer( wx.VERTICAL )
+        
+        self.dispanel = wx.Panel(container, wx.ID_ANY, wx.DefaultPosition, container.GetClientSize(), wx.TAB_TRAVERSAL )
+#        self.viewPanel_sub = wx.Panel( self.viewPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+    
+        sizer.Add( self.dispanel, 1, wx.EXPAND |wx.ALL, 5 )
+        
+        #        self.m_panel25.SetBackgroundColour( wx.SystemSettings.GetColour( "sky blue" ) )
+        
+        self.dispanel.SetBackgroundColour("sky blue")
+        wx.StaticText(self.dispanel, -1, txt, (20*i, 10*i))
+        
+
+        container.SetSizer(sizer)
+#        container.SetAutoLayout(True)
+        container.Layout()
+        

@@ -34,11 +34,27 @@ class FrameBase ( wx.Frame ):
 		
 		self.SetMenuBar( self.m_menubar1 )
 		
+		self.m_toolBar2 = self.CreateToolBar( wx.TB_HORIZONTAL, wx.ID_ANY )
+		self.m_toolBar2.SetToolSeparation( 10 )
+		self.m_toolBar2.AddLabelTool( wx.ID_ANY, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_ADD_BOOKMARK, wx.ART_MENU ), wx.NullBitmap, wx.ITEM_NORMAL, _(u"添加设备"), wx.EmptyString, None ) 
+		
+		self.m_toolBar2.AddLabelTool( wx.ID_ANY, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_WARNING, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
+		
+		self.m_toolBar2.Realize() 
+		
 		
 		self.Centre( wx.BOTH )
+		
+		# Connect Events
+		self.Bind( wx.EVT_TOOL, self.addDevice, id = wx.ID_ANY )
 	
 	def __del__( self ):
 		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def addDevice( self, event ):
+		event.Skip()
 	
 
 ###########################################################################
@@ -221,5 +237,85 @@ class SplitterPanelBase ( wx.Panel ):
 	def m_splitter6OnIdle( self, event ):
 		self.m_splitter6.SetSashPosition( 0 )
 		self.m_splitter6.Unbind( wx.EVT_IDLE )
+	
+
+###########################################################################
+## Class Panel_AddDevice_Base
+###########################################################################
+
+class Panel_AddDevice_Base ( wx.Panel ):
+	
+	def __init__( self, parent ):
+		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL )
+		
+		bSizer7 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_splitter5 = wx.SplitterWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SP_3D )
+		self.m_splitter5.Bind( wx.EVT_IDLE, self.m_splitter5OnIdle )
+		
+		self.m_panel17 = wx.Panel( self.m_splitter5, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_panel17.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
+		self.m_panel17.SetMinSize( wx.Size( 100,100 ) )
+		
+		bSizer19 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_staticText20 = wx.StaticText( self.m_panel17, wx.ID_ANY, _(u"设备信息"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText20.Wrap( -1 )
+		self.m_staticText20.SetFont( wx.Font( 18, 74, 90, 90, False, "Tahoma" ) )
+		
+		bSizer19.Add( self.m_staticText20, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT, 5 )
+		
+		self.m_staticline1 = wx.StaticLine( self.m_panel17, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		bSizer19.Add( self.m_staticline1, 0, wx.EXPAND |wx.ALL, 5 )
+		
+		fgSizer2 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer2.AddGrowableCol( 1 )
+		fgSizer2.SetFlexibleDirection( wx.BOTH )
+		fgSizer2.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_staticText21 = wx.StaticText( self.m_panel17, wx.ID_ANY, _(u"名称："), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText21.Wrap( -1 )
+		fgSizer2.Add( self.m_staticText21, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
+		
+		self.m_textCtrl21 = wx.TextCtrl( self.m_panel17, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer2.Add( self.m_textCtrl21, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		self.m_staticText23 = wx.StaticText( self.m_panel17, wx.ID_ANY, _(u"位置："), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText23.Wrap( -1 )
+		fgSizer2.Add( self.m_staticText23, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
+		
+		self.m_textCtrl22 = wx.TextCtrl( self.m_panel17, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer2.Add( self.m_textCtrl22, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		self.m_staticText24 = wx.StaticText( self.m_panel17, wx.ID_ANY, _(u"描述："), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText24.Wrap( -1 )
+		fgSizer2.Add( self.m_staticText24, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
+		
+		self.m_textCtrl23 = wx.TextCtrl( self.m_panel17, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer2.Add( self.m_textCtrl23, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		bSizer19.Add( fgSizer2, 1, wx.EXPAND, 5 )
+		
+		
+		self.m_panel17.SetSizer( bSizer19 )
+		self.m_panel17.Layout()
+		bSizer19.Fit( self.m_panel17 )
+		self.m_panel18 = wx.Panel( self.m_splitter5, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_panel18.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_HIGHLIGHT ) )
+		
+		self.m_splitter5.SplitVertically( self.m_panel17, self.m_panel18, 0 )
+		bSizer7.Add( self.m_splitter5, 1, wx.EXPAND, 5 )
+		
+		
+		self.SetSizer( bSizer7 )
+		self.Layout()
+	
+	def __del__( self ):
+		pass
+	
+	def m_splitter5OnIdle( self, event ):
+		self.m_splitter5.SetSashPosition( 0 )
+		self.m_splitter5.Unbind( wx.EVT_IDLE )
 	
 

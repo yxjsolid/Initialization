@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-# -*- coding:gb2312 -*- ＃
+# -*- coding: utf-8 -*- 
 import wx
 import sys
+import MyGlobal as gl
 from  MyMiddleWare import *
 
 class MyApp(wx.App):
@@ -11,21 +12,29 @@ class MyApp(wx.App):
         wx.App.__init__(self, redirect, filename)
 
     def OnInit(self):
-        print "OnInit"    #输出到stdout
-        self.frame = MyFrame(parent=None)  #创建框架
+        print "OnInit"
+        self.frame = MyFrame(parent=None)
         self.frame.Show()
         self.SetTopWindow(self.frame)
-        print    sys.stderr, "A pretend error message"    #输出到stderr
+        print    sys.stderr, "A pretend error message"
         return True
 
     def OnExit(self):
         print "OnExit"
+    
+    def SetAppViewSelectPanel(self, panel):
+        self.ViewSelectPanel = panel
+        return
+    
+    def GetAppViewSelectPane(self):
+        return self.ViewSelectPanel
+        
 
 if __name__ == '__main__':
-    app = MyApp(redirect=False) #1 文本重定向从这开始
+    app = MyApp(redirect=False)
     print "before MainLoop"
-    app.MainLoop()  #2 进入主事件循环
+    app.MainLoop()
+    
+    gl.app = app
     print "after MainLoop"
     
-    
-    wx.Treebook
