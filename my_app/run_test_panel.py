@@ -4,21 +4,19 @@ import wx
 import sys
 import MyGlobal as gl
 from  MyMiddleWare import *
-from MyDevice import *
-
 
 class MyApp(wx.App):
 
     def __init__(self, redirect=True, filename=None):
         print "App __init__"
         wx.App.__init__(self, redirect, filename)
-        self.deviceController = DeviceController()
-
+		
     def OnInit(self):
         print "OnInit"
-        self.frame = MyFrame(parent=None)
+        self.frame = wx.Frame(parent=None)
         self.frame.Show()
         self.SetTopWindow(self.frame)
+        testPanel(self.frame)
         print    sys.stderr, "A pretend error message"
         return True
 
@@ -40,4 +38,3 @@ if __name__ == '__main__':
     
     gl.app = app
     print "after MainLoop"
-    

@@ -3,7 +3,7 @@
 import wx
 import images
 import string
-
+from MyGlobal import *
 
 class MyTreeCtrl(wx.TreeCtrl):
     def __init__(self, parent, id, pos, size, style, log):
@@ -67,11 +67,11 @@ class ViewSelectPanel(wx.Panel):
 
        
         
-        self.defaultViewNode = self.AddViewOption("总览")
-        self.deviceViewNode = self.AddViewOption("设备")
+        self.defaultViewNode = self.AddViewOption(VIEW_OPTION_NAME_MAIN)
+        self.deviceViewNode = self.AddViewOption(VIEW_OPTION_NAME_DEVICE)
         self.tree.Expand(self.root)
         
-        self.AddDeviceNode("皮带机1")
+        self.AddDeviceNode(DEVICE_NAME_TRANSPORT)
        
        
         self.Bind(wx.EVT_TREE_ITEM_EXPANDED, self.OnItemExpanded, self.tree)
