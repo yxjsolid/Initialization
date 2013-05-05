@@ -16,23 +16,26 @@ class DeviceController():
 			return
 
 class Device_Transport():
-		
-		def __init__(self, nm="", desc="", pos=""):
 
-			self.name = nm;
-			self.desc = desc;
-			self.pos = pos;
-			self.modules = []
-			
-			return
+    def __init__(self, nm="", desc="", pos=""):
 
-		def dumpDevice(self):
-			print "name: ",self.name
-			print "desc: ",self.desc
-			print "pos : ",self.pos	
+        self.name = nm;
+        self.desc = desc;
+        self.pos = pos;
+        self.modules = []
 
-		def addModule(self, module):
-			self.modules.append(module)
+        return
+
+    def dumpDevice(self):
+        print "name: ",self.name
+        print "desc: ",self.desc
+        print "pos : ",self.pos	
+
+    def addModule(self, module):
+        self.modules.append(module)
+
+    def getModules(self):
+        return self.modules
 
 
 
@@ -43,6 +46,32 @@ class DeviceModule():
 		self.type = tp
 
 		return
+
+class ModuelControl():
+    def __init__(self, nm=''):
+        self.name = nm
+        self.info = "Œ¥∂®“Â"
+
+
+
+
+
+
+
+class ModuleAction():
+    def __init__(self):
+        self.moudleOutput = None
+        self.outputValue = 0
+
+        self.moduleFeedback = None
+        self.feedbackTimeout = 0
+
+        self.moduleDelay = None
+        return
+
+
+
+
 
 	
 
