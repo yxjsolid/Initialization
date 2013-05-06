@@ -1,5 +1,19 @@
 import wx
 from wx.lib.mixins.listctrl import CheckListCtrlMixin
+from wx.lib.agw import ultimatelistctrl as ULC
+
+
+class UlcListCtrl(ULC.UltimateListCtrl):
+    def __init__(self, parent, id, pos, size, style=0):
+        ULC.UltimateListCtrl.__init__(self, parent, -1, agwStyle=wx.LC_REPORT
+                                                    |wx.LC_SINGLE_SEL
+                                                    |wx.LC_HRULES
+                                                    |wx.LC_VRULES
+                                                    |ULC.ULC_SHOW_TOOLTIPS)
+        return
+
+
+
 
 class CheckListCtrl(wx.ListCtrl, CheckListCtrlMixin):
     def __init__(self, parent, id, pos, size, style):
@@ -32,7 +46,7 @@ class CheckListCtrl(wx.ListCtrl, CheckListCtrlMixin):
    
 
     def onListItemSelected(self, evt):
-        help(evt)
+        #help(evt)
         print evt.getItem()
 
 

@@ -51,8 +51,13 @@ class ModuelControl():
     def __init__(self, nm=''):
         self.name = nm
         self.info = "Œ¥∂®“Â"
+        self.actions = []
+    
+    def addNewAction(self, action):
+        self.actions.append(action)
 
-
+    def setActions(self, actions):
+        self.actions = actions
 
 
 
@@ -60,7 +65,7 @@ class ModuelControl():
 
 class ModuleAction():
     def __init__(self):
-        self.moudleOutput = None
+        self.moduleOutput = None
         self.outputValue = 0
 
         self.moduleFeedback = None
