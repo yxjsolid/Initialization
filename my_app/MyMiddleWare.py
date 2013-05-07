@@ -9,7 +9,7 @@ import MainBase
 #from MainBase import *
 from MyDevice import *
 from ViewSelectPanel import *
-
+import pickle
 
 mydata = wxPythonInAction.Chapter_15.data.tree
 
@@ -19,37 +19,68 @@ mydata = wxPythonInAction.Chapter_15.data.tree
 
 
 class MyFrame( MainBase.FrameBase ):
-        def __init__( self, parent ):
-                MainBase.FrameBase.__init__( self, parent )
-                self.parent = parent
-                self.construceFrame()
-                
-        def construceFrame(self):
-            self.panel = testMySplitterPanel(self)
-            return
-        
-        def addDevice(self, event):
-            print "add device"
-#            self.pane.
-            wx.GetApp().GetAppViewSelectPane().AddDeviceNode("tool bar create")
-
-            frame1 = wx.Frame(parent=self.parent, size=(800,400))
+    def __init__( self, parent ):
+        MainBase.FrameBase.__init__( self, parent )
+        self.parent = parent
+        self.construceFrame()
+        self.saveFileName = "d:/tttttssssssss.txt"
             
-            Panel_AddDevice(frame1)
-            frame1.CenterOnScreen()
-            frame1.Show()
+    def construceFrame(self):
+        self.panel = testMySplitterPanel(self)
+        self.viewPanel_sub = self.panel.viewPanel_sub
+        return
 
+    def addDevice(self):
+        print "add device"
+#            self.pane.
+# wx.GetApp().GetAppViewSelectPane().AddDeviceNode("tool bar create")
 
-            return
+        frame1 = wx.Frame(parent=self.parent, size=(800,400))
+        Panel_AddDevice(frame1)
+        frame1.CenterOnScreen()
+        frame1.Show()
 
+        return
+    
+    
+    def onSave(self):
+        print "onSave"
+        saveFile = open(self.saveFileName, "w")
 
-     
+        deviceController = wx.GetApp().deviceController
+        pickle.dump(deviceController, saveFile)
+        saveFile.close()
+        
+        return
+
+    def onLoad(self):
+        print "onLoad"
+        saveFile = open(self.saveFileName, "r")
+        deviceController = pickle.load(saveFile)
+        wx.GetApp().deviceController = deviceController
+        for device in deviceController.transports:
+            print device.name
+
+        self.viewPanel_sub.onEditUpdate()
+
+    def onMenuBtnClicked(self, event):
+        eventId = event.GetId()
+        ret = {
+        MainBase.ID_MENU_SAVE:          lambda: self.onSave(),
+        MainBase.ID_MENU_LOAD:          lambda: self.onLoad(),
+        MainBase.ID_MENU_ADD_DEVICE:    lambda: self.addDevice(),
+        MainBase.ctrl_down:             lambda: self.moveDownCtrlModule(),
+        }[eventId]()
+        return
+
 class testMySplitterPanel( MainBase.SplitterPanelBase ):
     def __init__( self, parent ):
         MainBase.SplitterPanelBase.__init__( self, parent )
         self.parent = parent
         
         self.buildViewSelectPanel()
+
+        self.viewPanel_sub = self.viewPanel_sub
         #self.ViewPanelSetDsp()
 
     
@@ -72,13 +103,12 @@ class testMySplitterPanel( MainBase.SplitterPanelBase ):
     
     def GetViewPanel(self):
         return self.viewPanel
-    
 
-        
 class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
-    def __init__( self, parent ):
-        MainBase.Panel_AddDevice_Base.__init__( self, parent )
+    def __init__( self, frame ):
+        MainBase.Panel_AddDevice_Base.__init__( self, frame )
         self.thisDevice = Device_Transport()
+        self.frame = frame
         self.deviceInfoPanelSetup()
         self.moduleListSetup()
         self.setupCtrlModuleTree()
@@ -129,7 +159,20 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
             print "ok"
         else:
             print "not ok"
-        
+    
+    def getControlModules(self):
+        ctrlModules = []
+        tree = self.ctrl_tree
+        item = tree.GetRootItem() 
+        while True:
+            item = tree.GetNext(item)
+            if item.IsOk():
+                ctrlModule = tree.GetItemPyData(item)
+                ctrlModules.append(ctrlModule)
+                print ctrlModule.name
+            else:
+                break    
+        return
 
     def setCtrlModule(self, ctrl,index, txtIn):
         if index is 0:
@@ -291,17 +334,17 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
     def onEditActionUpdate(self):
         actionList = self.action_list
         ctrlModule = self.getCurrentCtrlModule()
-        item = -1
+        index = -1
         actions = []
 
         while True:
-            item = actionList.GetNextItem(item)
+            index = actionList.GetNextItem(index)
 
-            print "onEditActionUpdate", item
-            if item == -1:
+            print "onEditActionUpdate", index
+            if index == -1:
                 break
             
-            action = actionList.GetItemData(item)
+            action = actionList.GetItemData(index)
             actions.append(action)
             #self.dumpAction(action)
        
@@ -418,10 +461,6 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
         self.list.SetItemData(index, module)
         print " name,", module.name, sys.getrefcount(module)
 
-    def showValue(self):
-        #print self.text_name.GetValue()
-        return
-        
     def addModule(self, module):
         self.thisDevice.addModule(module)
 
@@ -467,18 +506,27 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
 #------------------------------------------------------
 # module list end
 #######################################################
+# main
+    def closeWindow(self):
+        self.frame.Close()
     def onApply(self, event):
         print "my onApply"
 
         name = self.text_name.GetValue()
-        position = self.text_pos.GetValue()
-        description = self.text_desc.GetValue()
+        info = self.text_pos.GetValue()
+        location = self.text_desc.GetValue()
+        controls = self.getControlModules()
 
-        device = Device_Transport(nm=name, pos=position,desc=description)
-        wx.GetApp().deviceController.addTransport(device)
-
-        self.showValue()
+        self.thisDevice.name = name
+        self.thisDevice.info = info
+        self.thisDevice.location = location
+  
+        self.thisDevice.setControls(controls)
+        wx.GetApp().deviceController.addTransport(self.thisDevice)
+        self.closeWindow()
         
+        """ViewSelectPanel.onEditUpdate()"""
+        wx.GetApp().viewPanel_sub.onEditUpdate()
 
     def onCancel(self, event):
         print "my onCancel"

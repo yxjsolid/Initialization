@@ -4,25 +4,29 @@ import wx
 
 
 class DeviceController():
-		def __init__(self):
-			self.transports = []
+    def __init__(self):
+        self.transports = []
 
-			print "init transportList"
-			return
+        print "init transportList"
+        return
 
-		def addTransport(self, device):
-			print "addTransport"
-			self.transports.append(device)
-			return
+    def getDevices(self):
+        return self.transports
+
+    def addTransport(self, device):
+        print "addTransport"
+        self.transports.append(device)
+        return
 
 class Device_Transport():
 
-    def __init__(self, nm="", desc="", pos=""):
+    def __init__(self, nm="", info="", location=""):
 
-        self.name = nm;
-        self.desc = desc;
-        self.pos = pos;
+        self.name = nm
+        self.info = info
+        self.location = location
         self.modules = []
+        self.controls = []
 
         return
 
@@ -37,7 +41,11 @@ class Device_Transport():
     def getModules(self):
         return self.modules
 
+    def setModules(self, moduels):
+        self.modules = modules
 
+    def setControls(self, controls):
+        self.controls = controls
 
 class DeviceModule():
 	def __init__(self, nm="", io="", tp=None):

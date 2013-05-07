@@ -8,16 +8,21 @@ from MyDevice import *
 
 
 class MyApp(wx.App):
-
+    deviceController = None
     def __init__(self, redirect=True, filename=None):
         print "App __init__"
         wx.App.__init__(self, redirect, filename)
-        self.deviceController = DeviceController()
-
+       
+    
+    def getDevices(self):
+        return self.deviceController.getDevices()
+        
     def OnInit(self):
         print "OnInit"
+        self.deviceController = DeviceController()
         self.frame = MyFrame(parent=None)
         self.frame.Show()
+        self.viewPanel_sub = self.frame.viewPanel_sub
         self.SetTopWindow(self.frame)
         print    sys.stderr, "A pretend error message"
         return True

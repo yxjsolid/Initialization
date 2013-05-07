@@ -17,14 +17,17 @@ import wx.grid
 import gettext
 _ = gettext.gettext
 
-ctrl_new = 1000
-ctrl_del = 1001
-ctrl_up = 1002
-ctrl_down = 1003
-action_new = 1004
-action_del = 1005
-action_up = 1006
-action_down = 1007
+ID_MENU_SAVE = 1000
+ID_MENU_LOAD = 1001
+ID_MENU_ADD_DEVICE = 1002
+ctrl_new = 1003
+ctrl_del = 1004
+ctrl_up = 1005
+ctrl_down = 1006
+action_new = 1007
+action_del = 1008
+action_up = 1009
+action_down = 1010
 
 ###########################################################################
 ## Class FrameBase
@@ -40,6 +43,12 @@ class FrameBase ( wx.Frame ):
 		self.m_statusBar1 = self.CreateStatusBar( 1, wx.ST_SIZEGRIP, wx.ID_ANY )
 		self.m_menubar1 = wx.MenuBar( 0 )
 		self.m_menu1 = wx.Menu()
+		self.menuSave = wx.MenuItem( self.m_menu1, ID_MENU_SAVE, _(u"Save"), wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menu1.AppendItem( self.menuSave )
+		
+		self.menuLoad = wx.MenuItem( self.m_menu1, ID_MENU_LOAD, _(u"Load"), wx.EmptyString, wx.ITEM_NORMAL )
+		self.m_menu1.AppendItem( self.menuLoad )
+		
 		self.m_menubar1.Append( self.m_menu1, _(u"File") ) 
 		
 		self.m_menu2 = wx.Menu()
@@ -49,7 +58,7 @@ class FrameBase ( wx.Frame ):
 		
 		self.m_toolBar2 = self.CreateToolBar( wx.TB_HORIZONTAL, wx.ID_ANY )
 		self.m_toolBar2.SetToolSeparation( 10 )
-		self.m_toolBar2.AddLabelTool( wx.ID_ANY, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_ADD_BOOKMARK, wx.ART_MENU ), wx.NullBitmap, wx.ITEM_NORMAL, _(u"添加设备"), wx.EmptyString, None ) 
+		self.m_toolBar2.AddLabelTool( ID_MENU_ADD_DEVICE, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_ADD_BOOKMARK, wx.ART_MENU ), wx.NullBitmap, wx.ITEM_NORMAL, _(u"添加设备"), wx.EmptyString, None ) 
 		
 		self.m_toolBar2.AddLabelTool( wx.ID_ANY, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_WARNING, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
 		
@@ -59,15 +68,19 @@ class FrameBase ( wx.Frame ):
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
-		self.Bind( wx.EVT_TOOL, self.addDevice, id = wx.ID_ANY )
+		self.Bind( wx.EVT_MENU, self.onMenuBtnClicked, id = self.menuSave.GetId() )
+		self.Bind( wx.EVT_MENU, self.onMenuBtnClicked, id = self.menuLoad.GetId() )
+		self.Bind( wx.EVT_TOOL, self.onMenuBtnClicked, id = ID_MENU_ADD_DEVICE )
 	
 	def __del__( self ):
 		pass
 	
 	
 	# Virtual event handlers, overide them in your derived class
-	def addDevice( self, event ):
+	def onMenuBtnClicked( self, event ):
 		event.Skip()
+	
+	
 	
 
 ###########################################################################
@@ -459,7 +472,7 @@ class Panel_AddDevice_Base ( wx.Panel ):
 		self.module_panel.SetSizer( fgSizer51 )
 		self.module_panel.Layout()
 		fgSizer51.Fit( self.module_panel )
-		self.m_notebook4.AddPage( self.module_panel, _(u"输入输出"), False )
+		self.m_notebook4.AddPage( self.module_panel, _(u"输入输出"), True )
 		self.contorl_panel = wx.Panel( self.m_notebook4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		bSizer33 = wx.BoxSizer( wx.VERTICAL )
 		

@@ -23,8 +23,7 @@ class ViewSelectPanel(wx.Panel):
     root = 0
     deviceViewNode = 0
     defaultViewNode = 0
-    
-    
+
     def __init__( self, parent, container, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL ):
         
         # Use the WANTS_CHARS style so the panel doesn't eat the Return key.
@@ -45,6 +44,21 @@ class ViewSelectPanel(wx.Panel):
                                #| wx.TR_HIDE_ROOT
                                , 0)
 
+        self.Bind(wx.EVT_TREE_ITEM_EXPANDED, self.OnItemExpanded, self.tree)
+        self.Bind(wx.EVT_TREE_ITEM_COLLAPSED, self.OnItemCollapsed, self.tree)
+        self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelChanged, self.tree)
+        self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.OnBeginEdit, self.tree)
+        self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.OnEndEdit, self.tree)
+        self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.OnActivate, self.tree)
+
+        self.tree.Bind(wx.EVT_LEFT_DCLICK, self.OnLeftDClick)
+        self.tree.Bind(wx.EVT_RIGHT_DOWN, self.OnRightDown)
+        self.tree.Bind(wx.EVT_RIGHT_UP, self.OnRightUp)
+
+        self.buildMainViewPanel()
+        self.onEditUpdate() 
+
+    def buildMainViewPanel(self):
         isz = (16,16)
         il = wx.ImageList(isz[0], isz[1])
         self.fldridx     = il.Add(wx.ArtProvider_GetBitmap(wx.ART_FOLDER,      wx.ART_OTHER, isz))
@@ -65,30 +79,12 @@ class ViewSelectPanel(wx.Panel):
         self.tree.SetItemImage(self.root, self.fldridx, wx.TreeItemIcon_Normal)
         self.tree.SetItemImage(self.root, self.fldropenidx, wx.TreeItemIcon_Expanded)
 
-       
-        
         self.defaultViewNode = self.AddViewOption(VIEW_OPTION_NAME_MAIN)
         self.deviceViewNode = self.AddViewOption(VIEW_OPTION_NAME_DEVICE)
         self.tree.Expand(self.root)
         
-        self.AddDeviceNode(DEVICE_NAME_TRANSPORT)
-       
-       
-        self.Bind(wx.EVT_TREE_ITEM_EXPANDED, self.OnItemExpanded, self.tree)
-        self.Bind(wx.EVT_TREE_ITEM_COLLAPSED, self.OnItemCollapsed, self.tree)
-        self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelChanged, self.tree)
-        self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.OnBeginEdit, self.tree)
-        self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.OnEndEdit, self.tree)
-        self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.OnActivate, self.tree)
+        #self.AddDeviceNode(DEVICE_NAME_TRANSPORT)
 
-        self.tree.Bind(wx.EVT_LEFT_DCLICK, self.OnLeftDClick)
-        self.tree.Bind(wx.EVT_RIGHT_DOWN, self.OnRightDown)
-        self.tree.Bind(wx.EVT_RIGHT_UP, self.OnRightUp)
-        
-        
-       
-    
-        
     def OnRightDown(self, event):
         pt = event.GetPosition();
         item, flags = self.tree.HitTest(pt)
@@ -96,11 +92,6 @@ class ViewSelectPanel(wx.Panel):
             self.log.WriteText("OnRightClick: %s, %s, %s\n" %
                                (self.tree.GetItemText(item), type(item), item.__class__))
             self.tree.SelectItem(item)
-            
-            
-           
-
-
 
     def OnRightUp(self, event):
         pt = event.GetPosition();
@@ -109,8 +100,6 @@ class ViewSelectPanel(wx.Panel):
             self.log.WriteText("OnRightUp: %s (manually starting label edit)\n"
                                % self.tree.GetItemText(item))
             self.tree.EditLabel(item)
-
-
 
     def OnBeginEdit(self, event):
         self.log.WriteText("OnBeginEdit\n")
@@ -133,7 +122,6 @@ class ViewSelectPanel(wx.Panel):
 
             event.Veto()
 
-
     def OnEndEdit(self, event):
         self.log.WriteText("OnEndEdit: %s %s\n" %
                            (event.IsEditCancelled(), event.GetLabel()) )
@@ -143,7 +131,6 @@ class ViewSelectPanel(wx.Panel):
                 self.log.WriteText("You can't enter digits...\n")
                 event.Veto()
                 return
-
 
     def OnLeftDClick(self, event):
         pt = event.GetPosition();
@@ -155,24 +142,21 @@ class ViewSelectPanel(wx.Panel):
                 self.tree.SortChildren(parent)
         event.Skip()
 
-
     def OnSize(self, event):
         w,h = self.GetClientSizeTuple()
         print "onSize"
         self.tree.SetDimensions(0, 0, w, h)
 
-
     def OnItemExpanded(self, event):
         item = event.GetItem()
         if item:
-            self.log.WriteText("OnItemExpanded: %s\n" % self.tree.GetItemText(item))
-
+            #self.log.WriteText("OnItemExpanded: %s\n" % self.tree.GetItemText(item))
+            print "OnItemExpanded: %s\n" % self.tree.GetItemText(item)
     def OnItemCollapsed(self, event):
         item = event.GetItem()
         if item:
-            self.log.WriteText("OnItemCollapsed: %s\n" % self.tree.GetItemText(item))
-
-    
+            #self.log.WriteText("OnItemCollapsed: %s\n" % self.tree.GetItemText(item))
+            print ("OnItemCollapsed: %s\n" % self.tree.GetItemText(item))
     def OnSelChanged(self, event):
         self.item = event.GetItem()
         
@@ -186,16 +170,18 @@ class ViewSelectPanel(wx.Panel):
             self.ViewPanelSetDsp(self.parent, self.tree.GetItemText(self.item), self.i)
             
             if wx.Platform == '__WXMSW__':
-                self.log.WriteText("BoundingRect: %s\n" %
+                #self.log.WriteText("BoundingRect: %s\n" %
+                                   #self.tree.GetBoundingRect(self.item, True))
+                print ("BoundingRect: %s\n" %
                                    self.tree.GetBoundingRect(self.item, True))
             #items = self.tree.GetSelections()
             #print map(self.tree.GetItemText, items)
         event.Skip()
 
-
     def OnActivate(self, event):
         if self.item:
-            self.log.WriteText("OnActivate: %s\n" % self.tree.GetItemText(self.item))
+            #self.log.WriteText("OnActivate: %s\n" % self.tree.GetItemText(self.item))
+            print ("OnActivate: %s\n" % self.tree.GetItemText(self.item))
     
     def AddViewOption(self, name):
         child = self.tree.AppendItem(self.root, name)
@@ -207,9 +193,12 @@ class ViewSelectPanel(wx.Panel):
     def getDeviceViewNode(self):
         return self.deviceViewNode
 
-    def AddDeviceNode(self, name):
-        child = self.tree.AppendItem(self.getDeviceViewNode(), name)
-        self.tree.SetPyData(child, None)
+    def clearDeviceNode(self):
+        self.tree.DeleteChildren(self.deviceViewNode)
+
+    def AddDeviceNode(self, device):
+        child = self.tree.AppendItem(self.getDeviceViewNode(), device.name)
+        self.tree.SetPyData(child, device)
         self.tree.SetItemImage(child, self.fldridx, wx.TreeItemIcon_Normal)
         self.tree.SetItemImage(child, self.fldropenidx, wx.TreeItemIcon_Expanded)
 
@@ -230,9 +219,18 @@ class ViewSelectPanel(wx.Panel):
         
         self.dispanel.SetBackgroundColour("sky blue")
         wx.StaticText(self.dispanel, -1, txt, (20*i, 10*i))
-        
 
         container.SetSizer(sizer)
 #        container.SetAutoLayout(True)
         container.Layout()
-        
+
+    def onEditUpdate(self):
+        self.clearDeviceNode()
+        deviceList = wx.GetApp().getDevices()
+        for device in deviceList:
+            self.AddDeviceNode(device)
+
+        self.tree.Expand(self.getDeviceViewNode())
+        return
+
+
