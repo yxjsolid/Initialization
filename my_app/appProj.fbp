@@ -42,7 +42,7 @@
             <property name="minimum_size"></property>
             <property name="name">FrameBase</property>
             <property name="pos"></property>
-            <property name="size">771,447</property>
+            <property name="size">1024,768</property>
             <property name="style">wxDEFAULT_FRAME_STYLE</property>
             <property name="subclass"></property>
             <property name="title">my app</property>
@@ -177,7 +177,7 @@
                 <event name="OnSetFocus"></event>
                 <event name="OnSize"></event>
                 <event name="OnUpdateUI"></event>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">File</property>
                     <property name="name">m_menu1</property>
                     <property name="permission">protected</property>
@@ -298,7 +298,7 @@
                 <event name="OnSize"></event>
                 <event name="OnUpdateUI"></event>
                 <object class="tool" expanded="0">
-                    <property name="bitmap">Load From Art Provider; wxART_ADD_BOOKMARK; wxART_MENU</property>
+                    <property name="bitmap">Load From Art Provider; wxART_NEW; wxART_TOOLBAR</property>
                     <property name="context_menu">1</property>
                     <property name="id">ID_MENU_ADD_DEVICE</property>
                     <property name="kind">wxITEM_NORMAL</property>
@@ -319,12 +319,33 @@
                     <event name="OnUpdateUI"></event>
                 </object>
                 <object class="tool" expanded="0">
-                    <property name="bitmap">Load From Art Provider; wxART_WARNING; wxART_TOOLBAR</property>
+                    <property name="bitmap">Load From Art Provider; wxART_EXECUTABLE_FILE; wxART_TOOLBAR</property>
                     <property name="context_menu">0</property>
-                    <property name="id">wxID_ANY</property>
+                    <property name="id">ID_MENU_EDIT_DEVICE</property>
                     <property name="kind">wxITEM_NORMAL</property>
                     <property name="label">tool</property>
-                    <property name="name">m_tool4</property>
+                    <property name="name">editBtn</property>
+                    <property name="permission">protected</property>
+                    <property name="statusbar"></property>
+                    <property name="tooltip"></property>
+                    <event name="OnAuiToolBarBeginDrag"></event>
+                    <event name="OnAuiToolBarMiddleClick"></event>
+                    <event name="OnAuiToolBarOverflowClick"></event>
+                    <event name="OnAuiToolBarRightClick"></event>
+                    <event name="OnAuiToolBarToolDropDown"></event>
+                    <event name="OnMenuSelection"></event>
+                    <event name="OnToolClicked">onMenuBtnClicked</event>
+                    <event name="OnToolEnter"></event>
+                    <event name="OnToolRClicked"></event>
+                    <event name="OnUpdateUI"></event>
+                </object>
+                <object class="tool" expanded="1">
+                    <property name="bitmap">Load From Art Provider; wxART_DELETE; wxART_TOOLBAR</property>
+                    <property name="context_menu">0</property>
+                    <property name="id">ID_MENU_DELETE_DEVICE</property>
+                    <property name="kind">wxITEM_NORMAL</property>
+                    <property name="label">tool</property>
+                    <property name="name">delBtn</property>
                     <property name="permission">protected</property>
                     <property name="statusbar"></property>
                     <property name="tooltip"></property>
@@ -357,7 +378,7 @@
             <property name="minimum_size"></property>
             <property name="name">SplitterPanelBase</property>
             <property name="pos"></property>
-            <property name="size">500,300</property>
+            <property name="size">508,463</property>
             <property name="subclass"></property>
             <property name="tooltip"></property>
             <property name="window_extra_style"></property>
@@ -447,7 +468,7 @@
                         <property name="pos"></property>
                         <property name="resize">Resizable</property>
                         <property name="sashgravity">0.0</property>
-                        <property name="sashpos">0</property>
+                        <property name="sashpos">150</property>
                         <property name="sashsize">-1</property>
                         <property name="show">1</property>
                         <property name="size"></property>
@@ -692,12 +713,12 @@
                                             <property name="pos"></property>
                                             <property name="resize">Resizable</property>
                                             <property name="sashgravity">0.0</property>
-                                            <property name="sashpos">0</property>
+                                            <property name="sashpos">500</property>
                                             <property name="sashsize">5</property>
                                             <property name="show">1</property>
                                             <property name="size"></property>
                                             <property name="splitmode">wxSPLIT_HORIZONTAL</property>
-                                            <property name="style">wxSP_3D</property>
+                                            <property name="style">wxSP_3D|wxSP_LIVE_UPDATE</property>
                                             <property name="subclass"></property>
                                             <property name="toolbar_pane">0</property>
                                             <property name="tooltip"></property>
@@ -1447,7 +1468,7 @@
                                                     <property name="validator_style">wxFILTER_NONE</property>
                                                     <property name="validator_type">wxDefaultValidator</property>
                                                     <property name="validator_variable"></property>
-                                                    <property name="value"></property>
+                                                    <property name="value">aaaaaaaaa</property>
                                                     <property name="window_extra_style"></property>
                                                     <property name="window_name"></property>
                                                     <property name="window_style"></property>
@@ -5931,7 +5952,7 @@
                 </object>
             </object>
         </object>
-        <object class="Panel" expanded="0">
+        <object class="Panel" expanded="1">
             <property name="aui_managed">0</property>
             <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
@@ -5983,7 +6004,7 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxFlexGridSizer" expanded="0">
+            <object class="wxFlexGridSizer" expanded="1">
                 <property name="cols">1</property>
                 <property name="flexible_direction">wxBOTH</property>
                 <property name="growablecols">0</property>
@@ -7433,11 +7454,11 @@
                         </object>
                     </object>
                 </object>
-                <object class="sizeritem" expanded="0">
+                <object class="sizeritem" expanded="1">
                     <property name="border">10</property>
                     <property name="flag">wxEXPAND|wxBOTTOM</property>
                     <property name="proportion">1</property>
-                    <object class="wxGridSizer" expanded="0">
+                    <object class="wxGridSizer" expanded="1">
                         <property name="cols">2</property>
                         <property name="hgap">0</property>
                         <property name="minimum_size"></property>
@@ -7625,10 +7646,10 @@
                 </object>
             </object>
         </object>
-        <object class="Panel" expanded="0">
+        <object class="Panel" expanded="1">
             <property name="aui_managed">0</property>
             <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
-            <property name="bg"></property>
+            <property name="bg">wxSYS_COLOUR_CAPTIONTEXT</property>
             <property name="context_help"></property>
             <property name="context_menu">1</property>
             <property name="enabled">1</property>
@@ -7639,7 +7660,7 @@
             <property name="id">wxID_ANY</property>
             <property name="maximum_size"></property>
             <property name="minimum_size"></property>
-            <property name="name">MyPanel6</property>
+            <property name="name">testPanel</property>
             <property name="pos"></property>
             <property name="size">500,300</property>
             <property name="subclass"></property>
@@ -7677,14 +7698,14 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxBoxSizer" expanded="0">
+            <object class="wxBoxSizer" expanded="1">
                 <property name="minimum_size"></property>
                 <property name="name">bSizer13</property>
                 <property name="orient">wxVERTICAL</property>
                 <property name="permission">none</property>
                 <object class="sizeritem" expanded="0">
                     <property name="border">5</property>
-                    <property name="flag">wxALL</property>
+                    <property name="flag">wxALL|wxEXPAND</property>
                     <property name="proportion">0</property>
                     <object class="wxGrid" expanded="0">
                         <property name="BottomDockable">1</property>
@@ -7704,7 +7725,7 @@
                         <property name="cell_bg"></property>
                         <property name="cell_font"></property>
                         <property name="cell_horiz_alignment">wxALIGN_LEFT</property>
-                        <property name="cell_text"></property>
+                        <property name="cell_text">wxSYS_COLOUR_WINDOWTEXT</property>
                         <property name="cell_vert_alignment">wxALIGN_TOP</property>
                         <property name="center_pane">0</property>
                         <property name="close_button">1</property>
@@ -7767,7 +7788,7 @@
                         <property name="tooltip"></property>
                         <property name="window_extra_style"></property>
                         <property name="window_name"></property>
-                        <property name="window_style"></property>
+                        <property name="window_style">wxTRANSPARENT_WINDOW</property>
                         <event name="OnChar"></event>
                         <event name="OnEnterWindow"></event>
                         <event name="OnEraseBackground"></event>

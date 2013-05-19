@@ -22,6 +22,7 @@ class MyApp(wx.App):
         self.deviceController = DeviceController()
         self.frame = MyFrame(parent=None)
         self.frame.Show()
+        
         self.viewPanel_sub = self.frame.viewPanel_sub
         self.SetTopWindow(self.frame)
         print    sys.stderr, "A pretend error message"

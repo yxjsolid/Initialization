@@ -41,6 +41,34 @@ class MyFrame( MainBase.FrameBase ):
         frame1.Show()
 
         return
+
+    def editDevice(self):
+        print "editDevice device"
+#            self.pane.
+# wx.GetApp().GetAppViewSelectPane().AddDeviceNode("tool bar create")
+        item = self.viewPanel_sub.tree.GetSelection()
+        isDevice = 0;
+
+        if item.IsOk():
+            print "ok"
+            obj = self.viewPanel_sub.tree.GetItemPyData(item)
+            if obj:
+                isDevice = isinstance(obj, Device_Transport)
+        else:
+            print "not ok"
+
+        if isDevice:
+            print "isdevice"
+        else:
+            print "not device"
+
+
+        frame1 = wx.Frame(parent=self.parent, size=(800,400))
+        Panel_AddDevice(frame1, obj)
+        frame1.CenterOnScreen()
+        frame1.Show()
+
+        return
     
     
     def onSave(self):
@@ -63,13 +91,17 @@ class MyFrame( MainBase.FrameBase ):
 
         self.viewPanel_sub.onEditUpdate()
 
+
+
+
     def onMenuBtnClicked(self, event):
         eventId = event.GetId()
         ret = {
         MainBase.ID_MENU_SAVE:          lambda: self.onSave(),
         MainBase.ID_MENU_LOAD:          lambda: self.onLoad(),
         MainBase.ID_MENU_ADD_DEVICE:    lambda: self.addDevice(),
-        MainBase.ctrl_down:             lambda: self.moveDownCtrlModule(),
+        MainBase.ID_MENU_EDIT_DEVICE:   lambda: self.editDevice(),
+        MainBase.ID_MENU_DELETE_DEVICE: lambda: self.addDevice(),
         }[eventId]()
         return
 
@@ -103,23 +135,47 @@ class testMySplitterPanel( MainBase.SplitterPanelBase ):
     
     def GetViewPanel(self):
         return self.viewPanel
+"""
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
 class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
-    def __init__( self, frame ):
+    def __init__( self, frame , device=None):
         MainBase.Panel_AddDevice_Base.__init__( self, frame )
-        self.thisDevice = Device_Transport()
+
+        if device is None:
+            self.thisDevice = Device_Transport()
+        else:
+            self.thisDevice = device
         self.frame = frame
         self.deviceInfoPanelSetup()
         self.moduleListSetup()
         self.setupCtrlModuleTree()
         self.SetupActionList()
+        self.onLoadUpdate()
         
     def deviceInfoPanelSetup(self):
         self.label_name.SetLabel(ADD_DEVICE_LABEL_NAME)
         self.label_pos.SetLabel(ADD_DEVICE_LABEL_POS)
         self.label_desc.SetLabel(ADD_DEVICE_LABEL_DESC)
 
-    
+    def setupDeviceInfo(self, device):
+        self.text_name.SetValue(device.name)
+        self.text_pos.SetValue(device.info)
+        self.text_desc.SetValue(device.location)
     
 ####################################################################
 # control list related  
@@ -140,11 +196,20 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
         tree = self.ctrl_tree
         name = "Î´ÃüÃû" + str(tree.GetCount()+1) 
         ctrl = ModuelControl(name)
-
+        self.appendCtrlModule(ctrl)
+    
+    def appendCtrlModule(self, ctrl):
+        tree = self.ctrl_tree
         child = tree.AppendItem(tree.root, ctrl.name)
         tree.SetItemText(child, ctrl.info,1)        
         tree.SetItemPyData(child, ctrl)
-    
+
+    def onCtrlModuleUpdate(self):
+        for ctrl in self.thisDevice.controls:
+            self.appendCtrlModule(ctrl)
+
+        return
+
     def getCurrentCtrlModule(self):
         tree = self.ctrl_tree
         item = tree.GetSelection()
@@ -172,7 +237,7 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
                 print ctrlModule.name
             else:
                 break    
-        return
+        return ctrlModules
 
     def setCtrlModule(self, ctrl,index, txtIn):
         if index is 0:
@@ -448,7 +513,7 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
 	
         
 
-    def listInsertNewModule(self, module, key):
+    def listInsertNewModule(self, module):
         count = self.list.GetItemCount() + 1
         index = self.list.InsertStringItem(sys.maxint, str(count), 0)
         self.list.SetStringItem(index, 1, module.name, 0)
@@ -478,16 +543,24 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
             key += 1
         self.thisDevice.modules = modules
 
+    def onLoadUpdate(self):
+        self.setupDeviceInfo(self.thisDevice)
+        self.onModuleListUpdate()
+        self.onCtrlModuleUpdate()
+
+        return
+
+
     def onEditUpdate(self, targetObj=None):
         self.editDeviceUpdate()
 
-    def editDeviceUpdate(self):
+    def onModuleListUpdate(self):
         self.list.DeleteAllItems()
         self.list.checkList = []
         
         index = 0
         for item in self.thisDevice.modules:
-            self.listInsertNewModule(item,index) 
+            self.listInsertNewModule(item) 
             index += 1
         self.list.SetColumnWidth(0, wx.LIST_AUTOSIZE)
         self.list.SetColumnWidth(1, wx.LIST_AUTOSIZE)
@@ -495,11 +568,13 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
         self.list.SetColumnWidth(3, wx.LIST_AUTOSIZE)
         return
 
+    def editDeviceUpdate(self):
+        self.onModuleListUpdate()
+        return
+
     def onModuleListItemSelected(self, event):
             
         moduleObj = event.GetData()
-    
-
         print sys.getrefcount(moduleObj)
 
         return
@@ -544,7 +619,7 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
     def onDeleteModule(self, event):
         print "onDeleteModule"
         self.deleteModuel()
-        self.editDeviceUpdate()
+        self.onModuleListUpdate()
         
 
 

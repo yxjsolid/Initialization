@@ -4,6 +4,7 @@ import wx
 import images
 import string
 from MyGlobal import *
+from myPygame import *
 
 class MyTreeCtrl(wx.TreeCtrl):
     def __init__(self, parent, id, pos, size, style, log):
@@ -201,6 +202,7 @@ class ViewSelectPanel(wx.Panel):
         self.tree.SetPyData(child, device)
         self.tree.SetItemImage(child, self.fldridx, wx.TreeItemIcon_Normal)
         self.tree.SetItemImage(child, self.fldropenidx, wx.TreeItemIcon_Expanded)
+        self.tree.SetItemPyData(child, device)
 
     def ViewPanelSetDsp(self, parent, txt, i):
         
@@ -210,8 +212,9 @@ class ViewSelectPanel(wx.Panel):
         
         sizer = wx.BoxSizer( wx.VERTICAL )
         
-        self.dispanel = wx.Panel(container, wx.ID_ANY, wx.DefaultPosition, container.GetClientSize(), wx.TAB_TRAVERSAL )
-#        self.viewPanel_sub = wx.Panel( self.viewPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+        #self.dispanel = wx.Panel(container, wx.ID_ANY, wx.DefaultPosition, container.GetClientSize(), wx.TAB_TRAVERSAL )
+
+        self.dispanel = PygameDisplay(container, -1)
     
         sizer.Add( self.dispanel, 1, wx.EXPAND |wx.ALL, 5 )
         

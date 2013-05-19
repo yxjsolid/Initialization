@@ -114,7 +114,7 @@ class MyApp(wx.App):
     def OnInit(self):
         print "OnInit"
         self.frame = wx.Frame(parent=None)
-        self.frame.Show()
+        
         self.SetTopWindow(self.frame)
         panel = mytestPanel(self.frame)
         #panel = TestPanel(self.frame)
@@ -124,9 +124,9 @@ class MyApp(wx.App):
         #help( panel.m_listbook2.ListView)
 
         #listView = panel.m_listbook2.GetListView()
-    
-
-    
+        panel.SetTransparent(0)
+        self.frame.SetTransparent(50)
+        self.frame.Show()
         print    sys.stderr, "A pretend error message"
         return True
 

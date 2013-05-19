@@ -20,14 +20,16 @@ _ = gettext.gettext
 ID_MENU_SAVE = 1000
 ID_MENU_LOAD = 1001
 ID_MENU_ADD_DEVICE = 1002
-ctrl_new = 1003
-ctrl_del = 1004
-ctrl_up = 1005
-ctrl_down = 1006
-action_new = 1007
-action_del = 1008
-action_up = 1009
-action_down = 1010
+ID_MENU_EDIT_DEVICE = 1003
+ID_MENU_DELETE_DEVICE = 1004
+ctrl_new = 1005
+ctrl_del = 1006
+ctrl_up = 1007
+ctrl_down = 1008
+action_new = 1009
+action_del = 1010
+action_up = 1011
+action_down = 1012
 
 ###########################################################################
 ## Class FrameBase
@@ -36,7 +38,7 @@ action_down = 1010
 class FrameBase ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"my app"), pos = wx.DefaultPosition, size = wx.Size( 771,447 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"my app"), pos = wx.DefaultPosition, size = wx.Size( 1024,768 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		
@@ -58,9 +60,11 @@ class FrameBase ( wx.Frame ):
 		
 		self.m_toolBar2 = self.CreateToolBar( wx.TB_HORIZONTAL, wx.ID_ANY )
 		self.m_toolBar2.SetToolSeparation( 10 )
-		self.m_toolBar2.AddLabelTool( ID_MENU_ADD_DEVICE, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_ADD_BOOKMARK, wx.ART_MENU ), wx.NullBitmap, wx.ITEM_NORMAL, _(u"添加设备"), wx.EmptyString, None ) 
+		self.m_toolBar2.AddLabelTool( ID_MENU_ADD_DEVICE, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_NEW, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, _(u"添加设备"), wx.EmptyString, None ) 
 		
-		self.m_toolBar2.AddLabelTool( wx.ID_ANY, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_WARNING, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
+		self.m_toolBar2.AddLabelTool( ID_MENU_EDIT_DEVICE, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_EXECUTABLE_FILE, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
+		
+		self.m_toolBar2.AddLabelTool( ID_MENU_DELETE_DEVICE, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_DELETE, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
 		
 		self.m_toolBar2.Realize() 
 		
@@ -71,6 +75,7 @@ class FrameBase ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.onMenuBtnClicked, id = self.menuSave.GetId() )
 		self.Bind( wx.EVT_MENU, self.onMenuBtnClicked, id = self.menuLoad.GetId() )
 		self.Bind( wx.EVT_TOOL, self.onMenuBtnClicked, id = ID_MENU_ADD_DEVICE )
+		self.Bind( wx.EVT_TOOL, self.onMenuBtnClicked, id = ID_MENU_EDIT_DEVICE )
 	
 	def __del__( self ):
 		pass
@@ -82,6 +87,7 @@ class FrameBase ( wx.Frame ):
 	
 	
 	
+	
 
 ###########################################################################
 ## Class SplitterPanelBase
@@ -90,7 +96,7 @@ class FrameBase ( wx.Frame ):
 class SplitterPanelBase ( wx.Panel ):
 	
 	def __init__( self, parent ):
-		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL )
+		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 508,463 ), style = wx.TAB_TRAVERSAL )
 		
 		bSizer6 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -103,7 +109,7 @@ class SplitterPanelBase ( wx.Panel ):
 		self.viewContainPanel = wx.Panel( self.m_splitter4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SUNKEN_BORDER|wx.TAB_TRAVERSAL )
 		bSizer12 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.m_splitter6 = wx.SplitterWindow( self.viewContainPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SP_3D )
+		self.m_splitter6 = wx.SplitterWindow( self.viewContainPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SP_3D|wx.SP_LIVE_UPDATE )
 		self.m_splitter6.SetSashSize( 5 )
 		self.m_splitter6.Bind( wx.EVT_IDLE, self.m_splitter6OnIdle )
 		
@@ -111,14 +117,14 @@ class SplitterPanelBase ( wx.Panel ):
 		self.viewPanel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_GRAYTEXT ) )
 		
 		self.detailPanel = wx.Panel( self.m_splitter6, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-		self.m_splitter6.SplitHorizontally( self.viewPanel, self.detailPanel, 0 )
+		self.m_splitter6.SplitHorizontally( self.viewPanel, self.detailPanel, 500 )
 		bSizer12.Add( self.m_splitter6, 1, wx.EXPAND, 5 )
 		
 		
 		self.viewContainPanel.SetSizer( bSizer12 )
 		self.viewContainPanel.Layout()
 		bSizer12.Fit( self.viewContainPanel )
-		self.m_splitter4.SplitVertically( self.viewSelectPanel, self.viewContainPanel, 0 )
+		self.m_splitter4.SplitVertically( self.viewSelectPanel, self.viewContainPanel, 150 )
 		bSizer6.Add( self.m_splitter4, 1, wx.EXPAND, 5 )
 		
 		
@@ -129,11 +135,11 @@ class SplitterPanelBase ( wx.Panel ):
 		pass
 	
 	def m_splitter4OnIdle( self, event ):
-		self.m_splitter4.SetSashPosition( 0 )
+		self.m_splitter4.SetSashPosition( 150 )
 		self.m_splitter4.Unbind( wx.EVT_IDLE )
 	
 	def m_splitter6OnIdle( self, event ):
-		self.m_splitter6.SetSashPosition( 0 )
+		self.m_splitter6.SetSashPosition( 500 )
 		self.m_splitter6.Unbind( wx.EVT_IDLE )
 	
 
@@ -180,7 +186,7 @@ class Panel_AddDevice_Base1 ( wx.Panel ):
 		self.label_name.Wrap( -1 )
 		fgSizer2.Add( self.label_name, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
 		
-		self.text_name = wx.TextCtrl( self.m_panel17, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.text_name = wx.TextCtrl( self.m_panel17, wx.ID_ANY, _(u"aaaaaaaaa"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer2.Add( self.text_name, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		self.label_pos = wx.StaticText( self.m_panel17, wx.ID_ANY, _(u"Position:"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -813,17 +819,19 @@ class Panel_NewAction_Base ( wx.Panel ):
 	
 
 ###########################################################################
-## Class MyPanel6
+## Class testPanel
 ###########################################################################
 
-class MyPanel6 ( wx.Panel ):
+class testPanel ( wx.Panel ):
 	
 	def __init__( self, parent ):
 		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL )
 		
+		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_CAPTIONTEXT ) )
+		
 		bSizer13 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.m_grid1 = wx.grid.Grid( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_grid1 = wx.grid.Grid( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TRANSPARENT_WINDOW )
 		
 		# Grid
 		self.m_grid1.CreateGrid( 5, 5 )
@@ -846,8 +854,9 @@ class MyPanel6 ( wx.Panel ):
 		# Label Appearance
 		
 		# Cell Defaults
+		self.m_grid1.SetDefaultCellTextColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
 		self.m_grid1.SetDefaultCellAlignment( wx.ALIGN_LEFT, wx.ALIGN_TOP )
-		bSizer13.Add( self.m_grid1, 0, wx.ALL, 5 )
+		bSizer13.Add( self.m_grid1, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		
 		self.SetSizer( bSizer13 )
