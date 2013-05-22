@@ -143,7 +143,7 @@ class PygameDisplay(wx.Window):
         img = wx.ImageFromData(self.size[0], self.size[1], s)  # Load this string into a wx image
         bmp = wx.BitmapFromImage(img)  # Get the image in bitmap form
         dc = wx.ClientDC(self)  # Device context for drawing the bitmap
-        dc.DrawBitmap(bmp, 0, 0, False)  # Blit the bitmap image to the display
+        dc.DrawBitmap(bmp, 0, 0, 1)  # Blit the bitmap image to the display
         del dc
     
 

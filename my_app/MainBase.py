@@ -12,7 +12,6 @@ from MyClass import UlcListCtrl
 from wx.gizmos import TreeListCtrl
 import wx
 import wx.xrc
-import wx.grid
 
 import gettext
 _ = gettext.gettext
@@ -829,37 +828,46 @@ class testPanel ( wx.Panel ):
 		
 		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_CAPTIONTEXT ) )
 		
-		bSizer13 = wx.BoxSizer( wx.VERTICAL )
+	
+	def __del__( self ):
+		pass
+	
+
+###########################################################################
+## Class MyPanel8
+###########################################################################
+
+class MyPanel8 ( wx.Panel ):
+	
+	def __init__( self, parent ):
+		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL )
 		
-		self.m_grid1 = wx.grid.Grid( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TRANSPARENT_WINDOW )
+		bSizer14 = wx.BoxSizer( wx.VERTICAL )
 		
-		# Grid
-		self.m_grid1.CreateGrid( 5, 5 )
-		self.m_grid1.EnableEditing( True )
-		self.m_grid1.EnableGridLines( False )
-		self.m_grid1.EnableDragGridSize( False )
-		self.m_grid1.SetMargins( 0, 0 )
+		self.m_button14 = wx.Button( self, wx.ID_ANY, _(u"MyButton"), wx.DefaultPosition, wx.Size( -1,-1 ), wx.NO_BORDER )
+		self.m_button14.SetDefault() 
+		self.m_button14.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_CAPTIONTEXT ) )
+		self.m_button14.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
+		self.m_button14.SetToolTipString( _(u"tooltip") )
+		self.m_button14.SetHelpText( _(u"help") )
 		
-		# Columns
-		self.m_grid1.EnableDragColMove( False )
-		self.m_grid1.EnableDragColSize( True )
-		self.m_grid1.SetColLabelSize( 30 )
-		self.m_grid1.SetColLabelAlignment( wx.ALIGN_CENTRE, wx.ALIGN_CENTRE )
+		bSizer14.Add( self.m_button14, 0, wx.ALL, 10 )
 		
-		# Rows
-		self.m_grid1.EnableDragRowSize( True )
-		self.m_grid1.SetRowLabelSize( 80 )
-		self.m_grid1.SetRowLabelAlignment( wx.ALIGN_CENTRE, wx.ALIGN_CENTRE )
+		self.m_button15 = wx.Button( self, wx.ID_ANY, _(u"MyButton"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button15.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
+		self.m_button15.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
 		
-		# Label Appearance
+		bSizer14.Add( self.m_button15, 0, wx.ALL, 5 )
 		
-		# Cell Defaults
-		self.m_grid1.SetDefaultCellTextColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
-		self.m_grid1.SetDefaultCellAlignment( wx.ALIGN_LEFT, wx.ALIGN_TOP )
-		bSizer13.Add( self.m_grid1, 0, wx.ALL|wx.EXPAND, 5 )
+		self.m_bpButton3 = wx.BitmapButton( self, wx.ID_ANY, wx.Bitmap( u"image/btn1.bmp", wx.BITMAP_TYPE_ANY ), wx.DefaultPosition, wx.DefaultSize, wx.BU_AUTODRAW )
+		
+		self.m_bpButton3.SetBitmapSelected( wx.ArtProvider.GetBitmap( wx.ART_REMOVABLE, wx.ART_MENU ) )
+		self.m_bpButton3.SetBitmapFocus( wx.ArtProvider.GetBitmap( wx.ART_CROSS_MARK, wx.ART_BUTTON ) )
+		self.m_bpButton3.SetBitmapHover( wx.ArtProvider.GetBitmap( wx.ART_TIP, wx.ART_BUTTON ) )
+		bSizer14.Add( self.m_bpButton3, 0, wx.ALL, 5 )
 		
 		
-		self.SetSizer( bSizer13 )
+		self.SetSizer( bSizer14 )
 		self.Layout()
 	
 	def __del__( self ):
