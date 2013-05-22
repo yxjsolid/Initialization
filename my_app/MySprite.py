@@ -14,6 +14,7 @@ image_btn2 = image_path +"btn2.png"
 image_device1 = image_path +"d1.png"
 image_device2 = image_path +"d2.png"
 
+print "test"
 pygame.font.init()
 try:
     regular_font_file = os.path.join(os.path.dirname(__file__), "Vera.ttf")
