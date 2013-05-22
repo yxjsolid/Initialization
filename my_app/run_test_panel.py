@@ -161,8 +161,8 @@ class MyApp(wx.App):
         self.frame.SetSize((1024,1000))
         self.SetTopWindow(self.frame)
         panel = mytestPanel(self.frame)
-       
-
+        self.testBtn = None
+        self.panel = panel
         newPanel = wx.Panel(panel, size=(100,200))
 
         #newPanel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_CAPTIONTEXT ) )
@@ -249,15 +249,20 @@ class MyApp(wx.App):
         
 
         #help(bmp)
-  
+    
+        self.index = 1
 
 
         #b =  platebtn.PlateButton(panel, -1,  pos = (470,300),bmp=Monkey.GetBitmap(), style =   platebtn.PB_STYLE_NOBG)#通用位图按钮  
         #b =  platebtn.PlateButton(panel, -1,  pos = (470,300),bmp=bmp, style =   platebtn.PB_STYLE_NOBG)#通用位图按钮  
-        b =  MyGenBitmapButton(panel, -1,  pos = (470,300),bitmap=bmp, style =   wx.BORDER_NONE|wx.TRANSPARENT_WINDOW)#通用位图按钮  
+        self.testBtn =  MyGenBitmapButton(panel, -1,  pos = (470,300),bitmap=bmp, style =   wx.BORDER_NONE|wx.TRANSPARENT_WINDOW)#通用位图按钮  
        
-        b.Enable(1)
+        self.testBtn.Enable(1)
         #print b.GetBackgroundMode()
+
+        self.testBtn.Bind( wx.EVT_BUTTON, self.onButton )
+        #self.Bind( wx.EVT_LEFT_UP, self.onLeft )
+
 
         bc = panel.GetBackgroundColour()
        # b.SetBackgroundColour((255,0,0,0)) 
@@ -279,8 +284,22 @@ class MyApp(wx.App):
        # b.SetUseFocusIndicator(False)  
        
         #b = buttons.GenToggleButton(panel, -1, "Toggle Button")#通用开关按钮  
-        
+       
 
+    def onButton(self,event):
+        print "onButton"
+        x = self.index
+        self.index += 1
+        self.testBtn.MoveXY(470+x,300)
+       
+        #self.testBtn.Refresh()
+        self.panel.Refresh()
+        #event.Skip()
+
+    def onLeft(self,event):
+        print "onLeft:",event.GetId()
+            
+        #event.pass() 
 #PlateButton
 
     def OnExit(self):
@@ -377,6 +396,10 @@ class MyGenBitmapButton(buttons.GenBitmapButton):
 
     def InitColours1(self):
         return
+
+    def OnLeftUp1(self,evt):
+        print "btn OnLeftUp"
+
     def OnPaint(self, event):
         (width, height) = self.GetClientSizeTuple()
         x1 = y1 = 0
@@ -393,18 +416,32 @@ class MyGenBitmapButton(buttons.GenBitmapButton):
 
 
        
-        
         dc = wx.PaintDC(self)
+        #
+        
         #return
         brush = self.GetBackgroundBrush(dc)
         if brush is not None:
             color =  brush.GetColour()
             brush.SetColour((255,255,0,0))
             dc.SetBackground(brush)
+            dc.SetBrush(wx.TRANSPARENT_BRUSH)
             #help(dc.GetBackground())
             #print dc.get            
 
             #dc.Clear()
+
+
+
+        #gc = wx.GCDC(dc)
+
+# Setup
+       # dc.SetBrush(wx.TRANSPARENT_BRUSH)
+       # gc.SetBrush(wx.TRANSPARENT_BRUSH)
+        #gc.SetFont(self.GetFont())
+       # gc.SetBackgroundMode(wx.TRANSPARENT)
+       # gc.Clear()
+
 
        # self.DrawBezel(dc, x1, y1, x2, y2)
         self.DrawLabel(dc, width, height)
@@ -412,7 +449,8 @@ class MyGenBitmapButton(buttons.GenBitmapButton):
             #self.DrawFocusIndicator(dc, width, height)
             pass
         
-        event.Skip()
+        #dc1 = wx.PaintDC(self)
+        #self.parent.Update()
 
     def GetBackgroundBrush(self, dc):
         if self.up:
@@ -461,7 +499,7 @@ class MyGenBitmapButton(buttons.GenBitmapButton):
 
         #file = r"D:\workspace\myGitProj\init\my_app\image\3.bmp"
         bmp = wx.Image(file).ConvertToBitmap()
-        dc.DrawBitmap(bmp, (width-bw)/2+dx, (height-bh)/2+dy, 1)
+        dc.DrawBitmap(bmp, (width-bw)/2+dx, (height-bh)/2+dy, 0)
 
     def SetBackgroundColour(self, colour):
 
