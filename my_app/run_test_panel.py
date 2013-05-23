@@ -10,7 +10,7 @@ import wx.lib.agw.shapedbutton as sbbutton
 import wx.lib.platebtn as platebtn
 import  wx.gizmos   as  gizmos
 from wx.lib.embeddedimage import PyEmbeddedImage
-
+from MyButton import *
 Monkey = PyEmbeddedImage(
     "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAACDhJ"
     "REFUWIXtlmuMXVUVgL+99zn33HvnPmbmDtOZYabTKXSGmdAWi6JAi6U1GgMN2qAIgYgaMAKJ"
@@ -171,7 +171,9 @@ class MyApp(wx.App):
 
         #self.m_button14 = wx.Button( panel, wx.ID_ANY, "MyButton",(100,180), wx.DefaultSize,wx.NO_BORDER,name = "teset")
 	
-        self.testButton(panel)    
+        self.testButton(panel) 
+
+        panel.SetDoubleBuffered(1) 
 
         panel.SetTransparent(0)
         
@@ -234,34 +236,52 @@ class MyApp(wx.App):
         b.SetForegroundColour("white")  
         b.SetToolTipString("This is a BIG button...")  
         """        
-        file = r"D:\workspace\myGitProj\init\my_app\image\btn1.png"
-        file = r"D:\workspace\myGitProj\init\my_app\image\fugu.png"
+      
+ 
 
-        #file = r"D:\workspace\myGitProj\init\my_app\image\3.bmp"
-        bmp = wx.Image(file).ConvertToBitmap()
-
-        #bmp.SetMask(wx.Mask(bmp,(255,255,255,0))) 
-
-       # img = bmp.ConvertToImage()
-
-        #help(img)
-        #img.Show()
-        
-
-        #help(bmp)
-    
         self.index = 1
 
 
-        #b =  platebtn.PlateButton(panel, -1,  pos = (470,300),bmp=Monkey.GetBitmap(), style =   platebtn.PB_STYLE_NOBG)#通用位图按钮  
-        #b =  platebtn.PlateButton(panel, -1,  pos = (470,300),bmp=bmp, style =   platebtn.PB_STYLE_NOBG)#通用位图按钮  
-        self.testBtn =  MyGenBitmapButton(panel, -1,  pos = (470,300),bitmap=bmp, style =   wx.BORDER_NONE|wx.TRANSPARENT_WINDOW)#通用位图按钮  
-       
+        self.testBtn =  MyGenBitmapButton(panel, -1,  pos = (470,300), style =   wx.BORDER_NONE|wx.TRANSPARENT_WINDOW)#通用位图按钮  
+        
         self.testBtn.Enable(1)
-        #print b.GetBackgroundMode()
-
         self.testBtn.Bind( wx.EVT_BUTTON, self.onButton )
-        #self.Bind( wx.EVT_LEFT_UP, self.onLeft )
+        self.Bind(wx.EVT_MOUSE_EVENTS,           self.OnMouse)
+        self.testBtn.loadImageLabel(btn_red_up)
+        self.testBtn.loadImageSelected(btn_red_down)
+
+
+        self.testBtn1 =  MyGenBitmapToggleButton(panel, -1,  pos = (520,300), style =   wx.BORDER_NONE|wx.TRANSPARENT_WINDOW)#通用位图按钮  
+        
+        self.testBtn1.Enable(1)
+        self.testBtn1.Bind( wx.EVT_BUTTON, self.onButton )
+        self.Bind(wx.EVT_MOUSE_EVENTS,           self.OnMouse)
+
+
+
+       
+        self.testBtn2 =  MyGenBitmapToggleButton(panel, -1,  pos = (520,300), style =   wx.BORDER_NONE|wx.TRANSPARENT_WINDOW)#通用位图按钮  
+        
+        self.testBtn2.Enable(1)
+        self.testBtn2.Bind( wx.EVT_BUTTON, self.onButton )
+        self.testBtn2.loadImageLabel(btn_on)
+        self.testBtn2.loadImageSelected(btn_off)
+        self.testBtn2.setSizeFitImage()
+
+
+
+
+         
+        self.testBtn3 =  MyGenBitmapToggleButton(panel, -1,  pos = (520,300), style =   wx.BORDER_NONE|wx.TRANSPARENT_WINDOW)#通用位图按钮  
+        
+        self.testBtn3.Enable(1)
+        self.testBtn3.Bind( wx.EVT_BUTTON, self.onButton )
+        self.testBtn3.loadImageLabel(circle_btn_on)
+        self.testBtn3.loadImageSelected(circle_btn_off)
+        self.testBtn3.setSizeFitImage()
+
+
+
 
 
         bc = panel.GetBackgroundColour()
@@ -284,16 +304,63 @@ class MyApp(wx.App):
        # b.SetUseFocusIndicator(False)  
        
         #b = buttons.GenToggleButton(panel, -1, "Toggle Button")#通用开关按钮  
-       
+    def OnMouse(self, event):
 
+
+        if event.GetEventObject() is not self:
+            pass
+
+        if event.LeftDown():
+
+            print "left",(event.GetX(),event.GetY())
+
+            print "getButton",event.GetButton()
+            btn = event.GetEventObject()
+            #help(event)
+            btn.SetMoveBegin((event.GetX(),event.GetY()))
+          
+
+        elif event.LeftUp():
+            print "left up"
+            self.SetMoveEnd()
+        elif event.RightDown():
+            print "reight do",(event.GetX(),event.GetY())
+            self.removeSelectedSprite()   
+
+
+        elif event.Dragging():
+            print "left drag", (event.GetX(),event.GetY())
+
+            btn = event.GetEventObject()
+
+            #print btn
+
+            btn.SetMoving((event.GetX(),event.GetY()))
+
+        event.Skip()
+    def onMotion1(self,event):
+        
+        #print event
+
+        print "onMothion"
+        if event.Dragging():
+            print "dragging"
+
+            print self.testBtn.GetPosition()
+            pos = event.GetPosition()
+            print pos
+            self.testBtn.Move(pos)
+            self.panel.Refresh()    
+    
+  
     def onButton(self,event):
         print "onButton"
         x = self.index
         self.index += 1
-        self.testBtn.MoveXY(470+x,300)
+        #self.testBtn.MoveXY(470+x,300)
        
         #self.testBtn.Refresh()
-        self.panel.Refresh()
+        #self.panel.Refresh()
         #event.Skip()
 
     def onLeft(self,event):
@@ -313,206 +380,6 @@ class MyApp(wx.App):
         return self.ViewSelectPanel
     
 
-class MyGenBitmapButton(buttons.GenBitmapButton):
-    def __init__(self, parent, id=-1, bitmap=wx.NullBitmap,
-                 pos = wx.DefaultPosition, size = wx.DefaultSize,
-                 style = 0, validator = wx.DefaultValidator,
-                 name = "genbutton"):
-        self.parent = parent
-        self.index = 0
-        buttons.GenBitmapButton.__init__(self, parent, id, bitmap,pos , size,style , validator,name )
-        
-    def OnPaint2(self, event):
-        (width, height) = self.GetClientSizeTuple()
-        x1 = y1 = 0
-        x2 = width-1
-        y2 = height-1
-
-        dc = wx.PaintDC(self)
-        brush = self.GetBackgroundBrush(dc)
-        if brush is not None:
-            dc.SetBackground(brush)
-            dc.Clear()
-
-        self.DrawBezel(dc, x1, y1, x2, y2)
-        self.DrawLabel(dc, width, height)
-        if self.hasFocus and self.useFocusInd:
-            self.DrawFocusIndicator(dc, width, height)
-
-    def GetBackgroundBrush2(self, dc):
-        if self.up:
-            colBg = self.GetBackgroundColour()
-            brush = wx.Brush(colBg, wx.SOLID)
-            if self.style & wx.BORDER_NONE:
-                myAttr = self.GetDefaultAttributes()
-                parAttr = self.GetParent().GetDefaultAttributes()
-                myDef = colBg == myAttr.colBg
-                parDef = self.GetParent().GetBackgroundColour() == parAttr.colBg
-                if myDef and parDef:
-                    if wx.Platform == "__WXMAC__":
-                        brush.MacSetTheme(1) # 1 == kThemeBrushDialogBackgroundActive
-                    elif wx.Platform == "__WXMSW__":
-                        if self.DoEraseBackground(dc):
-                            brush = None
-                elif myDef and not parDef:
-                    colBg = self.GetParent().GetBackgroundColour()
-                    brush = wx.Brush(colBg, wx.SOLID)
-        else:
-            # this line assumes that a pressed button should be hilighted with
-            # a solid colour even if the background is supposed to be transparent
-            brush = wx.Brush(self.faceDnClr, wx.SOLID)
-        return brush
-    def GetBackgroundBrush(self,dc):
-
-        b = wx.Brush((255,0,0,0))
-       
-        return b
-
-    
-    def GetBg(self):
-        x,y=self.GetPosition()
-        xx,yy=self.GetSizeTuple()
-
-        self.index += 1        
-        print "x,y",x,y
-        print "xx,yy",xx,yy
-        print "index",self.index
-
-        bmp = wx.EmptyBitmap(xx, yy)
-        dc = wx.MemoryDC()
-        dc.SelectObject(bmp)
-        dc.Blit(x,y,xx,yy,wx.ScreenDC(),x,y)
-        return bmp
-
-    def OnPaint1(self, evt):
-        x,y=self.GetPosition()
-        dc = wx.ScreenDC()
-        bmp = self.GetBg()
-        brush = wx.BrushFromBitmap(bmp)
-        dc.SetBackground(brush)
-        orange = wx.Colour(255,132.0)
-        dc.SetTextForeground(orange)
-        dc.DrawText('Hello transparent window! This text is not transparent.', x+13, y+11) 
-
-    def InitColours1(self):
-        return
-
-    def OnLeftUp1(self,evt):
-        print "btn OnLeftUp"
-
-    def OnPaint(self, event):
-        (width, height) = self.GetClientSizeTuple()
-        x1 = y1 = 0
-        x2 = width-1
-        y2 = height-1
-        
-        print "onpaint"
-
-        #help(event)
-
-        #event.Skip()
-
-        #dc = wx.ClientDC
-
-
-       
-        dc = wx.PaintDC(self)
-        #
-        
-        #return
-        brush = self.GetBackgroundBrush(dc)
-        if brush is not None:
-            color =  brush.GetColour()
-            brush.SetColour((255,255,0,0))
-            dc.SetBackground(brush)
-            dc.SetBrush(wx.TRANSPARENT_BRUSH)
-            #help(dc.GetBackground())
-            #print dc.get            
-
-            #dc.Clear()
-
-
-
-        #gc = wx.GCDC(dc)
-
-# Setup
-       # dc.SetBrush(wx.TRANSPARENT_BRUSH)
-       # gc.SetBrush(wx.TRANSPARENT_BRUSH)
-        #gc.SetFont(self.GetFont())
-       # gc.SetBackgroundMode(wx.TRANSPARENT)
-       # gc.Clear()
-
-
-       # self.DrawBezel(dc, x1, y1, x2, y2)
-        self.DrawLabel(dc, width, height)
-        if self.hasFocus and self.useFocusInd:
-            #self.DrawFocusIndicator(dc, width, height)
-            pass
-        
-        #dc1 = wx.PaintDC(self)
-        #self.parent.Update()
-
-    def GetBackgroundBrush(self, dc):
-        if self.up:
-            colBg = self.GetBackgroundColour()
-            brush = wx.Brush(colBg, wx.SOLID)
-            if self.style & wx.BORDER_NONE:
-                myAttr = self.GetDefaultAttributes()
-                parAttr = self.GetParent().GetDefaultAttributes()
-                myDef = colBg == myAttr.colBg
-                parDef = self.GetParent().GetBackgroundColour() == parAttr.colBg
-                if myDef and parDef:
-                    if wx.Platform == "__WXMAC__":
-                        brush.MacSetTheme(1) # 1 == kThemeBrushDialogBackgroundActive
-                    elif wx.Platform == "__WXMSW__":
-                        if self.DoEraseBackground(dc):
-                            brush = None
-                elif myDef and not parDef:
-                    colBg = self.GetParent().GetBackgroundColour()
-                    brush = wx.Brush(colBg, wx.TRANSPARENT)
-        else:
-            # this line assumes that a pressed button should be hilighted with
-            # a solid colour even if the background is supposed to be transparent
-            brush = wx.Brush(self.faceDnClr, wx.TRANSPARENT)
-        return brush
-
-    def DrawLabel(self, dc, width, height, dx=0, dy=0):
-        bmp = self.bmpLabel
-        if self.bmpDisabled and not self.IsEnabled():
-            bmp = self.bmpDisabled
-        if self.bmpFocus and self.hasFocus:
-            bmp = self.bmpFocus
-        if self.bmpSelected and not self.up:
-            bmp = self.bmpSelected
-        bw,bh = bmp.GetWidth(), bmp.GetHeight()
-        if not self.up:
-            dx = dy = self.labelDelta
-        hasMask = bmp.GetMask() != None
-        #dc.Clear()
-        
-        #dc = wx.ClientDC(self)
-        print wx.TRANSPARENT,dc.GetBackgroundMode()
-        bmp = self.bmpLabel
-        print "DrawLabel dc size= ",dc.GetSize()
-        
-        file = r"D:\workspace\myGitProj\init\my_app\image\fugu.png"
-
-        #file = r"D:\workspace\myGitProj\init\my_app\image\3.bmp"
-        bmp = wx.Image(file).ConvertToBitmap()
-        dc.DrawBitmap(bmp, (width-bw)/2+dx, (height-bh)/2+dy, 0)
-
-    def SetBackgroundColour(self, colour):
-
-        return
-        wx.PyControl.SetBackgroundColour(self, colour)
-        self.InitColours()
-
-
-    def SetForegroundColour(self, colour):
-        return
-
-    def _GetLabelSize1(self):
-        return 10,10,0
 
 if __name__ == '__main__':
     app = MyApp(redirect=False)

@@ -3,18 +3,8 @@ import pygame
 from pygame.locals import *
 from math import pi
 from PIL import Image
+from MyGlobal import *
 
-
-
-image_path = "D:\workspace\myGitProj\init\my_app\image\\"
-image_fish = image_path +"fugu.png"
-image_btn1 = image_path +"btn1.png"
-image_btn2 = image_path +"btn2.png"
-
-image_device1 = image_path +"d1.png"
-image_device2 = image_path +"d2.png"
-
-print "test"
 pygame.font.init()
 try:
     regular_font_file = os.path.join(os.path.dirname(__file__), "Vera.ttf")
@@ -480,8 +470,8 @@ class Sprite_Button(test_Drag_Sprite):
         test_Drag_Sprite.__init__(self, color, initial_position, speed, border)
         self.imageResource = []
 
-        self.loadImgResource(image_btn1)
-        self.loadImgResource(image_btn2)
+        self.loadImgResource(btn_red_up)
+        self.loadImgResource(btn_red_down)
         self.setCurrentResource(0)
 
     def loadImgResource(self, file):
@@ -919,8 +909,8 @@ class SwitchButtonSprite(DragSprite):
         self.width = width
         self.height = height
         self.rect = pygame.Rect(initPos, (width, height))
-        self.loadImgResource(image_btn1)
-        self.loadImgResource(image_btn2)
+        self.loadImgResource(circle_btn_on)
+        self.loadImgResource(circle_btn_off)
         self.setCurrentResource(0)
 
     

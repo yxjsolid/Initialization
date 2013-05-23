@@ -24,3 +24,19 @@ MODULE_TYPE_SIG_OUT : "ÐÅºÅÁ¿Êä³ö",
 }
 
 
+
+btn_red_up = r"D:\workspace\myGitProj\init\my_app\image\red_up.png"
+btn_red_down = r"D:\workspace\myGitProj\init\my_app\image\red_down.png"
+
+
+btn_green_up = r"D:\workspace\myGitProj\init\my_app\image\green_up.png"
+btn_green_down = r"D:\workspace\myGitProj\init\my_app\image\green_down.png"
+
+
+btn_on = r"D:\workspace\myGitProj\init\my_app\image\btn_on.png"
+btn_off = r"D:\workspace\myGitProj\init\my_app\image\btn_off.png"
+
+circle_btn_on = r"D:\workspace\myGitProj\init\my_app\image\circle_btn_on.png"
+circle_btn_off = r"D:\workspace\myGitProj\init\my_app\image\circle_btn_off.png"
+
+
