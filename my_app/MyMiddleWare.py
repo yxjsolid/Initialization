@@ -13,6 +13,14 @@ import pickle
 
 mydata = wxPythonInAction.Chapter_15.data.tree
 
+def dumpModuleObj(module, pad=0):
+    return
+    if pad:
+        print
+    print "name", module.name, sys.getrefcount(module)
+#---------------------------------------------------------------------------
+
+
 class MyFrame( MainBase.FrameBase ):
     def __init__( self, parent ):
         MainBase.FrameBase.__init__( self, parent )
@@ -141,9 +149,10 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
         self.frame = frame
         self.deviceInfoPanelSetup()
         self.moduleListSetup()
-        self.setupCtrlModuleTree()
-        self.SetupActionList()
         self.attrCtrl = AttributeViewControl(self)
+
+        self.actionListCtrl = ActionViewControl(self)
+        self.actGrpCtrl = ActionGroupViewControl(self)
         self.onLoadUpdate()
         
     def deviceInfoPanelSetup(self):
@@ -155,322 +164,13 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
         self.text_name.SetValue(device.name)
         self.text_pos.SetValue(device.info)
         self.text_desc.SetValue(device.location)
-    
-####################################################################
-# control list related  
-    def setupCtrlModuleTree(self):
-        tree = self.ctrl_tree
-
-        tree.AddColumn(ADD_MOUDLE_LABEL_NAME)
-        tree.AddColumn(ADD_MOUDLE_LABEL_DESC)
-        
-        tree.SetMainColumn(0) # the one with the tree in it...
-        tree.SetColumnWidth(0, 150)
-
-        tree.SetColumnEditable(0, True)
-        tree.SetColumnEditable(1, True)  
-        tree.root = tree.AddRoot("Root Item")
-
-    def addNewCtrlModule(self):
-        tree = self.ctrl_tree
-        name = MOUDLE_NAME_DEFAULT + str(tree.GetCount()+1) 
-        ctrl = ModuelControl(name)
-        self.appendCtrlModule(ctrl)
-    
-    def appendCtrlModule(self, ctrl):
-        tree = self.ctrl_tree
-        child = tree.AppendItem(tree.root, ctrl.name)
-        tree.SetItemText(child, ctrl.info,1)        
-        tree.SetItemPyData(child, ctrl)
-
-    def onCtrlModuleUpdate(self):
-        for ctrl in self.thisDevice.controls:
-            self.appendCtrlModule(ctrl)
-
-        return
-
-    def getCurrentCtrlModule(self):
-        tree = self.ctrl_tree
-        item = tree.GetSelection()
-        
-        if item != tree.GetRootItem():
-            print "not root"
-            return tree.GetItemPyData(item)
-        else:
-            print " root"
-
-        if item.IsOk():
-            print "ok"
-        else:
-            print "not ok"
-    
-    def getControlModules(self):
-        ctrlModules = []
-        tree = self.ctrl_tree
-        item = tree.GetRootItem() 
-        while True:
-            item = tree.GetNext(item)
-            if item.IsOk():
-                ctrlModule = tree.GetItemPyData(item)
-                ctrlModules.append(ctrlModule)
-                print ctrlModule.name
-            else:
-                break    
-        return ctrlModules
-
-    def setCtrlModule(self, ctrl,index, txtIn):
-        if index is 0:
-            ctrl.name = txtIn
-        elif index is 1:
-            ctrl.info = txtIn
-        
-    def deleteCtrlModule(self):
-        tree = self.ctrl_tree
-        item = tree.GetSelection()
-       
-        #print "\n\n deleteCtrlModule"
-        if item != tree.GetRootItem():
-            prev = tree.GetPrev(item)
-            next = tree.GetNext(item)
-            tree.Delete(item)
-            if prev.IsOk():
-                tree.SelectItem(prev)
-            elif next.IsOk():
-                tree.SelectItem(next)
-
-    def moveUpCtrlModule(self):
-        tree = self.ctrl_tree
-        item = tree.GetSelection()
-        prev = tree.GetPrev(item)
-        ctrl = tree.GetItemPyData(item)
-
-        if prev.IsOk():
-            prev = tree.GetPrev(prev)
-            if prev.IsOk():
-                newItem = tree.InsertItem(tree.GetRootItem(), prev, ctrl.name)
-                tree.SetItemText(newItem, ctrl.info,1)
-                tree.SetItemPyData(newItem, ctrl)   
-            else:
-                newItem = tree.InsertItemBefore(tree.GetRootItem(), 0, ctrl.name)    
-                tree.SetItemText(newItem, ctrl.info,1)
-                tree.SetItemPyData(newItem, ctrl)
-            
-            tree.Delete(item)
-            tree.SelectItem(newItem)
-        return
-
-    def moveDownCtrlModule(self):
-        tree = self.ctrl_tree
-        item = tree.GetSelection()
-        next = tree.GetNext(item)
-        ctrl = tree.GetItemPyData(item)
-
-        if next.IsOk():
-            newItem = tree.InsertItem(tree.GetRootItem(), next, ctrl.name)
-            tree.SetItemText(newItem, ctrl.info,1)
-            tree.SetItemPyData(newItem, ctrl)
-
-            tree.Delete(item)
-            tree.SelectItem(newItem)   
-  
-    def onCtrlToolClicked(self, event):
-        eventId = event.GetId()
-        #print "onCtrlToolClicked:", eventId
-        ret = {
-            MainBase.ctrl_new:  lambda: self.addNewCtrlModule(),
-            MainBase.ctrl_del:  lambda: self.deleteCtrlModule(),
-            MainBase.ctrl_up:   lambda: self.moveUpCtrlModule(),
-            MainBase.ctrl_down: lambda: self.moveDownCtrlModule(),
-        }[eventId]()
-
-    def onCtrlSelChanged(self, event):
-        ctrlModule = self.getCurrentCtrlModule()
-        print "\n\n onCtrlSelChanged:"
-
-        if ctrlModule is None:
-            self.action_toolbar.EnableTool(MainBase.action_new, 0)
-        else:
-            self.action_toolbar.EnableTool(MainBase.action_new, 1)
-            self.refreshActionList(ctrlModule)
-
-    def onCtrlItemBeginEdit(self, event):
-        print "\n\n onCtrlItemBeginEdit"
-        self.ctrl_tree.editColumn =  event.GetInt()
-
-    def onCtrlItemEndEdit(self, event):
-        tree = self.ctrl_tree
-        item = event.GetItem()
-        ctrl = tree.GetItemPyData(item)
-        newLable =  event.GetLabel()
-        self.setCtrlModule(ctrl, tree.editColumn, newLable)
-    def onCtrlItemDelete(self, event):
-        print "onCtrlItemDelete"
-#------------------------------------------------------------------
-# control list end 
-
-###################################################################
-# action list related
-
-    def SetupActionList(self):
-        actionList = self.action_list
-
-        actionList.InsertColumn(0, "")
-#actionList.InsertColumn(1, ACTION_COL_ACT, wx.LIST_FORMAT_RIGHT)
-        actionList.InsertColumn(1, ACTION_COL_ACT, wx.LIST_FORMAT_RIGHT)
-        actionList.InsertColumn(2, ACTION_COL_FEEDBACK)
-        actionList.InsertColumn(3, ACTION_COL_FEEDBACK_TIMEOUT)
-
-#self.list.SetColumnWidth(0, wx.LIST_AUTOSIZE)
-
-        actionList.SetColumnWidth(0, wx.LIST_AUTOSIZE_USEHEADER)
-        actionList.SetColumnWidth(1, wx.LIST_AUTOSIZE_USEHEADER)
-        actionList.SetColumnWidth(2, wx.LIST_AUTOSIZE_USEHEADER)
-        actionList.SetColumnWidth(3, wx.LIST_AUTOSIZE_USEHEADER)
-
-
-    def listInsertNewAction(self, index, action):
-        actionList = self.action_list
-
-        """ ref SetStringItem """ 
-        actionCount = actionList.GetItemCount()
-
-        if index > actionCount+1:
-            print "error" 
-            return
-
-        if index == -1:
-            if actionCount == 0:
-                index = actionList.InsertStringItem(sys.maxint, str(actionCount+1),0)
-            else:
-                index = actionList.InsertStringItem(actionCount, str(actionCount+1),0)
-        else:
-            index = actionList.InsertStringItem(index, str(actionCount+1),0)
-
-        actionList.SetStringItem(index, 1, action.moduleOutput.name, 0) 
-        actionList.SetStringItem(index, 2, action.moduleFeedback.name, 0)
-        actionList.SetStringItem(index, 3, action.feedbackTimeout, 0)
-        actionList.SetItemData(index, action)
-
-    def listRemoveAction(self, action):
-        actionList = self.action_list
-
-        item = actionList.GetFocusedItem()
-        
-        actionList.DeleteItem(item)
-
-    def refreshActionList(self, ctrlModule):
-        actionList = self.action_list
-        actionList.DeleteAllItems()
-
-        for action in ctrlModule.actions:
-            self.listInsertNewAction(-1, action)
-        
-        return
-
-    def dumpAction(self, action):
-        print "dumpAction"
-        print action.moduleOutput.name
-        print action.moduleFeedback.name
-
-    def onEditActionUpdate(self):
-        actionList = self.action_list
-        ctrlModule = self.getCurrentCtrlModule()
-        index = -1
-        actions = []
-
-        while True:
-            index = actionList.GetNextItem(index)
-            print "onEditActionUpdate", index
-            if index == -1:
-                break
-            
-            action = actionList.GetItemData(index)
-            actions.append(action)
-            #self.dumpAction(action)
-
-        ctrlModule.setActions(actions)
-        self.refreshActionList(ctrlModule)
-        return
-
-    def onAddNewAction(self):
-        ctrlModule = self.getCurrentCtrlModule()
-
-        if ctrlModule is None:
-            print "Error: --> addNewAction"
-
-        frame = wx.Frame(None, size=(350,400))
-        Panel_NewAction(frame, self, targetObj=ctrlModule)
-        frame.CenterOnScreen()
-        frame.Show()
-
-    def onDeleteAction(self):
-        actionList = self.action_list
-        index = actionList.GetFocusedItem()
-        actionList.DeleteItem(index)
-
-        self.onEditActionUpdate()
-        actionCount = actionList.GetItemCount()
-        if actionCount:
-            if index == actionCount:
-                actionList.Select(index-1,1)
-            else:
-                actionList.Select(index,1)
-        return
-
-    def onActionMoveUp(self):
-        actionList = self.action_list
-        index = actionList.GetFocusedItem()
-        if index == -1:
-            return
-
-        action = actionList.GetItemData(index)
-        actionList.DeleteItem(index)
-        if index < 2:
-            self.listInsertNewAction(0, action)
-            index = 0
-        else:
-            self.listInsertNewAction(index-1, action)
-            index = index-1   
-
-        self.onEditActionUpdate()
-        actionList.Select(index,1)
-        return
-
-    def onActionMoveDown(self):
-        actionList = self.action_list
-        index = actionList.GetFocusedItem()
-        if index == -1:
-            return
-
-        actionCount = actionList.GetItemCount()
-        action = actionList.GetItemData(index)
-        if actionCount > 1 and index != actionCount-1:
-            self.listInsertNewAction(index+2, action)
-            actionList.DeleteItem(index)
-        else:
-            return 
-
-        self.onEditActionUpdate()
-        actionList.Select(index+1,1)
-        return 
 
     def onActionToolClicked(self, event):
-        eventId = event.GetId()
-        ret = {
-            MainBase.action_new:  lambda: self.onAddNewAction(),
-            MainBase.action_del:  lambda: self.onDeleteAction(),
-            MainBase.action_up:   lambda: self.onActionMoveUp(),
-            MainBase.action_down: lambda: self.onActionMoveDown(),
-        }[eventId]()
+        self.actionListCtrl.onActionToolClicked(event)
 
-        print ret
-
-#----------------------------------------------------------------
-# action list end
 
 #######################################################
 # module list related
-
     def moduleListSetup(self):
         self.io_moudle_list.InsertColumn(0, "")
         self.io_moudle_list.InsertColumn(1, "Name", wx.LIST_FORMAT_RIGHT)
@@ -517,7 +217,7 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
     def onLoadUpdate(self):
         self.setupDeviceInfo(self.thisDevice)
         self.onModuleListUpdate()
-        self.onCtrlModuleUpdate()
+        self.actGrpCtrl.onActGrpUpdate()
         return
 
     def onEditUpdate(self, targetObj=None):
@@ -579,13 +279,13 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
         name = self.text_name.GetValue()
         info = self.text_pos.GetValue()
         location = self.text_desc.GetValue()
-        controls = self.getControlModules()
+        actGrpList = self.actGrpCtrl.getActionGroupList()
 
         self.thisDevice.name = name
         self.thisDevice.info = info
         self.thisDevice.location = location
   
-        self.thisDevice.setControls(controls)
+        self.thisDevice.setControls(actGrpList)
         self.thisDevice.attrList = self.attrCtrl.attrObjList
         wx.GetApp().deviceController.addTransport(self.thisDevice)
         self.closeWindow()
@@ -597,24 +297,41 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
         print "my onCancel"
 
 
-    def onAddModule(self, event):
-        print "onAddModuel"
+
+    def onActGrpToolClicked(self, event):
+        self.actGrpCtrl.onActGrpToolClicked(event)
+
+    def onActGrpItemSelChanged(self, event):
+        self.actGrpCtrl.onActGrpItemSelChanged(event)
+
+    def onActGrpItemBeginEdit(self, event):
+        self.actGrpCtrl.onActGrpItemBeginEdit(event)
+
+    def onActGrpItemEndEdit(self, event):
+        self.actGrpCtrl.onActGrpItemEndEdit(event)
+
+    def onActGrpItemDelete(self, event):
+        self.actGrpCtrl.onActGrpItemDelete(event)
+
+
+    def onAddModuleIO(self, event):
+        print "onAddModuleIO"
         #frame1 = wx.Frame(parent=self.parent, size=(800,400))
         frame1 = wx.Frame(parent=None, size=(800,400))
-            
-        Panel_AddModule(frame1, self, self)
+
+        Panel_EditModuleIO(frame1, self, self)
         frame1.CenterOnScreen()
         frame1.Show()
 
-    def onDeleteModule(self, event):
-        print "onDeleteModule"
+    def onDeleteModuleIO(self, event):
+        print "onDeleteModuleIO"
         self.deleteModuel()
         self.onModuleListUpdate()
 
 
-class Panel_AddModule(MainBase.Panel_AddModule_Base):
+class Panel_EditModuleIO(MainBase.Panel_EditModuleIO_Base):
     def __init__(self, frame, parent, deviceEditor, targetObj=None):
-        MainBase.Panel_AddModule_Base.__init__( self, frame )
+        MainBase.Panel_EditModuleIO_Base.__init__( self, frame )
         self.moduleTypeChoiceSetup(self.choice)
         self.deviceEditor = deviceEditor
         self.frame = frame
@@ -672,16 +389,341 @@ class Panel_AddModule(MainBase.Panel_AddModule_Base):
         self.frame.Close()
 
 
-def dumpModuleObj(module, pad=0):
-    return
-    if pad:
-        print
-    print "name", module.name, sys.getrefcount(module)
-#---------------------------------------------------------------------------
+class ActionGroupViewControl():
+    def __init__(self, parent):
+        self.parent = parent
+        self.ioModuleList = []
+        self.setupActGrpTreeView()
 
-class Panel_NewAction(MainBase.Panel_NewAction_Base):
+    def setupActGrpTreeView(self):
+        tree = self.parent.actionGroupTree
+
+        tree.AddColumn(ADD_MOUDLE_LABEL_NAME)
+        tree.AddColumn(ADD_MOUDLE_LABEL_DESC)
+
+        tree.SetMainColumn(0) # the one with the tree in it...
+        tree.SetColumnWidth(0, 150)
+
+        tree.SetColumnEditable(0, True)
+        tree.SetColumnEditable(1, True)
+        tree.root = tree.AddRoot("Root Item")
+
+    def addNewActGrp(self):
+        tree = self.parent.actionGroupTree
+        name = MOUDLE_NAME_DEFAULT + str(tree.GetCount()+1)
+        ctrl = ActionGroup(name)
+        self.appendActGrp(ctrl)
+
+    def appendActGrp(self, ctrl):
+        tree = self.parent.actionGroupTree
+        child = tree.AppendItem(tree.root, ctrl.name)
+        tree.SetItemText(child, ctrl.info,1)
+        tree.SetItemPyData(child, ctrl)
+
+    def onActGrpUpdate(self):
+        for ctrl in self.parent.thisDevice.controls:
+            self.appendActGrp(ctrl)
+
+        return
+
+    def getCurrentActGrp(self):
+        tree = self.parent.actionGroupTree
+        item = tree.GetSelection()
+
+        if item != tree.GetRootItem():
+            print "not root"
+            return tree.GetItemPyData(item)
+        else:
+            print " root"
+
+        if item.IsOk():
+            print "ok"
+        else:
+            print "not ok"
+
+    def getActionGroupList(self):
+        ActGrps = []
+        tree = self.parent.actionGroupTree
+        item = tree.GetRootItem()
+        while True:
+            item = tree.GetNext(item)
+            if item.IsOk():
+                ActGrp = tree.GetItemPyData(item)
+                ActGrps.append(ActGrp)
+                print ActGrp.name
+            else:
+                break
+        return ActGrps
+
+    def setActGrp(self, ctrl,index, txtIn):
+        if index is 0:
+            ctrl.name = txtIn
+        elif index is 1:
+            ctrl.info = txtIn
+
+    def deleteActGrp(self):
+        tree = self.parent.actionGroupTree
+        item = tree.GetSelection()
+
+        #print "\n\n deleteActGrp"
+        if item != tree.GetRootItem():
+            prev = tree.GetPrev(item)
+            next = tree.GetNext(item)
+            tree.Delete(item)
+            if prev.IsOk():
+                tree.SelectItem(prev)
+            elif next.IsOk():
+                tree.SelectItem(next)
+
+    def moveUpActGrp(self):
+        tree = self.parent.actionGroupTree
+        item = tree.GetSelection()
+        prev = tree.GetPrev(item)
+        ctrl = tree.GetItemPyData(item)
+
+        if prev.IsOk():
+            prev = tree.GetPrev(prev)
+            if prev.IsOk():
+                newItem = tree.InsertItem(tree.GetRootItem(), prev, ctrl.name)
+                tree.SetItemText(newItem, ctrl.info,1)
+                tree.SetItemPyData(newItem, ctrl)
+            else:
+                newItem = tree.InsertItemBefore(tree.GetRootItem(), 0, ctrl.name)
+                tree.SetItemText(newItem, ctrl.info,1)
+                tree.SetItemPyData(newItem, ctrl)
+
+            tree.Delete(item)
+            tree.SelectItem(newItem)
+        return
+
+    def moveDownActGrp(self):
+        tree = self.parent.actionGroupTree
+        item = tree.GetSelection()
+        next = tree.GetNext(item)
+        ctrl = tree.GetItemPyData(item)
+
+        if next.IsOk():
+            newItem = tree.InsertItem(tree.GetRootItem(), next, ctrl.name)
+            tree.SetItemText(newItem, ctrl.info,1)
+            tree.SetItemPyData(newItem, ctrl)
+
+            tree.Delete(item)
+            tree.SelectItem(newItem)
+
+    def onActGrpToolClicked(self, event):
+        eventId = event.GetId()
+        print "onCtrlToolClicked:", eventId
+        ret = {
+            MainBase.ctrl_new:  lambda: self.addNewActGrp(),
+            MainBase.ctrl_del:  lambda: self.deleteActGrp(),
+            MainBase.ctrl_up:   lambda: self.moveUpActGrp(),
+            MainBase.ctrl_down: lambda: self.moveDownActGrp(),
+            }[eventId]()
+
+    def onActGrpItemSelChanged(self, event):
+        ActGrp = self.getCurrentActGrp()
+        print "\n\n onCtrlSelChanged:"
+
+        if ActGrp is None:
+            self.parent.action_toolbar.EnableTool(MainBase.action_new, 0)
+        else:
+            self.parent.action_toolbar.EnableTool(MainBase.action_new, 1)
+            self.parent.actionListCtrl.refreshActionList(ActGrp)
+
+    def onActGrpItemBeginEdit(self, event):
+        print "\n\n onActGrpItemBeginEdit"
+        tree = self.parent.actionGroupTree
+        tree.editColumn =  event.GetInt()
+
+    def onActGrpItemEndEdit(self, event):
+        tree = self.parent.actionGroupTree
+        item = event.GetItem()
+        ctrl = tree.GetItemPyData(item)
+        newLable =  event.GetLabel()
+        self.setActGrp(ctrl, tree.editColumn, newLable)
+    def onActGrpItemDelete(self, event):
+        print "onActGrpItemDelete"
+
+
+    def onAddModule(self, event):
+        print "onAddModuel"
+        #frame1 = wx.Frame(parent=self.parent, size=(800,400))
+        frame1 = wx.Frame(parent=None, size=(800,400))
+
+        Panel_EditActGroup(frame1, self, self)
+        frame1.CenterOnScreen()
+        frame1.Show()
+    #------------------------------------------------------------------
+
+class ActionViewControl():
+    def __init__(self, parent):
+        self.parent = parent
+        self.ioModuleList = []
+        self.SetupActionList()
+
+    ###################################################################
+    # action list related
+
+    def SetupActionList(self):
+        actionList = self.parent.action_list
+
+        actionList.InsertColumn(0, "")
+        #actionList.InsertColumn(1, ACTION_COL_ACT, wx.LIST_FORMAT_RIGHT)
+        actionList.InsertColumn(1, ACTION_COL_ACT, wx.LIST_FORMAT_RIGHT)
+        actionList.InsertColumn(2, ACTION_COL_FEEDBACK)
+        actionList.InsertColumn(3, ACTION_COL_FEEDBACK_TIMEOUT)
+
+        #self.list.SetColumnWidth(0, wx.LIST_AUTOSIZE)
+
+        actionList.SetColumnWidth(0, wx.LIST_AUTOSIZE_USEHEADER)
+        actionList.SetColumnWidth(1, wx.LIST_AUTOSIZE_USEHEADER)
+        actionList.SetColumnWidth(2, wx.LIST_AUTOSIZE_USEHEADER)
+        actionList.SetColumnWidth(3, wx.LIST_AUTOSIZE_USEHEADER)
+
+
+    def listInsertNewAction(self, index, action):
+        actionList = self.parent.action_list
+
+        """ ref SetStringItem """
+        actionCount = actionList.GetItemCount()
+
+        if index > actionCount+1:
+            print "error"
+            return
+
+        if index == -1:
+            if actionCount == 0:
+                index = actionList.InsertStringItem(sys.maxint, str(actionCount+1),0)
+            else:
+                index = actionList.InsertStringItem(actionCount, str(actionCount+1),0)
+        else:
+            index = actionList.InsertStringItem(index, str(actionCount+1),0)
+
+        actionList.SetStringItem(index, 1, action.moduleOutput.name, 0)
+        actionList.SetStringItem(index, 2, action.moduleFeedback.name, 0)
+        actionList.SetStringItem(index, 3, action.feedbackTimeout, 0)
+        actionList.SetItemData(index, action)
+
+    def listRemoveAction(self, action):
+        actionList = self.parent.action_list
+
+        item = actionList.GetFocusedItem()
+
+        actionList.DeleteItem(item)
+
+    def refreshActionList(self, ctrlModule):
+        actionList = self.parent.action_list
+        actionList.DeleteAllItems()
+
+        for action in ctrlModule.actions:
+            self.listInsertNewAction(-1, action)
+
+        return
+
+    def dumpAction(self, action):
+        print "dumpAction"
+        print action.moduleOutput.name
+        print action.moduleFeedback.name
+
+    def onEditActionUpdate(self):
+        actionList = self.parent.action_list
+        actGrp = self.parent.actGrpCtrl.getCurrentActGrp()
+        index = -1
+        actions = []
+
+        while True:
+            index = actionList.GetNextItem(index)
+            print "onEditActionUpdate", index
+            if index == -1:
+                break
+
+            action = actionList.GetItemData(index)
+            actions.append(action)
+            #self.dumpAction(action)
+
+        actGrp.setActions(actions)
+        self.refreshActionList(actGrp)
+        return
+
+    def onAddNewAction(self):
+        ctrlModule = self.parent.actGrpCtrl.getCurrentActGrp()
+
+        if ctrlModule is None:
+            print "Error: --> addNewAction"
+
+        frame = wx.Frame(None, size=(350,400))
+        Panel_EditAction(frame, self.parent, targetObj=ctrlModule)
+        frame.CenterOnScreen()
+        frame.Show()
+
+    def onDeleteAction(self):
+        actionList = self.parent.action_list
+        index = actionList.GetFocusedItem()
+        actionList.DeleteItem(index)
+
+        self.onEditActionUpdate()
+        actionCount = actionList.GetItemCount()
+        if actionCount:
+            if index == actionCount:
+                actionList.Select(index-1,1)
+            else:
+                actionList.Select(index,1)
+        return
+
+    def onActionMoveUp(self):
+        actionList = self.parent.action_list
+        index = actionList.GetFocusedItem()
+        if index == -1:
+            return
+
+        action = actionList.GetItemData(index)
+        actionList.DeleteItem(index)
+        if index < 2:
+            self.listInsertNewAction(0, action)
+            index = 0
+        else:
+            self.listInsertNewAction(index-1, action)
+            index = index-1
+
+        self.onEditActionUpdate()
+        actionList.Select(index,1)
+        return
+
+    def onActionMoveDown(self):
+        actionList = self.parent.action_list
+        index = actionList.GetFocusedItem()
+        if index == -1:
+            return
+
+        actionCount = actionList.GetItemCount()
+        action = actionList.GetItemData(index)
+        if actionCount > 1 and index != actionCount-1:
+            self.listInsertNewAction(index+2, action)
+            actionList.DeleteItem(index)
+        else:
+            return
+
+        self.onEditActionUpdate()
+        actionList.Select(index+1,1)
+        return
+
+    def onActionToolClicked(self, event):
+        eventId = event.GetId()
+        ret = {
+            MainBase.action_new:  lambda: self.onAddNewAction(),
+            MainBase.action_del:  lambda: self.onDeleteAction(),
+            MainBase.action_up:   lambda: self.onActionMoveUp(),
+            MainBase.action_down: lambda: self.onActionMoveDown(),
+            }[eventId]()
+
+        print ret
+
+#----------------------------------------------------------------
+# action list end
+
+class Panel_EditAction(MainBase.Panel_EditAction_Base):
     def __init__(self, frame, deviceEditor, targetObj=None):
-        MainBase.Panel_NewAction_Base.__init__(self, frame)
+        MainBase.Panel_EditAction_Base.__init__(self, frame)
         self.deviceEditor = deviceEditor
         self.targetObj = targetObj
         self.frame = frame
@@ -773,8 +815,8 @@ class Panel_NewAction(MainBase.Panel_NewAction_Base):
         type = event.GetInt()
         self.selectActionType(type)
     
-    def onAddModule(self, event):
-        print "onAddModuel"
+    def onAddModuleIO(self, event):
+        print "onAddModuleIO"
 
         if self.addOutputBtn is event.GetEventObject():
             targetChoice = self.choice_output
@@ -783,8 +825,8 @@ class Panel_NewAction(MainBase.Panel_NewAction_Base):
 
         #frame1 = wx.Frame(parent=self.parent, size=(800,400))
         frame1 = wx.Frame(parent=None, size=(800,400))
-            
-        Panel_AddModule(frame1, self, self.deviceEditor, targetObj=targetChoice)
+
+        Panel_EditModuleIO(frame1, self, self.deviceEditor, targetObj=targetChoice)
         frame1.CenterOnScreen()
         frame1.Show()
 
@@ -794,12 +836,12 @@ class Panel_NewAction(MainBase.Panel_NewAction_Base):
     def onApply(self, evt):
         newAction = self.createNewAction()
         self.targetObj.addNewAction(newAction)
-        self.deviceEditor.listInsertNewAction(-1, newAction)
+        self.deviceEditor.actionListCtrl.listInsertNewAction(-1, newAction)
 
         self.closeWindow()
         return
 
-    def onCancel():
+    def onCancel(self, evt):
         self.closeWindow()
         return
 

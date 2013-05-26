@@ -62,7 +62,7 @@ class DeviceModule():
 
 		return
 
-class ModuelControl():
+class ActionGroup():
     def __init__(self, nm=''):
         self.name = nm
         self.info = "δ����"

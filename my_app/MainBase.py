@@ -142,10 +142,10 @@ class SplitterPanelBase ( wx.Panel ):
 	
 
 ###########################################################################
-## Class Panel_AddModule_Base
+## Class Panel_EditModuleIO_Base
 ###########################################################################
 
-class Panel_AddModule_Base ( wx.Panel ):
+class Panel_EditModuleIO_Base ( wx.Panel ):
 	
 	def __init__( self, parent ):
 		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL )
@@ -320,7 +320,7 @@ class Panel_AddDevice_Base ( wx.Panel ):
 		self.attribute_panel.SetSizer( fgSizer511 )
 		self.attribute_panel.Layout()
 		fgSizer511.Fit( self.attribute_panel )
-		self.m_notebook4.AddPage( self.attribute_panel, _(u"变量"), True )
+		self.m_notebook4.AddPage( self.attribute_panel, _(u"变量"), False )
 		self.io_module_panel = wx.Panel( self.m_notebook4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.io_module_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
 		
@@ -383,8 +383,8 @@ class Panel_AddDevice_Base ( wx.Panel ):
 		
 		fgSizer34.Add( self.ctrl_toolbar, 0, wx.EXPAND, 5 )
 		
-		self.ctrl_tree = TreeListCtrl( self.m_panel80, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TR_DEFAULT_STYLE|wx.TR_FULL_ROW_HIGHLIGHT|wx.TR_HIDE_ROOT|wx.TR_LINES_AT_ROOT|wx.TR_ROW_LINES|wx.TR_SINGLE )
-		fgSizer34.Add( self.ctrl_tree, 0, wx.ALL|wx.EXPAND, 5 )
+		self.actionGroupTree = TreeListCtrl( self.m_panel80, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TR_DEFAULT_STYLE|wx.TR_FULL_ROW_HIGHLIGHT|wx.TR_HIDE_ROOT|wx.TR_LINES_AT_ROOT|wx.TR_ROW_LINES|wx.TR_SINGLE )
+		fgSizer34.Add( self.actionGroupTree, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		
 		self.m_panel80.SetSizer( fgSizer34 )
@@ -427,7 +427,7 @@ class Panel_AddDevice_Base ( wx.Panel ):
 		self.contorl_panel.SetSizer( bSizer33 )
 		self.contorl_panel.Layout()
 		bSizer33.Fit( self.contorl_panel )
-		self.m_notebook4.AddPage( self.contorl_panel, _(u"控制"), False )
+		self.m_notebook4.AddPage( self.contorl_panel, _(u"控制"), True )
 		
 		bSizer18.Add( self.m_notebook4, 1, wx.ALL|wx.EXPAND, 5 )
 		
@@ -459,18 +459,18 @@ class Panel_AddDevice_Base ( wx.Panel ):
 		self.m_button911.Bind( wx.EVT_BUTTON, self.onDeleteAttribute )
 		self.attribute_list.Bind( wx.EVT_LIST_ITEM_DESELECTED, self.OnItemDeselected )
 		self.attribute_list.Bind( wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected )
-		self.m_button81.Bind( wx.EVT_BUTTON, self.onAddModule )
-		self.m_button91.Bind( wx.EVT_BUTTON, self.onDeleteModule )
+		self.m_button81.Bind( wx.EVT_BUTTON, self.onAddModuleIO )
+		self.m_button91.Bind( wx.EVT_BUTTON, self.onDeleteModuleIO )
 		self.io_moudle_list.Bind( wx.EVT_LIST_ITEM_DESELECTED, self.OnItemDeselected )
 		self.io_moudle_list.Bind( wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected )
-		self.Bind( wx.EVT_TOOL, self.onCtrlToolClicked, id = ctrl_new )
-		self.Bind( wx.EVT_TOOL, self.onCtrlToolClicked, id = ctrl_del )
-		self.Bind( wx.EVT_TOOL, self.onCtrlToolClicked, id = ctrl_up )
-		self.Bind( wx.EVT_TOOL, self.onCtrlToolClicked, id = ctrl_down )
-		self.ctrl_tree.Bind( wx.EVT_TREE_BEGIN_LABEL_EDIT, self.onCtrlItemBeginEdit )
-		self.ctrl_tree.Bind( wx.EVT_TREE_DELETE_ITEM, self.onCtrlItemDelete )
-		self.ctrl_tree.Bind( wx.EVT_TREE_END_LABEL_EDIT, self.onCtrlItemEndEdit )
-		self.ctrl_tree.Bind( wx.EVT_TREE_SEL_CHANGED, self.onCtrlSelChanged )
+		self.Bind( wx.EVT_TOOL, self.onActGrpToolClicked, id = ctrl_new )
+		self.Bind( wx.EVT_TOOL, self.onActGrpToolClicked, id = ctrl_del )
+		self.Bind( wx.EVT_TOOL, self.onActGrpToolClicked, id = ctrl_up )
+		self.Bind( wx.EVT_TOOL, self.onActGrpToolClicked, id = ctrl_down )
+		self.actionGroupTree.Bind( wx.EVT_TREE_BEGIN_LABEL_EDIT, self.onActGrpItemBeginEdit )
+		self.actionGroupTree.Bind( wx.EVT_TREE_DELETE_ITEM, self.onActGrpItemDelete )
+		self.actionGroupTree.Bind( wx.EVT_TREE_END_LABEL_EDIT, self.onActGrpItemEndEdit )
+		self.actionGroupTree.Bind( wx.EVT_TREE_SEL_CHANGED, self.onActGrpItemSelChanged )
 		self.Bind( wx.EVT_TOOL, self.onActionToolClicked, id = action_new )
 		self.Bind( wx.EVT_TOOL, self.onActionToolClicked, id = action_del )
 		self.Bind( wx.EVT_TOOL, self.onActionToolClicked, id = action_up )
@@ -499,30 +499,30 @@ class Panel_AddDevice_Base ( wx.Panel ):
 	def OnItemSelected( self, event ):
 		event.Skip()
 	
-	def onAddModule( self, event ):
+	def onAddModuleIO( self, event ):
 		event.Skip()
 	
-	def onDeleteModule( self, event ):
-		event.Skip()
-	
-	
-	
-	def onCtrlToolClicked( self, event ):
+	def onDeleteModuleIO( self, event ):
 		event.Skip()
 	
 	
 	
-	
-	def onCtrlItemBeginEdit( self, event ):
+	def onActGrpToolClicked( self, event ):
 		event.Skip()
 	
-	def onCtrlItemDelete( self, event ):
+	
+	
+	
+	def onActGrpItemBeginEdit( self, event ):
 		event.Skip()
 	
-	def onCtrlItemEndEdit( self, event ):
+	def onActGrpItemDelete( self, event ):
 		event.Skip()
 	
-	def onCtrlSelChanged( self, event ):
+	def onActGrpItemEndEdit( self, event ):
+		event.Skip()
+	
+	def onActGrpItemSelChanged( self, event ):
 		event.Skip()
 	
 	def onActionToolClicked( self, event ):
@@ -546,10 +546,10 @@ class Panel_AddDevice_Base ( wx.Panel ):
 	
 
 ###########################################################################
-## Class Panel_NewAction_Base
+## Class Panel_EditAction_Base
 ###########################################################################
 
-class Panel_NewAction_Base ( wx.Panel ):
+class Panel_EditAction_Base ( wx.Panel ):
 	
 	def __init__( self, parent ):
 		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 344,397 ), style = wx.TAB_TRAVERSAL )
@@ -685,8 +685,8 @@ class Panel_NewAction_Base ( wx.Panel ):
 		
 		# Connect Events
 		self.m_choice4.Bind( wx.EVT_CHOICE, self.onChoice )
-		self.addOutputBtn.Bind( wx.EVT_BUTTON, self.onAddModule )
-		self.addFeedbackBtn.Bind( wx.EVT_BUTTON, self.onAddModule )
+		self.addOutputBtn.Bind( wx.EVT_BUTTON, self.onAddModuleIO )
+		self.addFeedbackBtn.Bind( wx.EVT_BUTTON, self.onAddModuleIO )
 		self.m_button40.Bind( wx.EVT_BUTTON, self.onApply )
 		self.m_button41.Bind( wx.EVT_BUTTON, self.onCancel )
 	
@@ -698,7 +698,7 @@ class Panel_NewAction_Base ( wx.Panel ):
 	def onChoice( self, event ):
 		event.Skip()
 	
-	def onAddModule( self, event ):
+	def onAddModuleIO( self, event ):
 		event.Skip()
 	
 	
