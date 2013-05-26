@@ -1,16 +1,15 @@
-# -*- coding: utf-8 -*-
+Ôªø# -*- coding: utf-8 -*-
+from MyTestApp import *
 
 
-VIEW_OPTION_NAME_MAIN = "◊‹¿¿"
-VIEW_OPTION_NAME_DEVICE = "…Ë±∏"
-DEVICE_NAME_TRANSPORT = "∆§¥¯ª˙"
+VIEW_OPTION_NAME_MAIN = u"ÊÄªËßà"
+VIEW_OPTION_NAME_DEVICE = u"ËÆæÂ§á"
+DEVICE_NAME_TRANSPORT = u"ÁöÆÂ∏¶Êú∫"
 
 
-
-ADD_DEVICE_LABEL_NAME = "√˚≥∆:"
-ADD_DEVICE_LABEL_POS = "Œª÷√:"
-ADD_DEVICE_LABEL_DESC = "√Ë ˆ:"
-
+ADD_DEVICE_LABEL_NAME = u"ÂêçÁß∞Ôºö"
+ADD_DEVICE_LABEL_POS = u"‰ΩçÁΩÆÔºö"
+ADD_DEVICE_LABEL_DESC = u"ÊèèËø∞Ôºö"
 
 
 MODULE_TYPE_SIG_IN = 1
@@ -18,25 +17,37 @@ MODULE_TYPE_VAL_IN = 2
 MODULE_TYPE_SIG_OUT = 3
 
 MODULE_TYPE_LIST = {
-MODULE_TYPE_SIG_IN : "–≈∫≈¡ø ‰»Î",
-MODULE_TYPE_VAL_IN : " ˝÷µ¡ø ‰»Î",
-MODULE_TYPE_SIG_OUT : "–≈∫≈¡ø ‰≥ˆ",
+MODULE_TYPE_SIG_IN : u"‰ø°Âè∑ÈáèËæìÂÖ•",
+MODULE_TYPE_VAL_IN : u"Êï∞ÂÄºÈáèËæìÂÖ•",
+MODULE_TYPE_SIG_OUT : u"‰ø°Âè∑ÈáèËæìÂá∫",
 }
 
 
+rescoure_dir = r".\image\\"
 
-btn_red_up = r"D:\workspace\myGitProj\init\my_app\image\red_up.png"
-btn_red_down = r"D:\workspace\myGitProj\init\my_app\image\red_down.png"
+btn_red_up = rescoure_dir + r"red_up.png"
+btn_red_down = rescoure_dir + "red_down.png"
 
+btn_green_up = rescoure_dir + "green_up.png"
+btn_green_down = rescoure_dir + "green_down.png"
 
-btn_green_up = r"D:\workspace\myGitProj\init\my_app\image\green_up.png"
-btn_green_down = r"D:\workspace\myGitProj\init\my_app\image\green_down.png"
+btn_on = rescoure_dir + "btn_on.png"
+btn_off = rescoure_dir + "btn_off.png"
 
+circle_btn_on = rescoure_dir + "circle_btn_on.png"
+circle_btn_off = rescoure_dir + "circle_btn_off.png"
 
-btn_on = r"D:\workspace\myGitProj\init\my_app\image\btn_on.png"
-btn_off = r"D:\workspace\myGitProj\init\my_app\image\btn_off.png"
+image_fish = rescoure_dir + "fugu.png"
 
-circle_btn_on = r"D:\workspace\myGitProj\init\my_app\image\circle_btn_on.png"
-circle_btn_off = r"D:\workspace\myGitProj\init\my_app\image\circle_btn_off.png"
+"""
+ def addDevice(self):
+        print "add device"
+#            self.pane.
+# wx.GetApp().GetAppViewSelectPane().AddDeviceNode("tool bar create")
 
+        frame1 = wx.Frame(parent=self.parent, size=(800,400))
+        Panel_AddDevice(frame1)
+        frame1.CenterOnScreen()
+        frame1.Show()
 
+"""

@@ -384,19 +384,12 @@ tXL5PwzOC4njj4K3gavA8cazczYacLd+p/+6y8mfAgwAsRuLfp/zVLMAAAAASUVORK5CYII="""))
 
         #image = pygame.image.load(ball_file, 'file')
         image = pygame.image.load(image_fish)
-
-        
-
         self.imagestr = pygame.image.tostring(image, "RGBA")
 
         x,y = image.get_size()
-        
-
         self.image = pygame.image.fromstring(self.imagestr,(x,y) , "RGBA")
 
         #self.image = pygame.image.fromstring(self.imagestr, (25, 25), "RGBA")
-        
-
         self.rect = self.image.fill(color, None, BLEND_ADD)
         self.rect.topleft = initial_position
         self.is_select = 0
@@ -693,6 +686,7 @@ class StaticRectSprite(pygame.sprite.Sprite):
         netRect = pygame.Rect(rect)
         netRect.topleft = (0,0)
         image = pygame.Surface((rect.w, rect.h), pygame.SRCALPHA, 32)
+        #image.fill((255,0,0,0), netRect)
 
         startP = (netRect.topleft[0],netRect.topleft[1])
         endP = (netRect.topright[0], netRect.topright[1])
@@ -728,21 +722,17 @@ class AnimateMotorSprite(pygame.sprite.Sprite):
         self.layer = 0
 
     def update(self, current_time):
-        
         if current_time - self.lastUpdate > 50:
             self.lastUpdate = current_time
         else:
             return
          
         #print "update"
-
-        self.angle += 20 
-
+        self.angle += 20
         if self.angle > 360:
             self.angel = 0
         
         center = self.rectOrig.center
-
         self.image = pygame.transform.rotate(self.imageOrig, self.angle)
         #self.image = drawBoader(self.image)
 
@@ -769,10 +759,10 @@ class AnimateMotorSprite(pygame.sprite.Sprite):
         p6 = [x, y+r]
         p7 = [x-r, y+r]
         p8 = [x-r, y]
-  
+
         pygame.draw.circle(image, color, p0, r)
 
-        maskColor = (255, 255, 0,0)
+        maskColor = (0, 0, 0, 0)
         pointlist = [p0 ,p2 ,p3 ]
         pygame.draw.polygon(image, maskColor, pointlist, 0)
 
@@ -786,8 +776,7 @@ class AnimateMotorSprite(pygame.sprite.Sprite):
         pygame.draw.polygon(image, maskColor, pointlist, 0)
         
         pygame.draw.circle(image, color, p0, r,2)
-
-        self.drawTextAtPos(image,rect,color)
+        #self.drawTextAtPos(image,rect,color)
         return image
 
     def drawTextAtPos(self, screen, rect, color):
@@ -816,7 +805,8 @@ class AnimateMotorSprite(pygame.sprite.Sprite):
 
 #class AnimateTansporterSprite(pygame.sprite.Sprite):
 class AnimateTansporterSprite(DragSprite):
-    def __init__(self, color, initPos, width, height,updateInterval, border):
+   # def __init__(self, color, initPos, width, height, updateInterval, border):
+    def __init__(self, color=(0,0,0), initPos=(0,0), width=0, height=0, updateInterval=0, border=0):
         #pygame.sprite.Sprite.__init__(self)
         DragSprite.__init__(self)
 
@@ -828,6 +818,9 @@ class AnimateTansporterSprite(DragSprite):
         self.components = []
         self.imageOrig = pygame.Surface((width + self.pad*2, height + self.pad*2), pygame.SRCALPHA, 32)
         self.rect = pygame.Rect(initPos, (width + self.pad*2, height + self.pad*2))
+
+        #self.imageOrig.fill((0,0,0,0), self.rect)
+
         self.addComponent()
         self.index = 0
         self.rectOrig = self.rect
@@ -851,8 +844,8 @@ class AnimateTansporterSprite(DragSprite):
         rect = pygame.Rect(x + r, y, width - r*2, height)
         
         comp1 = AnimateMotorSprite("comp1",BLUE, center1, r, 1)
-        comp2 = StaticRectSprite("comp2",red, rect)   
-        comp3 = AnimateMotorSprite("comp3",WHITE, center2, r, 1)
+        comp2 = StaticRectSprite("comp2",BLACK, rect)
+        comp3 = AnimateMotorSprite("comp3",BLUE, center2, r, 1)
         #comp4 = StaticLineSprite("comp4",WHITE, rect)
        
         self.components.append(comp2)
@@ -913,7 +906,6 @@ class SwitchButtonSprite(DragSprite):
         self.loadImgResource(circle_btn_off)
         self.setCurrentResource(0)
 
-    
     def loadImgResource1(self, file):
         """
             load image with PIL lib
@@ -926,7 +918,7 @@ class SwitchButtonSprite(DragSprite):
 
         imageSurface = pygame.image.fromstring(imagedata, imagesize , "RGBA")
         self.imageResource.append(imageSurface)
-       
+
     def loadImgResource(self, file):
         """
             load image with pygame lib
@@ -940,25 +932,104 @@ class SwitchButtonSprite(DragSprite):
         imageSurface = pygame.transform.smoothscale(imageSurface,(self.width, self.height))
         self.imageResource.append(imageSurface)
 
-
     def setCurrentResource(self, index):
         self.imageOrig = self.imageResource[index]
         self.image = self.imageOrig.copy()
         #self.rect = self.image.get_rect()
         #self.rectOrig = self.rect
 
-
     def switchResource(self, index):
         self.setCurrentResource(index)
 
-
     def update(self, current_time):
-
+        return
         if current_time - self.lastUpdate > 500:
             self.lastUpdate = current_time
-           
             self.status = ~(self.status)
             self.switchResource(self.status)
 
         if self.isSelected():
             drawBoader1(self.image, self.image.get_rect())
+
+
+
+class ButtonSprite(DragSprite):
+        def __init__(self, initPos=(0,0), width=50, height=50, dicts=None):
+            DragSprite.__init__(self)
+            self.imageResource = {}
+            self.status = 0
+            self.index = 0
+
+            self.initPos = (initPos[0],initPos[1])
+            self.width = width
+            self.height = height
+            self.rect = pygame.Rect(initPos, (width, height))
+
+            for dict in dicts:
+                self.loadImgResource(dict)
+
+            self.setCurrentResource("on")
+
+        def loadImgResource1(self, file):
+            """
+                load image with PIL lib
+            """
+            im = Image.open(file)
+            im = im.resize((self.width, self.height))
+
+            imagedata = im.convert('RGBA').tostring()
+            imagesize = im.size
+
+            imageSurface = pygame.image.fromstring(imagedata, imagesize , "RGBA")
+
+
+        def loadImgResource2(self, dicKey, file):
+            """
+                load image with pygame lib
+            """
+            image_file = pygame.image.load(file)
+            imagedata = pygame.image.tostring(image_file, "RGBA")
+            imagesize = image_file.get_size()
+            imageSurface = pygame.image.fromstring(imagedata, imagesize , "RGBA")
+            #imageS1.fill(color, None, BLEND_ADD)
+            #imageSurface = pygame.transform.smoothscale(imageSurface,(self.width, self.height))
+            #self.imageResource.append(imageSurface)
+            self.imageResource[dicKey] = imageSurface
+
+        def loadImgResource(self, dict):
+            """
+                load image with pygame lib
+            """
+            key = dict[0]
+            file_name = dict[1]
+
+            image_file = pygame.image.load(file_name)
+            imagedata = pygame.image.tostring(image_file, "RGBA")
+            imagesize = image_file.get_size()
+            imageSurface = pygame.image.fromstring(imagedata, imagesize , "RGBA")
+            #imageS1.fill(color, None, BLEND_ADD)
+            #imageSurface = pygame.transform.smoothscale(imageSurface,(self.width, self.height))
+            #self.imageResource.append(imageSurface)
+            self.imageResource[key] = (file_name, imageSurface)
+
+        def setCurrentResource(self, key):
+            self.imageOrig = self.imageResource[key][1]
+            self.image = self.imageOrig.copy()
+            self.rect = self.image.get_rect().copy()
+            #self.rectOrig = self.rect
+            # pygame.Rect().copy()
+        def switchResource(self, index):
+            self.setCurrentResource(index)
+
+        def update(self, current_time):
+            # return
+            # if current_time - self.lastUpdate > 500:
+            #     self.lastUpdate = current_time
+            #     self.status = ~(self.status)
+            #     self.switchResource(self.status)
+
+            if self.isSelected():
+                print "buttonSprite selected"
+                drawBoader1(self.image, self.image.get_rect())
+            else:
+                self.image = self.imageOrig.copy()

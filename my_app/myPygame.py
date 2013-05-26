@@ -50,7 +50,7 @@ class PygameDisplay(wx.Window):
         self.timer.Start(self.timespacing, False)
  
         self.linespacing = 5
-        self.addSprite();
+        self.addSprite()
         self.previous_time = 0
         self.Bind(wx.EVT_MOUSE_EVENTS, self.OnMouse)
 
@@ -70,16 +70,11 @@ class PygameDisplay(wx.Window):
         
         #self.rootSpriteGroup.add(mySelfTestSprite([200, 200, 200], [600, 600], [5,6], (350, 350)))
 
-
-                                        #(color, initial_position, width, height, speed, border):
         trans =  specialSprite_transport([200, 200, 200], (100,100), 500,50,1,1)
-
-      
         trans1 = AnimateTansporterSprite([200, 200, 200], (150,150), 150,40,500,1)
                
         self.rootSpriteGroup.add(trans)
         self.rootSpriteGroup.add(trans1)
-
         
         btn = SwitchButtonSprite([200, 200, 200], (250,150), 50,50,500,1)
         self.rootSpriteGroup.add(btn)
@@ -109,6 +104,8 @@ class PygameDisplay(wx.Window):
         return
  
     def Redraw(self):
+       # print "select page is pygame", self.GetParent().GetCurrentPage() is self
+       # print "isEnabled", self.IsEnabled()
         if self.size_dirty:
             self.screen = pygame.Surface(self.size, 0, 32)
             self.size_dirty = False
@@ -141,6 +138,10 @@ class PygameDisplay(wx.Window):
         #saver.save(self.screen, "test")
         s = pygame.image.tostring(self.screen, 'RGB')  # Convert the surface to an RGB string
         img = wx.ImageFromData(self.size[0], self.size[1], s)  # Load this string into a wx image
+
+        if img.IsOk() is not True:
+            return
+
         bmp = wx.BitmapFromImage(img)  # Get the image in bitmap form
         dc = wx.ClientDC(self)  # Device context for drawing the bitmap
         dc.DrawBitmap(bmp, 0, 0, 1)  # Blit the bitmap image to the display

@@ -1,11 +1,10 @@
-﻿# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*- 
 
 import wx
 import images
 import string
-from myPygame import *
-from MyHmiPanel import *
 from MyGlobal import *
+from myPygame import *
 
 class MyTreeCtrl(wx.TreeCtrl):
     def __init__(self, parent, id, pos, size, style, log):
@@ -186,7 +185,7 @@ class ViewSelectPanel(wx.Panel):
             print ("OnActivate: %s\n" % self.tree.GetItemText(self.item))
     
     def AddViewOption(self, name):
-        child = self.tree.AppendItem(self.root, name)
+        child = self.tree.AppendItem(self.root, "什么")
         self.tree.SetPyData(child, None)
         self.tree.SetItemImage(child, self.fldridx, wx.TreeItemIcon_Normal)
         self.tree.SetItemImage(child, self.fldropenidx, wx.TreeItemIcon_Expanded)
@@ -215,24 +214,14 @@ class ViewSelectPanel(wx.Panel):
         
         #self.dispanel = wx.Panel(container, wx.ID_ANY, wx.DefaultPosition, container.GetClientSize(), wx.TAB_TRAVERSAL )
 
-        # self.dispanel =
-
-        self.dispanel = wx.Notebook( container, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
-
-        pygamePanel = PygameDisplay(self.dispanel, -1)
-        myHMIPanel = MyHmiPanel(self.dispanel, -1)
-
-
-
-        self.dispanel.AddPage( pygamePanel, (u"pygame"), False )
-        self.dispanel.AddPage( myHMIPanel, (u"HMI"), False )
-
+        self.dispanel = PygameDisplay(container, -1)
+    
         sizer.Add( self.dispanel, 1, wx.EXPAND |wx.ALL, 5 )
         
         #        self.m_panel25.SetBackgroundColour( wx.SystemSettings.GetColour( "sky blue" ) )
         
-        # self.dispanel.SetBackgroundColour("sky blue")
-        # wx.StaticText(self.dispanel, -1, txt, (20*i, 10*i))
+        self.dispanel.SetBackgroundColour("sky blue")
+        wx.StaticText(self.dispanel, -1, txt, (20*i, 10*i))
 
         container.SetSizer(sizer)
 #        container.SetAutoLayout(True)

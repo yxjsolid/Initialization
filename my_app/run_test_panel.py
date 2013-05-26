@@ -223,13 +223,17 @@ class MyApp(wx.App):
     def testCommonBtn(self, panel):
 
 
-        b = buttons.GenButton(panel, -1, pos = (500,200),name='Genric Button')#»ù±¾µÄÍ¨ÓÃ°´Å¥  
+        """
+
+:param panel:
+"""
+        b = buttons.GenButton(panel, -1, pos = (500,200),name='Genric Button')#ï¿½ï¿½ï¿½Í¨ï¿½Ã°ï¿½Å¥
        
-        b = buttons.GenButton(panel, -1,  label='disabled Generic',pos = (500,290),name='disabled Generic')#ÎÞÐ§µÄÍ¨ÓÃ°´Å¥  
+        b = buttons.GenButton(panel, -1,  label='disabled Generic',pos = (500,290),name='disabled Generic')#ï¿½ï¿½Ð§ï¿½ï¿½Í¨ï¿½Ã°ï¿½Å¥  
         #b.Enable(False)  
           
         """
-        b = buttons.GenButton(panel, -1,  pos = (500,400),name='bigger')#×Ô¶¨Òå³ß´çºÍÑÕÉ«µÄ°´Å¥  
+        b = buttons.GenButton(panel, -1,  pos = (500,400),name='bigger')#ï¿½Ô¶ï¿½ï¿½ï¿½ß´ï¿½ï¿½ï¿½ï¿½É«ï¿½Ä°ï¿½Å¥  
         b.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD, False))  
         b.SetBezelWidth(5)  
         b.SetBackgroundColour("Navy")  
@@ -242,7 +246,7 @@ class MyApp(wx.App):
         self.index = 1
 
 
-        self.testBtn =  MyGenBitmapButton(panel, -1,  pos = (470,300), style =   wx.BORDER_NONE|wx.TRANSPARENT_WINDOW)#Í¨ÓÃÎ»Í¼°´Å¥  
+        self.testBtn =  MyGenBitmapButton(panel, -1,  pos = (470,300), style =   wx.BORDER_NONE|wx.TRANSPARENT_WINDOW)#Í¨ï¿½ï¿½Î»Í¼ï¿½ï¿½Å¥  
         
         self.testBtn.Enable(1)
         self.testBtn.Bind( wx.EVT_BUTTON, self.onButton )
@@ -251,7 +255,7 @@ class MyApp(wx.App):
         self.testBtn.loadImageSelected(btn_red_down)
 
 
-        self.testBtn1 =  MyGenBitmapToggleButton(panel, -1,  pos = (520,300), style =   wx.BORDER_NONE|wx.TRANSPARENT_WINDOW)#Í¨ÓÃÎ»Í¼°´Å¥  
+        self.testBtn1 =  MyGenBitmapToggleButton(panel, -1,  pos = (520,300), style =   wx.BORDER_NONE|wx.TRANSPARENT_WINDOW)#Í¨ï¿½ï¿½Î»Í¼ï¿½ï¿½Å¥  
         
         self.testBtn1.Enable(1)
         self.testBtn1.Bind( wx.EVT_BUTTON, self.onButton )
@@ -260,7 +264,7 @@ class MyApp(wx.App):
 
 
        
-        self.testBtn2 =  MyGenBitmapToggleButton(panel, -1,  pos = (520,300), style =   wx.BORDER_NONE|wx.TRANSPARENT_WINDOW)#Í¨ÓÃÎ»Í¼°´Å¥  
+        self.testBtn2 =  MyGenBitmapToggleButton(panel, -1,  pos = (520,300), style =   wx.BORDER_NONE|wx.TRANSPARENT_WINDOW)#Í¨ï¿½ï¿½Î»Í¼ï¿½ï¿½Å¥  
         
         self.testBtn2.Enable(1)
         self.testBtn2.Bind( wx.EVT_BUTTON, self.onButton )
@@ -272,7 +276,7 @@ class MyApp(wx.App):
 
 
          
-        self.testBtn3 =  MyGenBitmapToggleButton(panel, -1,  pos = (520,300), style =   wx.BORDER_NONE|wx.TRANSPARENT_WINDOW)#Í¨ÓÃÎ»Í¼°´Å¥  
+        self.testBtn3 =  MyGenBitmapToggleButton(panel, -1,  pos = (520,300), style =   wx.BORDER_NONE|wx.TRANSPARENT_WINDOW)#Í¨ï¿½ï¿½Î»Í¼ï¿½ï¿½Å¥  
         
         self.testBtn3.Enable(1)
         self.testBtn3.Bind( wx.EVT_BUTTON, self.onButton )
@@ -295,15 +299,15 @@ class MyApp(wx.App):
 
 
         b = sbbutton.SToggleButton(panel, -1,  pos = (450,600))
-        #b = sbbutton.SBitmapButton(panel, -1, pos = (500,400),bitmap=bmp)#Í¨ÓÃÎ»Í¼¿ª¹Ø°´Å¥  
+        #b = sbbutton.SBitmapButton(panel, -1, pos = (500,400),bitmap=bmp)#Í¨ï¿½ï¿½Î»Í¼ï¿½ï¿½ï¿½Ø°ï¿½Å¥  
         
         #bitmap = wx.BitmapFromImage(image)
 
 
-       # b = buttons.GenBitmapTextButton(panel, -1, pos = (500,700),bitmap=bmp, name="Bitmapped Text",size=(175, 75))#Î»Í¼ÎÄ±¾°´Å¥  
+       # b = buttons.GenBitmapTextButton(panel, -1, pos = (500,700),bitmap=bmp, name="Bitmapped Text",size=(175, 75))#Î»Í¼ï¿½Ä±ï¿½ï¿½ï¿½Å¥  
        # b.SetUseFocusIndicator(False)  
        
-        #b = buttons.GenToggleButton(panel, -1, "Toggle Button")#Í¨ÓÃ¿ª¹Ø°´Å¥  
+        #b = buttons.GenToggleButton(panel, -1, "Toggle Button")#Í¨ï¿½Ã¿ï¿½ï¿½Ø°ï¿½Å¥  
     def OnMouse(self, event):
 
 

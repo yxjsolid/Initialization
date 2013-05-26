@@ -34,6 +34,7 @@ class MyApp(wx.App):
     def SetAppViewSelectPanel(self, panel):
         self.ViewSelectPanel = panel
         return
+
     
     def GetAppViewSelectPane(self):
         return self.ViewSelectPanel
