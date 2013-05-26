@@ -59,18 +59,15 @@ class __MyBtnMixin:
         self.loadImageSelected(btn_green_down)
 
     def getIconBmp(self, size=None):
-
         if size:
             x,y = size
             img = self.imageLabel.Scale(x,y,quality=wx.IMAGE_QUALITY_HIGH)
         else:
             img = self.imageLabel
-
         return img.ConvertToBitmap()
 
     def SetMoveBegin(self, pos):
         self.initPos = pos
-
 
     def SetMoveEnd(self, pos):
         self.initPos = pos

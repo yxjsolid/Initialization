@@ -3,6 +3,13 @@
 import wx
 
 
+class DeviceAttribute():
+    def __init__(self):
+        self.name = ""
+        self.desc = ""
+        return
+
+
 class DeviceController():
     def __init__(self):
         self.transports = []
@@ -58,7 +65,7 @@ class DeviceModule():
 class ModuelControl():
     def __init__(self, nm=''):
         self.name = nm
-        self.info = "Î´¶¨Òå"
+        self.info = "Î´ï¿½ï¿½ï¿½ï¿½"
         self.actions = []
     
     def addNewAction(self, action):
@@ -94,7 +101,7 @@ class TransporterDevice():
 		self.identifiers = ['id','nm','ds','sv','pr','pl','op','fx','ts']
 				
 		self.data = [{'id':1,
-					  'nm':"Æ¤´ø»ú",
+					  'nm':"Æ¤ï¿½ï¿½ï¿½",
 		              'ds':"É¶É¶",
 		              'sv':"major",
 		              'pr':1,

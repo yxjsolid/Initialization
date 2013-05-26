@@ -9,7 +9,6 @@ from MyWidgetLibrary import *
 
 def testRSizedWidget(parent):
     rw1 = rw.ResizeWidget(parent)
-
     # This one we will reparent to the ResizeWidget...
     tst = wx.Panel(parent)
     tst.SetBackgroundColour('pink')
@@ -26,7 +25,6 @@ class MyHmiPanel(wx.Panel):
 
         self.size = self.GetSizeTuple()
         self.size_dirty = True
-
         self.rootSpriteGroup = pygame.sprite.LayeredUpdates()
 
         self.timer = wx.Timer(self)
@@ -40,7 +38,7 @@ class MyHmiPanel(wx.Panel):
         #self.timer.Start(5000, False)
 
         self.linespacing = 5
-        self.addTestSprite()
+        # self.addTestSprite()
         self.previous_time = 0
         self.Bind(wx.EVT_MOUSE_EVENTS, self.OnMouse)
         self.Bind(wx.EVT_CONTEXT_MENU, self.OnContextMenu)
@@ -49,10 +47,8 @@ class MyHmiPanel(wx.Panel):
         #self.SetDoubleBuffered(True)
         testRSizedWidget(self)
 
-
     def addSpriteToPanel(self, sprite):
-        self.rootSpriteGroup.add(sprite)
-
+        self.rootSpriteGroup.add(sprite,layer=12)
 
     def addTestSprite(self):
         for color, location, speed in [([255, 0, 0], [50, 50], [2,3]),
@@ -60,17 +56,12 @@ class MyHmiPanel(wx.Panel):
                                        ([0, 0, 255], [150, 150], [4,3])]:
             self.rootSpriteGroup.add(MoveBall(color, location, speed, (350, 350)))
 
-
         self.rootSpriteGroup.add(test_Drag_Sprite([100, 100, 100], [200, 200], [5,6], (350, 350)))
-
         self.rootSpriteGroup.add(Sprite_Button([200, 200, 200], [300, 400], [5,6], (350, 350)))
         self.rootSpriteGroup.add(AnimateTansporterSprite([200, 200, 200], (150,150), 150,40,500,1))
         self.rootSpriteGroup.add(SwitchButtonSprite([200, 200, 200], (250,150), 50,50,500,1))
 
         #self.rootSpriteGroup.add(specialSprite_transport([200, 200, 200], (100,100), 500,50,1,1))
-
-
-
         #self.addTestSprite()
 
     def addSpritePerformanceTest(self):
@@ -90,15 +81,6 @@ class MyHmiPanel(wx.Panel):
 
     def Update(self, event):
         # Any update tasks would go here (moving sprites, advancing animation frames etc.)
-
-        #return
-
-        # if hasattr(self, 'testBtn'):
-        #     #self.testBtn.Update()
-        #     #self.testBtn.OnPaint(event)
-        #     self.testBtn.Refresh()
-        #     pass
-        #return
         self.Redraw()
 
         if hasattr(self, 'testBtn'):
@@ -129,7 +111,6 @@ class MyHmiPanel(wx.Panel):
         w, h = self.screen.get_size()
 
         while cur <= h:
-        #for i in range(0, 3):
             pygame.draw.aaline(self.screen, (255, 255, 255), (0, h - cur), (cur, 0))
             cur += self.linespacing
 
@@ -138,26 +119,18 @@ class MyHmiPanel(wx.Panel):
         #print "current_time - previous_time = ", current_time - self.previous_time
 
         self.previous_time = current_time
-
         self.rootSpriteGroup.update(current_time)
         self.rootSpriteGroup.draw(self.screen)
 
-        #saver.save(self.screen, "test")
         s = pygame.image.tostring(self.screen, 'RGB')  # Convert the surface to an RGB string
-
-        #print "hmisize ",self.size
         img = wx.ImageFromData(self.size[0], self.size[1], s)  # Load this string into a wx image
 
         #if img.IsOk() is not True:
            # return
         bmp = wx.BitmapFromImage(img)  # Get the image in bitmap form
         dc = wx.ClientDC(self)  # Device context for drawing the bitmap
-        #dc = wx.PaintDC(self)
         dc = wx.BufferedDC( dc)
-
-        #print "MyHmiPanel repaint"
         dc.DrawBitmap(bmp, 0, 0, 1)  # Blit the bitmap image to the display
-
 
         if hasattr(self, 'testBtn'):
             #dddc = self.testBtn.OnDrawBtn()
@@ -168,19 +141,16 @@ class MyHmiPanel(wx.Panel):
             #
             # dc.Blit(x,y,width,height, dddc, 0,0, useMask=True)
 
-     #del dc
-     #self.Refresh()
-
-
     def checkCollide(self, event):
         x , y = (event.GetX(),event.GetY())
 
         mousePoint = pygame.sprite.Sprite()
         mousePoint.rect = pygame.Rect(x, y, 1, 1)
-        copoint = pygame.sprite.spritecollideany(mousePoint, self.rootSpriteGroup)
+        #copoint = pygame.sprite.spritecollideany(mousePoint, self.rootSpriteGroup)
+        copoint = pygame.sprite.spritecollide(mousePoint, self.rootSpriteGroup, None)
 
         if copoint:
-            copoint.setSelect(1)
+            copoint = copoint[-1]
 
         return copoint
 
@@ -195,10 +165,16 @@ class MyHmiPanel(wx.Panel):
         self.selectedSprite = sprite
 
     def OnMouse(self, event):
+        mousePos = (event.GetX(),event.GetY())
+        onMouseObj = self.checkCollide(event)
+
+        #print "MyHmiPanel Mouse Event:", event
+
+        # if onMouseObj:
+        #     onMouseObj.OnMouseHandler(event)
+
         if event.LeftDown():
-
-            print "left",(event.GetX(),event.GetY())
-
+            print "LeftDown",(event.GetX(),event.GetY())
             selected = self.checkCollide(event)
 
             if selected:
@@ -218,15 +194,13 @@ class MyHmiPanel(wx.Panel):
             print "RightDown",(event.GetX(),event.GetY())
             self.removeSelectedSprite()
 
+        elif event.Dragging() and event.LeftIsDown():
+            print "left Dragging", (event.GetX(),event.GetY())
 
-        elif event.Dragging():
-            print "left drag", (event.GetX(),event.GetY())
             if self.selectedSprite:
                 self.selectedSprite.move((event.GetX(),event.GetY()))
 
         event.Skip()
-
-
 
     def OnPaint(self, event):
         self.Redraw()

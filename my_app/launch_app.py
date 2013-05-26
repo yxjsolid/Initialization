@@ -12,8 +12,8 @@ class MyApp(wx.App):
     def __init__(self, redirect=True, filename=None):
         print "App __init__"
         wx.App.__init__(self, redirect, filename)
-       
-    
+
+
     def getDevices(self):
         return self.deviceController.getDevices()
         

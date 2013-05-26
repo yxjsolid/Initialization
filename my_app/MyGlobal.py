@@ -2,6 +2,8 @@
 from MyTestApp import *
 
 
+teststr = "测试"
+
 VIEW_OPTION_NAME_MAIN = u"总览"
 VIEW_OPTION_NAME_DEVICE = u"设备"
 DEVICE_NAME_TRANSPORT = u"皮带机"
@@ -10,6 +12,23 @@ DEVICE_NAME_TRANSPORT = u"皮带机"
 ADD_DEVICE_LABEL_NAME = u"名称："
 ADD_DEVICE_LABEL_POS = u"位置："
 ADD_DEVICE_LABEL_DESC = u"描述："
+
+
+ADD_MOUDLE_LABEL_NAME = u"名称："
+ADD_MOUDLE_LABEL_POS = u"位置："
+ADD_MOUDLE_LABEL_DESC = u"描述："
+MOUDLE_NAME_DEFAULT = u"未命名"
+
+
+ACTION_COL_ACT = u"动作"
+ACTION_COL_FEEDBACK = u"反馈"
+ACTION_COL_FEEDBACK_TIMEOUT = u"反馈超时"
+
+
+ATTR_COL_NAME = u"名称"
+ATTR_COL_DESC = u"描述"
+ATTR_COL_OTHER = u"其他"
+
 
 
 MODULE_TYPE_SIG_IN = 1

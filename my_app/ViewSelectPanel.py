@@ -161,14 +161,10 @@ class ViewSelectPanel(wx.Panel):
             print ("OnItemCollapsed: %s\n" % self.tree.GetItemText(item))
     def OnSelChanged(self, event):
         self.item = event.GetItem()
-        
         self.i += 1
         if self.item:
             #self.log.WriteText("OnSelChanged: %s\n" % self.tree.GetItemText(self.item))
-            
 #           self.parent.ViewPanelSetDsp()
-            
-        
             self.ViewPanelSetDsp(self.parent, self.tree.GetItemText(self.item), self.i)
             
             if wx.Platform == '__WXMSW__':
@@ -208,34 +204,19 @@ class ViewSelectPanel(wx.Panel):
     def ViewPanelSetDsp(self, parent, txt, i):
         
         container = parent.viewPanel
-        
         container.DestroyChildren()
-        
         sizer = wx.BoxSizer( wx.VERTICAL )
-        
-        #self.dispanel = wx.Panel(container, wx.ID_ANY, wx.DefaultPosition, container.GetClientSize(), wx.TAB_TRAVERSAL )
-
-        # self.dispanel =
 
         self.dispanel = wx.Notebook( container, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
 
         pygamePanel = PygameDisplay(self.dispanel, -1)
         myHMIPanel = MyHmiPanel(self.dispanel, -1)
 
-
-
         self.dispanel.AddPage( pygamePanel, (u"pygame"), False )
         self.dispanel.AddPage( myHMIPanel, (u"HMI"), False )
-
         sizer.Add( self.dispanel, 1, wx.EXPAND |wx.ALL, 5 )
-        
-        #        self.m_panel25.SetBackgroundColour( wx.SystemSettings.GetColour( "sky blue" ) )
-        
-        # self.dispanel.SetBackgroundColour("sky blue")
-        # wx.StaticText(self.dispanel, -1, txt, (20*i, 10*i))
 
         container.SetSizer(sizer)
-#        container.SetAutoLayout(True)
         container.Layout()
 
     def onEditUpdate(self):
@@ -246,5 +227,3 @@ class ViewSelectPanel(wx.Panel):
 
         self.tree.Expand(self.getDeviceViewNode())
         return
-
-

@@ -109,7 +109,7 @@ class MyWidgetObj():
 
     def __init__(self, type):
 
-        self.dict = {"Button":self.createNewBtnSprite, "Sprite":self.getSpriteIconBmp}
+        self.dict = {"Button":self.createNewBtnSprite, "Transporter":self.createNewTranspotrSprite}
         self.type = type
         self.Sprite = None
 
@@ -196,16 +196,18 @@ class MyWidgetObj():
         fn = self.dict[self.type]
         return fn()
 
-
     def createNewBtnSprite(self):
         print "createNewBtnSprite"
-
         dicList = []
         dic = self.Sprite.imageResource
         for key in dic:
             dicList.append((key, dic[key][0]))
-
         sprite = ButtonSprite(initPos=(100,250), dicts=dicList)
+        return sprite
+
+    def createNewTranspotrSprite(self):
+        print "createNewTranspotrSprite"
+        sprite = AnimateTansporterSprite(width=400, height=60)
         return sprite
 
 class MyDefaultLibrary():
@@ -239,7 +241,7 @@ class MyDefaultLibrary():
         x = self.defaultSize[0]
         y = self.defaultSize[1]
 
-        obj = MyWidgetObj("Sprite")
+        obj = MyWidgetObj("Transporter")
         obj.Sprite = AnimateTansporterSprite(width=200, height=60)
         self.widgetList.append(obj)
 

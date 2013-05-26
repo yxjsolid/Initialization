@@ -12,7 +12,7 @@ from MySprite import *
 import random
 
 
-
+pygame.Rect
 pygame.init()
 class myFileSave():
     direc = r"D:\workspace\myGitProj\init\my_app\image\test1\\"
