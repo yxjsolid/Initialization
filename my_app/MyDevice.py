@@ -32,8 +32,9 @@ class Device_Transport():
         self.name = nm
         self.info = info
         self.location = location
-        self.modules = []
+        self.io_modules = []
         self.controls = []
+        self.attrList = []
 
         return
 
@@ -42,14 +43,14 @@ class Device_Transport():
         print "desc: ",self.desc
         print "pos : ",self.pos	
 
-    def addModule(self, module):
-        self.modules.append(module)
+    def addModule(self, io_module):
+        self.io_modules.append(io_module)
 
-    def getModules(self):
-        return self.modules
+    def getIoModules(self):
+        return self.io_modules
 
-    def setModules(self, moduels):
-        self.modules = modules
+    def setModules(self, io_modules):
+        self.io_modules = io_modules
 
     def setControls(self, controls):
         self.controls = controls

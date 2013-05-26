@@ -346,14 +346,14 @@ class Panel_AddDevice_Base ( wx.Panel ):
 		bSizer71.Fit( self.m_panel231 )
 		fgSizer51.Add( self.m_panel231, 1, wx.EXPAND |wx.ALL, 0 )
 		
-		self.io_moudle_list = UlcListCtrl( self.io_module_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT|wx.NO_BORDER )
-		fgSizer51.Add( self.io_moudle_list, 0, wx.EXPAND|wx.ALL, 5 )
+		self.moudleIo_list = UlcListCtrl( self.io_module_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT|wx.NO_BORDER )
+		fgSizer51.Add( self.moudleIo_list, 0, wx.EXPAND|wx.ALL, 5 )
 		
 		
 		self.io_module_panel.SetSizer( fgSizer51 )
 		self.io_module_panel.Layout()
 		fgSizer51.Fit( self.io_module_panel )
-		self.m_notebook4.AddPage( self.io_module_panel, _(u"输入输出"), False )
+		self.m_notebook4.AddPage( self.io_module_panel, _(u"输入输出"), True )
 		self.contorl_panel = wx.Panel( self.m_notebook4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		bSizer33 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -427,7 +427,7 @@ class Panel_AddDevice_Base ( wx.Panel ):
 		self.contorl_panel.SetSizer( bSizer33 )
 		self.contorl_panel.Layout()
 		bSizer33.Fit( self.contorl_panel )
-		self.m_notebook4.AddPage( self.contorl_panel, _(u"控制"), True )
+		self.m_notebook4.AddPage( self.contorl_panel, _(u"控制"), False )
 		
 		bSizer18.Add( self.m_notebook4, 1, wx.ALL|wx.EXPAND, 5 )
 		
@@ -461,8 +461,8 @@ class Panel_AddDevice_Base ( wx.Panel ):
 		self.attribute_list.Bind( wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected )
 		self.m_button81.Bind( wx.EVT_BUTTON, self.onAddModuleIO )
 		self.m_button91.Bind( wx.EVT_BUTTON, self.onDeleteModuleIO )
-		self.io_moudle_list.Bind( wx.EVT_LIST_ITEM_DESELECTED, self.OnItemDeselected )
-		self.io_moudle_list.Bind( wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected )
+		self.moudleIo_list.Bind( wx.EVT_LIST_ITEM_DESELECTED, self.OnItemDeselected )
+		self.moudleIo_list.Bind( wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected )
 		self.Bind( wx.EVT_TOOL, self.onActGrpToolClicked, id = ctrl_new )
 		self.Bind( wx.EVT_TOOL, self.onActGrpToolClicked, id = ctrl_del )
 		self.Bind( wx.EVT_TOOL, self.onActGrpToolClicked, id = ctrl_up )

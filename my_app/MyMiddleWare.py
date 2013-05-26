@@ -148,9 +148,9 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
             self.thisDevice = device
         self.frame = frame
         self.deviceInfoPanelSetup()
-        self.moduleListSetup()
-        self.attrCtrl = AttributeViewControl(self)
 
+        self.moduleIoViewCtrl = ModuleIoListControl(self)
+        self.attrCtrl = AttributeViewControl(self)
         self.actionListCtrl = ActionViewControl(self)
         self.actGrpCtrl = ActionGroupViewControl(self)
         self.onLoadUpdate()
@@ -168,89 +168,21 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
     def onActionToolClicked(self, event):
         self.actionListCtrl.onActionToolClicked(event)
 
-
-#######################################################
-# module list related
-    def moduleListSetup(self):
-        self.io_moudle_list.InsertColumn(0, "")
-        self.io_moudle_list.InsertColumn(1, "Name", wx.LIST_FORMAT_RIGHT)
-        self.io_moudle_list.InsertColumn(2, "type")
-        self.io_moudle_list.InsertColumn(3, "IO")
-        
-        #self.list.SetColumnWidth(0, wx.LIST_AUTOSIZE)
-
-        self.io_moudle_list.SetColumnWidth(0, wx.LIST_AUTOSIZE_USEHEADER)
-        self.io_moudle_list.SetColumnWidth(1, wx.LIST_AUTOSIZE_USEHEADER)
-        self.io_moudle_list.SetColumnWidth(2, wx.LIST_AUTOSIZE_USEHEADER)
-        self.io_moudle_list.SetColumnWidth(3, wx.LIST_AUTOSIZE_USEHEADER)
-        self.io_moudle_list.Bind( wx.EVT_LIST_ITEM_SELECTED, self.onModuleListItemSelected )
-
-    def listInsertNewModule(self, module):
-        count = self.io_moudle_list.GetItemCount() + 1
-        index = self.io_moudle_list.InsertStringItem(sys.maxint, str(count), 0)
-        self.io_moudle_list.SetStringItem(index, 1, module.name, 0)
-        self.io_moudle_list.SetStringItem(index, 2, module.type[1], 0)
-        self.io_moudle_list.SetStringItem(index, 3, module.io, 0)
-        
-        print "\n name,", module.name, sys.getrefcount(module)
-
-        self.io_moudle_list.SetItemData(index, module)
-        print " name,", module.name, sys.getrefcount(module)
-
-    def addModule(self, module):
-        self.thisDevice.addModule(module)
-
-    def getModules(self):
-        return self.thisDevice.getModules()
-
-    def deleteModuel(self):
-        modules = []
-        self.io_moudle_list.checkList
-
-        key = 0
-        for item in self.thisDevice.modules:
-            if key not in self.io_moudle_list.checkList:
-                modules.append(item)
-            key += 1
-        self.thisDevice.modules = modules
-
     def onLoadUpdate(self):
         self.setupDeviceInfo(self.thisDevice)
-        self.onModuleListUpdate()
+        self.moduleIoViewCtrl.onModuleIOListUpdate()
         self.actGrpCtrl.onActGrpUpdate()
+        self.attrCtrl.onAttrListUpdate()
         return
 
     def onEditUpdate(self, targetObj=None):
         self.editDeviceUpdate()
 
-    def onModuleListUpdate(self):
-        self.io_moudle_list.DeleteAllItems()
-        self.io_moudle_list.checkList = []
-        
-        index = 0
-        for item in self.thisDevice.modules:
-            self.listInsertNewModule(item) 
-            index += 1
-        self.io_moudle_list.SetColumnWidth(0, wx.LIST_AUTOSIZE)
-        self.io_moudle_list.SetColumnWidth(1, wx.LIST_AUTOSIZE)
-        self.io_moudle_list.SetColumnWidth(2, wx.LIST_AUTOSIZE)
-        self.io_moudle_list.SetColumnWidth(3, wx.LIST_AUTOSIZE)
-        return
-
     def editDeviceUpdate(self):
-        self.onModuleListUpdate()
+        self.getModuleIoViewControl().onModuleIOListUpdate()
         return
 
-    def onModuleListItemSelected(self, event):
-            
-        moduleObj = event.GetData()
-        print sys.getrefcount(moduleObj)
 
-        return
-
-#------------------------------------------------------
-# module list end
-#######################################################
     """
     Attribute list control
     """
@@ -296,8 +228,6 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
     def onCancel(self, event):
         print "my onCancel"
 
-
-
     def onActGrpToolClicked(self, event):
         self.actGrpCtrl.onActGrpToolClicked(event)
 
@@ -313,29 +243,100 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
     def onActGrpItemDelete(self, event):
         self.actGrpCtrl.onActGrpItemDelete(event)
 
-
     def onAddModuleIO(self, event):
         print "onAddModuleIO"
         #frame1 = wx.Frame(parent=self.parent, size=(800,400))
         frame1 = wx.Frame(parent=None, size=(800,400))
-
         Panel_EditModuleIO(frame1, self, self)
         frame1.CenterOnScreen()
         frame1.Show()
 
     def onDeleteModuleIO(self, event):
         print "onDeleteModuleIO"
-        self.deleteModuel()
-        self.onModuleListUpdate()
+        ioViewCtrl = self.getModuleIoViewControl()
+        ioViewCtrl.deleteIoModule()
+        ioViewCtrl.onModuleIOListUpdate()
+
+    def getModuleIoViewList(self):
+        return self.moudleIo_list
+    def getModuleIoViewControl(self):
+        return self.moduleIoViewCtrl
+
+class ModuleIoListControl():
+    def __init__(self, parent):
+        self.parent = parent
+        self.viewList = self.parent.getModuleIoViewList()
+        self.moduleListSetup()
+
+    def moduleListSetup(self):
+        self.viewList.InsertColumn(0, "")
+        self.viewList.InsertColumn(1, "Name", wx.LIST_FORMAT_RIGHT)
+        self.viewList.InsertColumn(2, "type")
+        self.viewList.InsertColumn(3, "IO")
+
+        #self.list.SetColumnWidth(0, wx.LIST_AUTOSIZE)
+
+        self.viewList.SetColumnWidth(0, wx.LIST_AUTOSIZE_USEHEADER)
+        self.viewList.SetColumnWidth(1, wx.LIST_AUTOSIZE_USEHEADER)
+        self.viewList.SetColumnWidth(2, wx.LIST_AUTOSIZE_USEHEADER)
+        self.viewList.SetColumnWidth(3, wx.LIST_AUTOSIZE_USEHEADER)
+        self.viewList.Bind( wx.EVT_LIST_ITEM_SELECTED, self.onModuleListItemSelected )
+
+    def listInsertNewModule(self, module):
+
+        count = self.viewList.GetItemCount() + 1
+        index = self.viewList.InsertStringItem(sys.maxint, str(count), 0)
+        self.viewList.SetStringItem(index, 1, module.name, 0)
+        self.viewList.SetStringItem(index, 2, module.type[1], 0)
+        self.viewList.SetStringItem(index, 3, module.io, 0)
+
+        print "\n name,", module.name, sys.getrefcount(module)
+
+        self.viewList.SetItemData(index, module)
+        print " name,", module.name, sys.getrefcount(module)
+
+    def addModule(self, module):
+        self.parent.thisDevice.addModule(module)
+
+    def getIoModules(self):
+        return  self.parent.thisDevice.getIoModules()
+
+    def deleteIoModule(self):
+        modules = []
+        key = 0
+        for item in  self.parent.thisDevice.getIoModules():
+            if key not in self.viewList.checkList:
+                modules.append(item)
+            key += 1
+        self.parent.thisDevice.modules = modules
+
+    def onModuleIOListUpdate(self):
+        self.viewList.DeleteAllItems()
+        self.viewList.checkList = []
+
+        index = 0
+        for item in  self.parent.thisDevice.getIoModules():
+            self.listInsertNewModule(item)
+            index += 1
+        self.viewList.SetColumnWidth(0, wx.LIST_AUTOSIZE)
+        self.viewList.SetColumnWidth(1, wx.LIST_AUTOSIZE)
+        self.viewList.SetColumnWidth(2, wx.LIST_AUTOSIZE)
+        self.viewList.SetColumnWidth(3, wx.LIST_AUTOSIZE)
+        return
+
+    def onModuleListItemSelected(self, event):
+        moduleObj = event.GetData()
+        print sys.getrefcount(moduleObj)
+        return
 
 
 class Panel_EditModuleIO(MainBase.Panel_EditModuleIO_Base):
-    def __init__(self, frame, parent, deviceEditor, targetObj=None):
+    def __init__(self, frame, opener, deviceEditor, targetObj=None):
         MainBase.Panel_EditModuleIO_Base.__init__( self, frame )
         self.moduleTypeChoiceSetup(self.choice)
         self.deviceEditor = deviceEditor
         self.frame = frame
-        self.parent = parent
+        self.opener = opener
         self.targetObj = targetObj
 
     def moduleTypeChoiceSetup(self, choice):
@@ -371,14 +372,9 @@ class Panel_EditModuleIO(MainBase.Panel_EditModuleIO_Base):
 
     def onApply(self, event):
         module = self.createNewModule()
-        print "aa name", module.name, sys.getrefcount(module)
-        dumpModuleObj(module, pad=1)
-        self.deviceEditor.addModule(module)
-        print "aa name", module.name, sys.getrefcount(module)
-        dumpModuleObj(module)
-        self.parent.onEditUpdate(targetObj=self.targetObj)
-        dumpModuleObj(module)
-        print "aa name", module.name, sys.getrefcount(module)
+        self.deviceEditor.getModuleIoViewControl().addModule(module)
+        self.opener.onEditUpdate(targetObj=self.targetObj)
+
         self.closeWindow()
 
     def onCancel(self, event):
@@ -757,12 +753,12 @@ class Panel_EditAction(MainBase.Panel_EditAction_Base):
     def buildChoiceList(self, choiceObj):
         """select the previous selected item after update"""
         index = 0
-        modules = self.deviceEditor.getModules()
+        io_modules = self.deviceEditor.getModuleIoViewControl().getIoModules()
         
         prevItem = self.getPrevSelected(choiceObj)
         choiceObj.Clear()
         
-        for item in modules:
+        for item in io_modules:
             print "\n",item.name, sys.getrefcount(item)
             choiceObj.Append(item.name, item)
 
@@ -851,7 +847,7 @@ class AttributeViewControl():
         self.parent = parent
         self.attrObjList = []
         self.SetupAttributeList()
-        self.addTestObj()
+        #self.addTestObj()
 
     def addTestObj(self):
         attrObj = DeviceAttribute()
@@ -875,7 +871,6 @@ class AttributeViewControl():
         attrList.SetColumnWidth(3, wx.LIST_AUTOSIZE_USEHEADER)
 
     def popupAttrEditWnd(self):
-
         # ctrlModule = self.getCurrentCtrlModule()
         # if ctrlModule is None:
         #     print "Error: --> addNewAction"
@@ -902,7 +897,6 @@ class AttributeViewControl():
 
         return
 
-
     def listInsertNewAttribute(self, index, attrObj):
         attrList = self.parent.attribute_list
 
@@ -926,8 +920,11 @@ class AttributeViewControl():
         attrList.SetStringItem(index, 3, "aaa", 0)
         attrList.SetItemData(index, None)
 
-    #----------------------------------------------------------------
-    # action list end
+    def onAttrListUpdate(self):
+        for attr in self.parent.thisDevice.attrList:
+            self.addNewAttribute(attr)
+
+        return
 
 class Panel_EditAttribute(MainBase.Panel_EditAttribute_Base):
     def __init__(self, frame, deviceEditor, target=None):
