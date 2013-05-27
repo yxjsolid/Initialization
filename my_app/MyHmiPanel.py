@@ -48,6 +48,7 @@ class MyHmiPanel(wx.Panel):
         testRSizedWidget(self)
 
     def addSpriteToPanel(self, sprite):
+        sprite.parent = self
         self.rootSpriteGroup.add(sprite,layer=12)
 
     def addTestSprite(self):
@@ -164,35 +165,48 @@ class MyHmiPanel(wx.Panel):
         sprite.setSelect(1)
         self.selectedSprite = sprite
 
+    def onSelectSprite(self, event, onMouseObj):
+        if onMouseObj:
+            if self.selectedSprite:
+                if onMouseObj != self.selectedSprite:
+                    self.setNewSelectedSprite(onMouseObj)
+            else:
+                self.setNewSelectedSprite(onMouseObj)
+
+            self.selectedSprite.setLastPos((event.GetX(),event.GetY()))
+        else:
+            self.removeSelectedSprite()
+
+
     def OnMouse(self, event):
         mousePos = (event.GetX(),event.GetY())
         onMouseObj = self.checkCollide(event)
-
         #print "MyHmiPanel Mouse Event:", event
+        event.Skip()
 
-        # if onMouseObj:
-        #     onMouseObj.OnMouseHandler(event)
+        if onMouseObj:
+            onMouseObj.OnMouseHandler(event)
+
+
+        #print "event.GetSkipped()", event.GetSkipped()
+
+        if not event.GetSkipped():
+
+            print "event dropped "
+            return
 
         if event.LeftDown():
             print "LeftDown",(event.GetX(),event.GetY())
-            selected = self.checkCollide(event)
-
-            if selected:
-                if self.selectedSprite:
-                    if selected != self.selectedSprite:
-                        self.setNewSelectedSprite(selected)
-                else:
-                    self.setNewSelectedSprite(selected)
-
-                self.selectedSprite.setLastPos((event.GetX(),event.GetY()))
-            else:
-                self.removeSelectedSprite()
-
+            self.onSelectSprite(event, onMouseObj)
         elif event.LeftUp():
             print "left up"
+
+        elif event.RightUp():
+            print "RightUp"
+            self.onSelectSprite(event, onMouseObj)
         elif event.RightDown():
             print "RightDown",(event.GetX(),event.GetY())
-            self.removeSelectedSprite()
+            self.onSelectSprite(event, onMouseObj)
 
         elif event.Dragging() and event.LeftIsDown():
             print "left Dragging", (event.GetX(),event.GetY())
@@ -200,7 +214,7 @@ class MyHmiPanel(wx.Panel):
             if self.selectedSprite:
                 self.selectedSprite.move((event.GetX(),event.GetY()))
 
-        event.Skip()
+
 
     def OnPaint(self, event):
         self.Redraw()

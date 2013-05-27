@@ -221,7 +221,7 @@ class ViewSelectPanel(wx.Panel):
 
     def onEditUpdate(self):
         self.clearDeviceNode()
-        deviceList = wx.GetApp().getDevices()
+        deviceList = wx.GetApp().getAllDeviceList()
         for device in deviceList:
             self.AddDeviceNode(device)
 

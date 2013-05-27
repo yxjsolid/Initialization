@@ -14,10 +14,11 @@ ADD_DEVICE_LABEL_POS = u"位置："
 ADD_DEVICE_LABEL_DESC = u"描述："
 
 
-ADD_MOUDLE_LABEL_NAME = u"名称："
-ADD_MOUDLE_LABEL_POS = u"位置："
-ADD_MOUDLE_LABEL_DESC = u"描述："
-MOUDLE_NAME_DEFAULT = u"未命名"
+OPERATION_LIST_LABEL_NAME = u"名称："
+OPERATION_LIST_LABEL_POS = u"位置："
+OPERATION_LIST_LABEL_DESC = u"描述："
+OPERATION_NAME_DEFAULT = u"未命名"
+OPERATION_DESC_DEFAULT = u"未定义"
 
 
 ACTION_COL_ACT = u"动作"
@@ -40,6 +41,9 @@ MODULE_TYPE_SIG_IN : u"信号量输入",
 MODULE_TYPE_VAL_IN : u"数值量输入",
 MODULE_TYPE_SIG_OUT : u"信号量输出",
 }
+
+MENU_ITEM_BUTTON_SETTING = u"动作绑定"
+
 
 
 rescoure_dir = r".\image\\"
@@ -70,3 +74,19 @@ image_fish = rescoure_dir + "fugu.png"
         frame1.Show()
 
 """
+
+
+class MyPopupWindow():
+    def __init__(self, parent=None, size=(800, 600), title=None):
+        #wx.DEFAULT_FRAME_STYLE
+        #self.frame = wx.MiniFrame(parent=None, size=size, style = wx.CAPTION | wx.RESIZE_BORDER)
+        self.frame = wx.Frame(parent=None, size=size, title=title)
+        self.frame.EnableCloseButton(1)
+
+    def windowPopup(self):
+        self.frame.CenterOnScreen()
+        self.frame.Show()
+
+# class Panel_ButtonSetting():
+#     def __init__(self, frame):
+#         return

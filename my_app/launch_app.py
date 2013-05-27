@@ -14,7 +14,7 @@ class MyApp(wx.App):
         wx.App.__init__(self, redirect, filename)
 
 
-    def getDevices(self):
+    def getAllDeviceList(self):
         return self.deviceController.getDevices()
         
     def OnInit(self):

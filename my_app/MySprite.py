@@ -3,7 +3,10 @@ import pygame
 from pygame.locals import *
 from math import pi
 from PIL import Image
+# from MyMiddleWare import *
 from MyGlobal import *
+import MyMiddleWare
+
 
 pygame.font.init()
 try:
@@ -592,7 +595,11 @@ class __MouseMixin:
         pass
 
     def onLeftDown(self, event):
-        print "onLeftUp"
+        print "onLeftDown"
+        pass
+
+    def onLeftDClick(self, event):
+        print "onLeftDClick"
         pass
 
     def onRightUp(self, event):
@@ -603,21 +610,41 @@ class __MouseMixin:
         print "onRightDown"
         pass
 
+    def onDragging(self, event):
+        print "onDragging"
+        pass
+
     def onMouseEnter(self, event):
         print "onMouseEnter"
         pass
 
     def OnMouseHandler(self, event):
-        print "OnMouseHandler"
+        #print "OnMouseHandler"
+        event.Skip()
+
+        if event.LeftUp():
+            self.onLeftUp(event)
+        elif event.LeftDown():
+            self.onLeftDown(event)
+        elif event.LeftDClick():
+            self.onLeftDClick(event)
+        elif event.RightUp():
+            self.onRightUp(event)
+        elif event.RightDown():
+            self.onRightDown(event)
+        elif event.Dragging() and event.LeftIsDown():
+            self.onDragging(event)
+
         pass
 
 
 class DragSprite(__MouseMixin, pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, parent=None):
         pygame.sprite.Sprite.__init__(self)
         self.is_select = 0
         self.lastPos = 0
         self.lastUpdate = 0
+        self.parent = parent
 
     def setLastPos(self, pos):
         self.lastPos = pos
@@ -979,8 +1006,8 @@ class SwitchButtonSprite(DragSprite):
 
 
 class ButtonSprite(DragSprite):
-        def __init__(self, initPos=(0,0), width=25, height=50, dicts=None):
-            DragSprite.__init__(self)
+        def __init__(self, parent=None, initPos=(0,0), width=25, height=50, dicts=None):
+            DragSprite.__init__(self, parent)
             self.imageResource = {}
             self.status = 0
             self.index = 0
@@ -991,10 +1018,22 @@ class ButtonSprite(DragSprite):
             self.rectOrig = pygame.Rect(initPos, (width, height))
             self.rect = self.rectOrig.copy()
 
-            for dict in dicts:
-                self.loadImgResource(dict)
+            self.operationOn = None
+            self.operationOff = None
 
-            self.setCurrentResource("on")
+            self.operationDic = {"on":self.getOperationOnItem, "off":self.getOperationOffItem}
+
+
+            for dic in dicts:
+                self.loadImgResource(dic)
+
+            self.setCurrentResource("off")
+
+        def getOperationOnItem(self):
+            return self.operationOn
+
+        def getOperationOffItem(self):
+            return self.operationOff
 
         def loadImgResource1(self, file):
             """
@@ -1002,12 +1041,9 @@ class ButtonSprite(DragSprite):
             """
             im = Image.open(file)
             im = im.resize((self.width, self.height))
-
             imagedata = im.convert('RGBA').tostring()
             imagesize = im.size
-
             imageSurface = pygame.image.fromstring(imagedata, imagesize , "RGBA")
-
 
         def loadImgResource2(self, dicKey, file):
             """
@@ -1036,7 +1072,6 @@ class ButtonSprite(DragSprite):
 
             #x = max(imagesize[0], imagesize[1])
             #newImg = pygame.Rect((0,0), (x, x))
-
             #imageS1.fill(color, None, BLEND_ADD)
             #imageSurface = pygame.transform.smoothscale(imageSurface,(self.width, self.height))
             #self.imageResource.append(imageSurface)
@@ -1045,9 +1080,10 @@ class ButtonSprite(DragSprite):
         def resizeResource(self, src, size):
             return pygame.transform.smoothscale(src, size)
 
+        def setCurrentResource(self, status):
+            self.currentStatus = status
 
-        def setCurrentResource(self, key):
-            self.imageOrig = self.resizeResource(self.imageResource[key][1], (self.width, self.height))
+            self.imageOrig = self.resizeResource(self.imageResource[status][1], (self.width, self.height))
             self.image = self.imageOrig.copy()
            # self.rect = self.image.get_rect().copy()
 
@@ -1066,3 +1102,47 @@ class ButtonSprite(DragSprite):
                 drawBoader1(self.image, self.image.get_rect())
             else:
                 self.image = self.imageOrig.copy()
+
+        def onRightUp(self, event):
+            print "onRightUp"
+            self.PopupButtonSetupMenu()
+            event.Skip(False)
+            pass
+
+        def PopupButtonSetupMenu(self):
+            menu = wx.Menu()
+            self.popupID = wx.NewId()
+            menu.Append(self.popupID, MENU_ITEM_BUTTON_SETTING)
+            menu.Bind(wx.EVT_MENU, self.onBeginButtonSetting, id=self.popupID)
+
+            # wx.EVT_MENU_RANGE(self, DIVISION_MENU_SPLIT_HORIZONTALLY, DIVISION_MENU_EDIT_BOTTOM_EDGE, self.OnMenu)
+            self.parent.PopupMenu(menu)
+
+        def onBeginButtonSetting(self, event):
+            print "onButtonSetting"
+            window = MyPopupWindow(self.parent, size=wx.DefaultSize, title="setting")
+
+            MyMiddleWare.Panel_ButtonSetting(window.frame, self.onButtonSettingDone)
+            window.windowPopup()
+
+        def onButtonSettingDone(self, operOn, operOff):
+            self.operationOn = operOn
+            self.operationOff = operOff
+            return
+
+        def onProcessOperation(self):
+            getOpItemFn = self.operationDic[self.currentStatus]
+
+            opItem = getOpItemFn()
+            if opItem:
+                opItem.processOperation()
+
+        def onLeftDClick(self, event):
+
+            if self.currentStatus == "on":
+                self.setCurrentResource("off")
+            elif self.currentStatus == "off":
+                self.setCurrentResource("on")
+
+            self.onProcessOperation()
+            return

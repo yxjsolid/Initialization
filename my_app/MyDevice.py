@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import wx
-
+from MyGlobal import *
 
 class DeviceAttribute():
     def __init__(self):
@@ -33,7 +33,7 @@ class Device_Transport():
         self.info = info
         self.location = location
         self.io_modules = []
-        self.controls = []
+        self.operations = []
         self.attrList = []
 
         return
@@ -52,21 +52,22 @@ class Device_Transport():
     def setModules(self, io_modules):
         self.io_modules = io_modules
 
-    def setControls(self, controls):
-        self.controls = controls
+    def setControls(self, operations):
+        self.operations = operations
 
 class DeviceModule():
-	def __init__(self, nm="", io="", tp=None):
-		self.name = nm
-		self.io = io
-		self.type = tp
-
-		return
-
-class ActionGroup():
-    def __init__(self, nm=''):
+    def __init__(self, nm="", io="", tp=None):
         self.name = nm
-        self.info = "δ����"
+        self.io = io
+        self.type = tp
+
+        return
+
+class DeviceOperation():
+    def __init__(self, parent, name=OPERATION_NAME_DEFAULT, info=OPERATION_DESC_DEFAULT):
+        self.parent = parent
+        self.name = name
+        self.info = info
         self.actions = []
     
     def addNewAction(self, action):
@@ -75,8 +76,13 @@ class ActionGroup():
     def setActions(self, actions):
         self.actions = actions
 
+    def genOperationDisplayName(self):
+        txt = self.parent.name + "\\" + self.name
+        return txt
 
-
+    def processOperation(self):
+        txt = self.genOperationDisplayName()
+        print "processOperation:", txt
 
 
 class ModuleAction():
@@ -89,34 +95,4 @@ class ModuleAction():
 
         self.moduleDelay = None
         return
-
-
-
-
-
-	
-
-class TransporterDevice():
-    def __init__(self, parent, id, pos, size, style, log):
-    
-		self.identifiers = ['id','nm','ds','sv','pr','pl','op','fx','ts']
-				
-		self.data = [{'id':1,
-					  'nm':"Ƥ���",
-		              'ds':"ɶɶ",
-		              'sv':"major",
-		              'pr':1,
-		              'pl':'MSW',
-		              'op':1,
-		              'fx':1,
-		              'ts':1
-		              }]
-    
-    
-    
-    
-    
-    
-    
-		return	
 
