@@ -771,8 +771,14 @@ class AnimateMotorSprite(pygame.sprite.Sprite):
         #print "self.rect", self.rect
         self.rectOrig = self.rect
         self.layer = 0
+        self.parent = None
 
     def update(self, current_time):
+
+        if self.parent and not self.parent.animateActive:
+            return
+
+
         if current_time - self.lastUpdate > 50:
             self.lastUpdate = current_time
         else:
@@ -872,12 +878,17 @@ class AnimateTansporterSprite(DragSprite):
 
         #self.imageOrig.fill((0,0,0,0), self.rect)
 
-        self.addComponent()
         self.index = 0
         self.rectOrig = self.rect
         self.angle = 0
         self.updateInterval = updateInterval
         self.isActive = 0
+
+        self.attribute = None   #bind to control the animation
+        self.attrCondition = None
+        self.animateActive = 0
+
+        self.addComponent()
         self.drawSelf(0)
 
     def addComponent(self):
@@ -898,7 +909,10 @@ class AnimateTansporterSprite(DragSprite):
         comp2 = StaticRectSprite("comp2", WHITE, rect)
         comp3 = AnimateMotorSprite("comp3", BLUE, center2, r, 1)
         #comp4 = StaticLineSprite("comp4",WHITE, rect)
-       
+
+        comp1.parent = self
+        comp3.parent = self
+
         self.components.append(comp2)
         self.components.append(comp1)
         self.components.append(comp3)
@@ -920,18 +934,29 @@ class AnimateTansporterSprite(DragSprite):
         for compent in self.components:
             compent.update(current_time)
             self.image.blit(compent.image, compent.rect)        
-     
+
+    def checkAnimate(self):
+        if self.attribute:
+            if self.attribute.value == self.attrCondition:
+                self.animateActive = 1
+                return
+
+        self.animateActive = 0
 
     def animate(self,current_time):
 
         return
+        # if self.attribute:
+        #     if self.attribute.value != self.attrCondition:
+        #         return
+
         if self.isActive and current_time - self.lastUpdate > self.updateInterval:
             self.lastUpdate = current_time
             self.angle += 15
         self.image = pygame.transform.rotate(self.image, self.angle)
 
     def update(self, current_time):
-
+        self.checkAnimate()
         center = self.rect.center
         self.drawSelf(current_time)    
         self.animate(current_time)
@@ -943,6 +968,50 @@ class AnimateTansporterSprite(DragSprite):
         self.rect = rect
         self.rect.center = center
 
+    def onRightUp(self, event):
+        print "onRightUp"
+        self.PopupDeviceSetupMenu()
+        event.Skip(False)
+        pass
+
+    def PopupDeviceSetupMenu(self):
+        menu = wx.Menu()
+        self.popupID = wx.NewId()
+        menu.Append(self.popupID, DEVICE_ITEM_SETTING)
+        menu.Bind(wx.EVT_MENU, self.onBeginDeviceSetting, id=self.popupID)
+
+        # wx.EVT_MENU_RANGE(self, DIVISION_MENU_SPLIT_HORIZONTALLY, DIVISION_MENU_EDIT_BOTTOM_EDGE, self.OnMenu)
+        self.parent.PopupMenu(menu)
+
+    def onBeginDeviceSetting(self, event):
+        print "onButtonSetting"
+        window = MyPopupWindow(self.parent, size=wx.DefaultSize, title="setting")
+
+        MyMiddleWare.Panel_DeviceAnimationSetting(window.frame, self, self.onDeviceAnimationSettingDone)
+        window.windowPopup()
+
+    def onDeviceAnimationSettingDone(self, attribute, attrCondition):
+        self.attribute = attribute   #bind to control the animation
+        self.attrCondition = attrCondition
+
+        return
+
+    def onProcessOperation(self):
+        getOpItemFn = self.operationDic[self.currentStatus]
+
+        opItem = getOpItemFn()
+        if opItem:
+            opItem.processOperation()
+
+    def onLeftDClick(self, event):
+
+        if self.currentStatus == "on":
+            self.setCurrentResource("off")
+        elif self.currentStatus == "off":
+            self.setCurrentResource("on")
+
+        self.onProcessOperation()
+        return
 
 class SwitchButtonSprite(DragSprite):
     def __init__(self, color, initPos, width, height,speed, border):
@@ -1122,7 +1191,7 @@ class ButtonSprite(DragSprite):
             print "onButtonSetting"
             window = MyPopupWindow(self.parent, size=wx.DefaultSize, title="setting")
 
-            MyMiddleWare.Panel_ButtonSetting(window.frame, self.onButtonSettingDone)
+            MyMiddleWare.Panel_ButtonSetting(window.frame, self, self.onButtonSettingDone)
             window.windowPopup()
 
         def onButtonSettingDone(self, operOn, operOff):

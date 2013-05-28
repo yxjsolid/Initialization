@@ -3,12 +3,6 @@
 import wx
 from MyGlobal import *
 
-class DeviceAttribute():
-    def __init__(self):
-        self.name = ""
-        self.desc = ""
-        return
-
 
 class DeviceController():
     def __init__(self):
@@ -84,6 +78,17 @@ class DeviceOperation():
         txt = self.genOperationDisplayName()
         print "processOperation:", txt
 
+class DeviceAttribute():
+    def __init__(self):
+        self.name = ""
+        self.desc = ""
+        self.value = 0
+        self.parent = None #link to device
+        return
+
+    def genAttributeDisplayName(self):
+        txt = self.parent.name + "\\" + self.name
+        return txt
 
 class ModuleAction():
     def __init__(self):

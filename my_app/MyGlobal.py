@@ -42,9 +42,9 @@ MODULE_TYPE_VAL_IN : u"数值量输入",
 MODULE_TYPE_SIG_OUT : u"信号量输出",
 }
 
-MENU_ITEM_BUTTON_SETTING = u"动作绑定"
+MENU_ITEM_BUTTON_SETTING = u"动作属性"
 
-
+DEVICE_ITEM_SETTING = u"属性设置"
 
 rescoure_dir = r".\image\\"
 

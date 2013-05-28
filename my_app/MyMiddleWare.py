@@ -732,20 +732,43 @@ class Panel_EditAction(MainBase.Panel_EditAction_Base):
         self.deviceEditor = deviceEditor
         self.targetObj = targetObj
         self.frame = frame
-        self.setActionType(0)       
+        self.selectActionType(0)
         self.buildOutputChoiceList()
         self.buildFeedbackChoiceList()
 
-    def setActionType(self, type):
-        self.actionType = type
-        #0: IO , 1:delay
-        if type == 1:
-            self.mainSizer.Hide(self.SizerIO)
-            self.mainSizer.Show(self.sizeTimeDelay)
 
-        else:
+    def selectActionType(self, type):
+        self.actionType = type
+        #0: IO , 1:delay, 2:attr
+
+        self.mainSizer.Hide(self.SizerIO)
+        self.mainSizer.Hide(self.sizeTimeDelay)
+        self.mainSizer.Hide(self.SizerAttr)
+
+        if type == 0:
+            self.mainSizer.Show(self.SizerIO)
+        elif type == 1:
+            self.mainSizer.Show(self.sizeTimeDelay)
+        elif type == 2:
+            self.mainSizer.Show(self.SizerAttr)
+
+        self.mainSizer.Layout()
+
+    def selectActionType1(self, type):
+        self.actionType = type
+        #0: IO , 1:delay, 2:attr
+        if type == 0:
             self.mainSizer.Show(self.SizerIO)
             self.mainSizer.Hide(self.sizeTimeDelay)
+            self.mainSizer.Hide(self.SizerAttr)
+        elif type == 1:
+            self.mainSizer.Hide(self.SizerIO)
+            self.mainSizer.Show(self.sizeTimeDelay)
+            self.mainSizer.Hide(self.SizerAttr)
+        elif type == 2:
+            self.mainSizer.Hide(self.SizerIO)
+            self.mainSizer.Hide(self.sizeTimeDelay)
+            self.mainSizer.Show(self.SizerAttr)
 
         self.mainSizer.Layout()
 
@@ -890,6 +913,7 @@ class AttributeViewControl():
         frame.Show()
 
     def addNewAttribute(self, attrObj):
+        attrObj.parent = self.parent.thisDevice
         self.attrObjList.append(attrObj)
         self.listInsertNewAttribute(1, attrObj)
         return
@@ -967,26 +991,32 @@ class Panel_EditAttribute(MainBase.Panel_EditAttribute_Base):
         return attrObj
 
 class Panel_ButtonSetting(MainBase.Panel_ButtonSetting_Base):
-    def __init__(self, frame, callbackFn):
+    def __init__(self, frame, opener, callbackFn):
         MainBase.Panel_ButtonSetting_Base.__init__(self, frame)
         self.frame = frame
+        self.opener = opener
         self.operationOn = None
         self.operationOff = None
         self.callbackFn = callbackFn
         self.setApplyBtnEnabled(0)
-
+        self.onLoadUpdate()
 
     def setApplyBtnEnabled(self, enabled):
         self.applyBtn.Enable(enabled)
 
+    def onLoadUpdate(self):
+        self.operationOff = self.opener.operationOff
+        self.operationOn = self.opener.operationOn
+        self.refreshDisplay()
+
     def refreshDisplay(self):
         if self.operationOff:
-            str = self.operationOff.genOperationDisplayName()
-            self.txt_oprOff.SetValue(str)
+            txt = self.operationOff.genOperationDisplayName()
+            self.txt_oprOff.SetValue(txt)
 
         if self.operationOn:
-            str = self.operationOn.genOperationDisplayName()
-            self.txt_oprOn.SetValue(str)
+            txt = self.operationOn.genOperationDisplayName()
+            self.txt_oprOn.SetValue(txt)
 
         if self.operationOn and self.operationOff:
             self.setApplyBtnEnabled(1)
@@ -1042,7 +1072,6 @@ class Panel_OperationSelect(MainBase.Panel_OperationSelect_Base):
         self.SetupOperationListCtrlView()
         self.OnLoadUpdate()
         self.setApplyBtnEnabled(0)
-
 
     def OnLoadUpdate(self):
         self.onLoadUpdateDeviceList()
@@ -1183,3 +1212,219 @@ class Panel_OperationSelect(MainBase.Panel_OperationSelect_Base):
 
     def closeWindow(self):
         self.frame.Close()
+
+
+class Panel_DeviceAnimationSetting(MainBase.Panel_DeviceAnimationSetting_Base):
+    def __init__(self, frame, opener, callbackFn):
+        MainBase.Panel_DeviceAnimationSetting_Base.__init__(self, frame)
+        self.frame = frame
+        self.opener = opener
+        self.callbackFn = callbackFn
+        self.setApplyBtnEnabled(0)
+        self.attribute = None
+        self.condition = None
+        self.onLoadUpdate()
+
+    def setApplyBtnEnabled(self, enabled):
+        self.applyBtn.Enable(enabled)
+
+    def onLoadUpdate(self):
+        self.attribute = self.opener.attribute
+        attrCondition = self.opener.attrCondition
+
+        if self.attribute and not attrCondition:
+            self.radioTrue.SetValue(False)
+            self.radioFalse.SetValue(True)
+
+        self.refreshDisplay()
+
+
+    def refreshDisplay(self):
+        if self.attribute:
+            txt = self.attribute.genAttributeDisplayName()
+            self.txt_attribute.SetValue(txt)
+            self.setApplyBtnEnabled(1)
+
+    def callbackGetAttributeSelect(self, attr):
+        print "callbackGetAttributeSelect"
+        print attr
+        self.attribute = attr
+        self.refreshDisplay()
+        return
+
+    def onSelectAttributeBind( self, event ):
+        print "onSelectOperationOn"
+        window = MyPopupWindow(size=(600,400), title="setting")
+        Panel_AttributeSelect(window.frame, self, self.callbackGetAttributeSelect)
+        window.windowPopup()
+
+    def getCondition(self):
+        #self.radioTrue.GetValue()
+        #self.radioFalse.GetValue()
+        return self.radioTrue.GetValue()
+
+    def closeWindow(self):
+        self.frame.Close()
+
+    def onApply( self, event ):
+        self.callbackFn(self.attribute, self.getCondition())
+        self.closeWindow()
+        return
+
+    def onCancel( self, event ):
+        print "onCancel"
+        self.closeWindow()
+        return
+
+class Panel_AttributeSelect(MainBase.Panel_OperationSelect_Base):
+    def __init__(self, frame, opener, callbackFn):
+        MainBase.Panel_OperationSelect_Base.__init__(self, frame)
+        self.frame = frame
+        self.opener = opener
+        self.callbackFn = callbackFn
+        self.SetupDeviceListCtrlView()
+        self.SetupOperationListCtrlView()
+        self.OnLoadUpdate()
+        self.setApplyBtnEnabled(0)
+
+    def OnLoadUpdate(self):
+        self.onLoadUpdateDeviceList()
+        #self.onLoadUpdateOperationList()
+
+    def getDeviceListCtrl(self):
+        return self.deviceListCtrl
+
+    def getOperationListCtrl(self):
+        return self.operationList
+
+    def SetupDeviceListCtrlView(self):
+        listCtrl = self.getDeviceListCtrl()
+        listCtrl.InsertColumn(0, "#")
+        # listCtrl.InsertColumn(1, ADD_DEVICE_LABEL_NAME, wx.LIST_FORMAT_RIGHT)
+        listCtrl.InsertColumn(1, ADD_DEVICE_LABEL_NAME, wx.LIST_FORMAT_RIGHT)
+        listCtrl.InsertColumn(2, ADD_DEVICE_LABEL_DESC)
+        #self.list.SetColumnWidth(0, wx.LIST_AUTOSIZE)
+        listCtrl.SetColumnWidth(0, wx.LIST_AUTOSIZE_USEHEADER)
+        listCtrl.SetColumnWidth(1, wx.LIST_AUTOSIZE_USEHEADER)
+        listCtrl.SetColumnWidth(2, wx.LIST_AUTOSIZE_USEHEADER)
+
+    def SetupOperationListCtrlView(self):
+        listCtrl = self.getOperationListCtrl()
+        listCtrl.InsertColumn(0, "#")
+        #actionList.InsertColumn(1, ACTION_COL_ACT, wx.LIST_FORMAT_RIGHT)
+        # listCtrl.InsertColumn(1, OPERATION_LIST_LABEL_NAME, wx.LIST_FORMAT_RIGHT)
+        listCtrl.InsertColumn(1, OPERATION_LIST_LABEL_NAME)
+        listCtrl.InsertColumn(2, OPERATION_LIST_LABEL_DESC)
+        #self.list.SetColumnWidth(0, wx.LIST_AUTOSIZE)
+        listCtrl.SetColumnWidth(0, wx.LIST_AUTOSIZE_USEHEADER)
+        listCtrl.SetColumnWidth(1, wx.LIST_AUTOSIZE_USEHEADER)
+        listCtrl.SetColumnWidth(2, wx.LIST_AUTOSIZE_USEHEADER)
+
+    def onLoadUpdateDeviceList(self):
+        deviceList = wx.GetApp().getAllDeviceList()
+        for device in deviceList:
+            self.listInsertDeviceNode(-1, device)
+
+        self.setDefaultDevice()
+        return
+
+    # def onLoadUpdateOperationList(self):
+    #     deviceList = wx.GetApp().getAllDeviceList()
+    #     for device in deviceList:
+    #         self.listInsertDeviceNode(-1, device)
+    #     return
+
+    def setDefaultDevice(self):
+        listCtrl = self.getDeviceListCtrl()
+
+        if listCtrl.GetItemCount():
+            listCtrl.Select(0)
+
+    def listInsertDeviceNode(self, index, device):
+        listCtrl = self.getDeviceListCtrl()
+
+        """ ref SetStringItem """
+        itemCount = listCtrl.GetItemCount()
+        if index > itemCount+1:
+            raise "error"
+            return
+
+        if index == -1:
+            if itemCount == 0:
+                index = listCtrl.InsertStringItem(sys.maxint, str(itemCount+1),0)
+            else:
+                index = listCtrl.InsertStringItem(itemCount, str(itemCount+1),0)
+        else:
+            index = listCtrl.InsertStringItem(index, str(itemCount+1),0)
+
+        listCtrl.SetStringItem(index, 1, device.name, 0)
+        listCtrl.SetStringItem(index, 2, device.info, 0)
+        listCtrl.SetItemData(index, device)
+
+
+    def listInsertOperationNode(self, index, operationItem):
+        listCtrl = self.getOperationListCtrl()
+
+        """ ref SetStringItem """
+        itemCount = listCtrl.GetItemCount()
+        if index > itemCount+1:
+            raise "error"
+            return
+
+        if index == -1:
+            if itemCount == 0:
+                index = listCtrl.InsertStringItem(sys.maxint, str(itemCount+1),0)
+            else:
+                index = listCtrl.InsertStringItem(itemCount, str(itemCount+1),0)
+        else:
+            index = listCtrl.InsertStringItem(index, str(itemCount+1),0)
+
+        listCtrl.SetStringItem(index, 1, operationItem.name, 0)
+        listCtrl.SetStringItem(index, 2, operationItem.desc, 0)
+        listCtrl.SetItemData(index, operationItem)
+
+    def refreshOperetionListCtrl(self):
+        listCtrl = self.getOperationListCtrl()
+        listCtrl.DeleteAllItems()
+
+    def onDeviceItemSelected(self, event):
+        deviceItem =  event.GetItem().GetData()
+        self.refreshOperetionListCtrl()
+
+        for operationItem in deviceItem.attrList:
+            self.listInsertOperationNode(-1, operationItem)
+
+        return
+
+    def getSelectedOperation(self):
+        listCtrl = self.getOperationListCtrl()
+        itemID = listCtrl.GetFirstSelected()
+        if itemID == -1:
+            return None
+        operationItem = listCtrl.GetItem(itemID).GetData()
+        return operationItem
+
+    def onOperationItemSelected(self, event):
+        self.setApplyBtnEnabled(1)
+
+    def setApplyBtnEnabled(self, enable):
+        self.applyBtn.Enable(enable)
+
+    def onApply(self, event):
+        opItem = self.getSelectedOperation()
+        print "opitme parent", opItem.parent
+        if opItem is None:
+            raise "Panel_OperationSelect error onApply"
+
+        self.callbackFn(opItem)
+        self.closeWindow()
+        return
+
+    def onCancel( self, event ):
+        self.closeWindow()
+        return
+
+    def closeWindow(self):
+        self.frame.Close()
+
+

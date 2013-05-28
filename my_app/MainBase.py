@@ -320,7 +320,7 @@ class Panel_AddDevice_Base ( wx.Panel ):
 		self.attribute_panel.SetSizer( fgSizer511 )
 		self.attribute_panel.Layout()
 		fgSizer511.Fit( self.attribute_panel )
-		self.m_notebook4.AddPage( self.attribute_panel, _(u"变量"), False )
+		self.m_notebook4.AddPage( self.attribute_panel, _(u"变量"), True )
 		self.io_module_panel = wx.Panel( self.m_notebook4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.io_module_panel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
 		
@@ -427,7 +427,7 @@ class Panel_AddDevice_Base ( wx.Panel ):
 		self.contorl_panel.SetSizer( bSizer33 )
 		self.contorl_panel.Layout()
 		bSizer33.Fit( self.contorl_panel )
-		self.m_notebook4.AddPage( self.contorl_panel, _(u"控制"), True )
+		self.m_notebook4.AddPage( self.contorl_panel, _(u"控制"), False )
 		
 		bSizer18.Add( self.m_notebook4, 1, wx.ALL|wx.EXPAND, 5 )
 		
@@ -546,10 +546,10 @@ class Panel_AddDevice_Base ( wx.Panel ):
 	
 
 ###########################################################################
-## Class Panel_EditAction_Base
+## Class Panel_EditAction_Base2
 ###########################################################################
 
-class Panel_EditAction_Base ( wx.Panel ):
+class Panel_EditAction_Base2 ( wx.Panel ):
 	
 	def __init__( self, parent ):
 		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 344,397 ), style = wx.TAB_TRAVERSAL )
@@ -700,6 +700,208 @@ class Panel_EditAction_Base ( wx.Panel ):
 	
 	def onAddModuleIO( self, event ):
 		event.Skip()
+	
+	
+	def onApply( self, event ):
+		event.Skip()
+	
+	def onCancel( self, event ):
+		event.Skip()
+	
+
+###########################################################################
+## Class Panel_EditAction_Base
+###########################################################################
+
+class Panel_EditAction_Base ( wx.Panel ):
+	
+	def __init__( self, parent ):
+		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 345,500 ), style = wx.TAB_TRAVERSAL )
+		
+		fgSizer86 = wx.FlexGridSizer( 2, 1, 0, 0 )
+		fgSizer86.AddGrowableCol( 0 )
+		fgSizer86.AddGrowableRow( 0 )
+		fgSizer86.SetFlexibleDirection( wx.BOTH )
+		fgSizer86.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.mainSizer = wx.FlexGridSizer( 0, 1, 0, 0 )
+		self.mainSizer.SetFlexibleDirection( wx.BOTH )
+		self.mainSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		bSizer57 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_staticText47 = wx.StaticText( self, wx.ID_ANY, _(u"动作类型:"), wx.DefaultPosition, wx.Size( 70,-1 ), 0 )
+		self.m_staticText47.Wrap( -1 )
+		bSizer57.Add( self.m_staticText47, 1, wx.ALIGN_CENTER|wx.ALL, 5 )
+		
+		m_choice4Choices = [ _(u"信号输出"), _(u"延时等待"), _(u"变量设置") ]
+		self.m_choice4 = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_choice4Choices, 0 )
+		self.m_choice4.SetSelection( 0 )
+		bSizer57.Add( self.m_choice4, 2, wx.ALIGN_CENTER|wx.ALL|wx.EXPAND, 5 )
+		
+		
+		self.mainSizer.Add( bSizer57, 0, wx.BOTTOM, 15 )
+		
+		self.sizeTimeDelay = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, _(u"延时") ), wx.HORIZONTAL )
+		
+		self.m_staticText73 = wx.StaticText( self, wx.ID_ANY, _(u"延时时间(秒):"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText73.Wrap( -1 )
+		self.sizeTimeDelay.Add( self.m_staticText73, 0, wx.ALL, 5 )
+		
+		self.m_textCtrl45 = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.sizeTimeDelay.Add( self.m_textCtrl45, 0, wx.ALL, 5 )
+		
+		
+		self.mainSizer.Add( self.sizeTimeDelay, 1, wx.EXPAND, 5 )
+		
+		self.SizerIO = wx.BoxSizer( wx.VERTICAL )
+		
+		self.sizer1 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, _(u"动作输出") ), wx.VERTICAL )
+		
+		fgSizer68 = wx.FlexGridSizer( 0, 3, 0, 0 )
+		fgSizer68.SetFlexibleDirection( wx.BOTH )
+		fgSizer68.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_staticText42 = wx.StaticText( self, wx.ID_ANY, _(u"输出点:"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText42.Wrap( -1 )
+		fgSizer68.Add( self.m_staticText42, 1, wx.ALL, 5 )
+		
+		choice_outputChoices = []
+		self.choice_output = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice_outputChoices, 0 )
+		self.choice_output.SetSelection( 0 )
+		fgSizer68.Add( self.choice_output, 1, wx.ALL|wx.EXPAND, 5 )
+		
+		self.addOutputBtn = wx.BitmapButton( self, wx.ID_ANY, wx.ArtProvider.GetBitmap( wx.ART_NEW, wx.ART_BUTTON ), wx.DefaultPosition, wx.DefaultSize, wx.BU_AUTODRAW )
+		fgSizer68.Add( self.addOutputBtn, 0, wx.ALL, 5 )
+		
+		self.m_staticText43 = wx.StaticText( self, wx.ID_ANY, _(u"输出值:"), wx.DefaultPosition, wx.Size( 70,-1 ), 0 )
+		self.m_staticText43.Wrap( -1 )
+		fgSizer68.Add( self.m_staticText43, 0, wx.ALIGN_CENTER|wx.ALL|wx.LEFT|wx.RIGHT, 5 )
+		
+		self.text_output = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer68.Add( self.text_output, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		self.sizer1.Add( fgSizer68, 0, wx.EXPAND, 5 )
+		
+		
+		self.SizerIO.Add( self.sizer1, 0, wx.EXPAND, 5 )
+		
+		self.sizer2 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, _(u"动作反馈") ), wx.VERTICAL )
+		
+		bSizer49 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_checkBox3 = wx.CheckBox( self, wx.ID_ANY, _(u"检测反馈信号"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer49.Add( self.m_checkBox3, 0, wx.ALL, 5 )
+		
+		fgSizer70 = wx.FlexGridSizer( 2, 3, 0, 0 )
+		fgSizer70.SetFlexibleDirection( wx.BOTH )
+		fgSizer70.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_staticText44 = wx.StaticText( self, wx.ID_ANY, _(u"输入点:"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText44.Wrap( -1 )
+		fgSizer70.Add( self.m_staticText44, 0, wx.ALL, 5 )
+		
+		choice_feedbackChoices = []
+		self.choice_feedback = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice_feedbackChoices, 0 )
+		self.choice_feedback.SetSelection( 0 )
+		fgSizer70.Add( self.choice_feedback, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		self.addFeedbackBtn = wx.BitmapButton( self, wx.ID_ANY, wx.ArtProvider.GetBitmap( wx.ART_NEW, wx.ART_BUTTON ), wx.DefaultPosition, wx.DefaultSize, wx.BU_AUTODRAW )
+		fgSizer70.Add( self.addFeedbackBtn, 0, wx.ALL, 5 )
+		
+		self.m_staticText46 = wx.StaticText( self, wx.ID_ANY, _(u"超时(秒)："), wx.DefaultPosition, wx.Size( 70,-1 ), 0 )
+		self.m_staticText46.Wrap( -1 )
+		fgSizer70.Add( self.m_staticText46, 0, wx.ALL, 5 )
+		
+		self.text_timeout = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer70.Add( self.text_timeout, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		bSizer49.Add( fgSizer70, 1, wx.EXPAND, 5 )
+		
+		
+		self.sizer2.Add( bSizer49, 1, wx.EXPAND, 5 )
+		
+		
+		self.SizerIO.Add( self.sizer2, 1, wx.EXPAND, 5 )
+		
+		
+		self.mainSizer.Add( self.SizerIO, 1, wx.EXPAND, 5 )
+		
+		self.SizerAttr = wx.BoxSizer( wx.VERTICAL )
+		
+		self.sizer11 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, _(u"变量设置") ), wx.VERTICAL )
+		
+		fgSizer681 = wx.FlexGridSizer( 0, 3, 0, 0 )
+		fgSizer681.SetFlexibleDirection( wx.BOTH )
+		fgSizer681.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.m_staticText421 = wx.StaticText( self, wx.ID_ANY, _(u"变 量"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText421.Wrap( -1 )
+		fgSizer681.Add( self.m_staticText421, 1, wx.ALL, 5 )
+		
+		choice_output1Choices = []
+		self.choice_output1 = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice_output1Choices, 0 )
+		self.choice_output1.SetSelection( 0 )
+		fgSizer681.Add( self.choice_output1, 1, wx.ALL|wx.EXPAND, 5 )
+		
+		self.addOutputBtn1 = wx.BitmapButton( self, wx.ID_ANY, wx.ArtProvider.GetBitmap( wx.ART_NEW, wx.ART_BUTTON ), wx.DefaultPosition, wx.DefaultSize, wx.BU_AUTODRAW )
+		fgSizer681.Add( self.addOutputBtn1, 0, wx.ALL, 5 )
+		
+		self.m_staticText431 = wx.StaticText( self, wx.ID_ANY, _(u"输出值:"), wx.DefaultPosition, wx.Size( 70,-1 ), 0 )
+		self.m_staticText431.Wrap( -1 )
+		fgSizer681.Add( self.m_staticText431, 0, wx.ALIGN_CENTER|wx.ALL|wx.LEFT|wx.RIGHT, 5 )
+		
+		self.text_output1 = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer681.Add( self.text_output1, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		self.sizer11.Add( fgSizer681, 0, wx.EXPAND, 5 )
+		
+		
+		self.SizerAttr.Add( self.sizer11, 1, wx.EXPAND, 5 )
+		
+		
+		self.mainSizer.Add( self.SizerAttr, 1, wx.EXPAND, 5 )
+		
+		
+		fgSizer86.Add( self.mainSizer, 1, wx.EXPAND|wx.TOP|wx.LEFT, 15 )
+		
+		gSizer15 = wx.GridSizer( 0, 2, 0, 0 )
+		
+		self.m_button40 = wx.Button( self, wx.ID_ANY, _(u"Apply"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		gSizer15.Add( self.m_button40, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
+		
+		self.m_button41 = wx.Button( self, wx.ID_ANY, _(u"Cancel"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		gSizer15.Add( self.m_button41, 0, wx.ALL, 5 )
+		
+		
+		fgSizer86.Add( gSizer15, 1, wx.EXPAND|wx.BOTTOM, 10 )
+		
+		
+		self.SetSizer( fgSizer86 )
+		self.Layout()
+		
+		# Connect Events
+		self.m_choice4.Bind( wx.EVT_CHOICE, self.onChoice )
+		self.addOutputBtn.Bind( wx.EVT_BUTTON, self.onAddModuleIO )
+		self.addFeedbackBtn.Bind( wx.EVT_BUTTON, self.onAddModuleIO )
+		self.addOutputBtn1.Bind( wx.EVT_BUTTON, self.onAddModuleIO )
+		self.m_button40.Bind( wx.EVT_BUTTON, self.onApply )
+		self.m_button41.Bind( wx.EVT_BUTTON, self.onCancel )
+	
+	def __del__( self ):
+		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def onChoice( self, event ):
+		event.Skip()
+	
+	def onAddModuleIO( self, event ):
+		event.Skip()
+	
 	
 	
 	def onApply( self, event ):
@@ -1082,5 +1284,115 @@ class MyPanel14 ( wx.Panel ):
 	
 	def __del__( self ):
 		pass
+	
+
+###########################################################################
+## Class Panel_DeviceAnimationSetting_Base
+###########################################################################
+
+class Panel_DeviceAnimationSetting_Base ( wx.Panel ):
+	
+	def __init__( self, parent ):
+		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 391,241 ), style = wx.TAB_TRAVERSAL )
+		
+		fgSizer33 = wx.FlexGridSizer( 2, 1, 0, 0 )
+		fgSizer33.AddGrowableCol( 0 )
+		fgSizer33.AddGrowableRow( 0 )
+		fgSizer33.SetFlexibleDirection( wx.BOTH )
+		fgSizer33.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		fgSizer34 = wx.FlexGridSizer( 2, 1, 0, 0 )
+		fgSizer34.AddGrowableCol( 0 )
+		fgSizer34.SetFlexibleDirection( wx.BOTH )
+		fgSizer34.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		sbSizer13 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, _(u"动画设置") ), wx.VERTICAL )
+		
+		fgSizer35 = wx.FlexGridSizer( 1, 3, 0, 0 )
+		fgSizer35.AddGrowableCol( 1 )
+		fgSizer35.SetFlexibleDirection( wx.BOTH )
+		fgSizer35.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		bSizer42 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_staticText37 = wx.StaticText( self, wx.ID_ANY, _(u"绑定变量"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText37.Wrap( -1 )
+		bSizer42.Add( self.m_staticText37, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		fgSizer35.Add( bSizer42, 1, wx.ALL|wx.EXPAND, 5 )
+		
+		self.txt_attribute = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY )
+		self.txt_attribute.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
+		
+		fgSizer35.Add( self.txt_attribute, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		self.m_button27 = wx.Button( self, wx.ID_ANY, _(u"选择"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer35.Add( self.m_button27, 0, wx.ALL, 5 )
+		
+		
+		sbSizer13.Add( fgSizer35, 1, wx.EXPAND, 5 )
+		
+		sbSizer15 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, _(u"活动条件") ), wx.HORIZONTAL )
+		
+		fgSizer29 = wx.FlexGridSizer( 0, 2, 0, 0 )
+		fgSizer29.AddGrowableCol( 0 )
+		fgSizer29.AddGrowableCol( 1 )
+		fgSizer29.AddGrowableRow( 0 )
+		fgSizer29.SetFlexibleDirection( wx.BOTH )
+		fgSizer29.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.radioTrue = wx.RadioButton( self, wx.ID_ANY, _(u"变量值为真"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.radioTrue.SetValue( True ) 
+		fgSizer29.Add( self.radioTrue, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		self.radioFalse = wx.RadioButton( self, wx.ID_ANY, _(u"变量值为假"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer29.Add( self.radioFalse, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		sbSizer15.Add( fgSizer29, 1, wx.EXPAND, 5 )
+		
+		
+		sbSizer13.Add( sbSizer15, 1, wx.EXPAND, 5 )
+		
+		
+		fgSizer34.Add( sbSizer13, 1, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		fgSizer33.Add( fgSizer34, 1, wx.ALL|wx.EXPAND, 5 )
+		
+		gSizer15 = wx.GridSizer( 0, 2, 0, 0 )
+		
+		self.applyBtn = wx.Button( self, wx.ID_ANY, _(u"Apply"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		gSizer15.Add( self.applyBtn, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
+		
+		self.m_button41 = wx.Button( self, wx.ID_ANY, _(u"Cancel"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		gSizer15.Add( self.m_button41, 0, wx.ALL, 5 )
+		
+		
+		fgSizer33.Add( gSizer15, 1, wx.BOTTOM|wx.EXPAND, 5 )
+		
+		
+		self.SetSizer( fgSizer33 )
+		self.Layout()
+		
+		# Connect Events
+		self.m_button27.Bind( wx.EVT_BUTTON, self.onSelectAttributeBind )
+		self.applyBtn.Bind( wx.EVT_BUTTON, self.onApply )
+		self.m_button41.Bind( wx.EVT_BUTTON, self.onCancel )
+	
+	def __del__( self ):
+		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def onSelectAttributeBind( self, event ):
+		event.Skip()
+	
+	def onApply( self, event ):
+		event.Skip()
+	
+	def onCancel( self, event ):
+		event.Skip()
 	
 
