@@ -11,6 +11,7 @@ from MyClass import UlcListCtrl
 from wx.gizmos import TreeListCtrl
 import wx
 import wx.xrc
+import wx.richtext
 
 import gettext
 _ = gettext.gettext
@@ -94,7 +95,7 @@ class FrameBase ( wx.Frame ):
 class SplitterPanelBase ( wx.Panel ):
 	
 	def __init__( self, parent ):
-		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 508,463 ), style = wx.TAB_TRAVERSAL )
+		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 527,589 ), style = wx.TAB_TRAVERSAL )
 		
 		bSizer6 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -107,15 +108,26 @@ class SplitterPanelBase ( wx.Panel ):
 		self.viewContainPanel = wx.Panel( self.m_splitter4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SUNKEN_BORDER|wx.TAB_TRAVERSAL )
 		bSizer12 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.m_splitter6 = wx.SplitterWindow( self.viewContainPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SP_3D|wx.SP_LIVE_UPDATE )
+		self.m_splitter6 = wx.SplitterWindow( self.viewContainPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SP_3D )
+		self.m_splitter6.SetSashGravity( 1 )
 		self.m_splitter6.SetSashSize( 5 )
 		self.m_splitter6.Bind( wx.EVT_IDLE, self.m_splitter6OnIdle )
+		self.m_splitter6.SetMinimumPaneSize( 100 )
 		
 		self.viewPanel = wx.Panel( self.m_splitter6, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.viewPanel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_GRAYTEXT ) )
 		
 		self.detailPanel = wx.Panel( self.m_splitter6, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-		self.m_splitter6.SplitHorizontally( self.viewPanel, self.detailPanel, 500 )
+		sbSizer17 = wx.StaticBoxSizer( wx.StaticBox( self.detailPanel, wx.ID_ANY, _(u"label") ), wx.VERTICAL )
+		
+		self.log_txt = wx.richtext.RichTextCtrl( self.detailPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY|wx.VSCROLL|wx.HSCROLL|wx.NO_BORDER|wx.WANTS_CHARS )
+		sbSizer17.Add( self.log_txt, 1, wx.EXPAND |wx.ALL, 5 )
+		
+		
+		self.detailPanel.SetSizer( sbSizer17 )
+		self.detailPanel.Layout()
+		sbSizer17.Fit( self.detailPanel )
+		self.m_splitter6.SplitHorizontally( self.viewPanel, self.detailPanel, 350 )
 		bSizer12.Add( self.m_splitter6, 1, wx.EXPAND, 5 )
 		
 		
@@ -137,7 +149,7 @@ class SplitterPanelBase ( wx.Panel ):
 		self.m_splitter4.Unbind( wx.EVT_IDLE )
 	
 	def m_splitter6OnIdle( self, event ):
-		self.m_splitter6.SetSashPosition( 500 )
+		self.m_splitter6.SetSashPosition( 350 )
 		self.m_splitter6.Unbind( wx.EVT_IDLE )
 	
 
@@ -841,10 +853,10 @@ class Panel_EditAction_Base ( wx.Panel ):
 		self.m_staticText421.Wrap( -1 )
 		fgSizer681.Add( self.m_staticText421, 1, wx.ALL, 5 )
 		
-		choice_output1Choices = []
-		self.choice_output1 = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice_output1Choices, 0 )
-		self.choice_output1.SetSelection( 0 )
-		fgSizer681.Add( self.choice_output1, 1, wx.ALL|wx.EXPAND, 5 )
+		choice_attrChoices = []
+		self.choice_attr = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice_attrChoices, 0 )
+		self.choice_attr.SetSelection( 0 )
+		fgSizer681.Add( self.choice_attr, 1, wx.ALL|wx.EXPAND, 5 )
 		
 		self.addOutputBtn1 = wx.BitmapButton( self, wx.ID_ANY, wx.ArtProvider.GetBitmap( wx.ART_NEW, wx.ART_BUTTON ), wx.DefaultPosition, wx.DefaultSize, wx.BU_AUTODRAW )
 		fgSizer681.Add( self.addOutputBtn1, 0, wx.ALL, 5 )
@@ -853,8 +865,8 @@ class Panel_EditAction_Base ( wx.Panel ):
 		self.m_staticText431.Wrap( -1 )
 		fgSizer681.Add( self.m_staticText431, 0, wx.ALIGN_CENTER|wx.ALL|wx.LEFT|wx.RIGHT, 5 )
 		
-		self.text_output1 = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		fgSizer681.Add( self.text_output1, 0, wx.ALL|wx.EXPAND, 5 )
+		self.text_valuSet = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		fgSizer681.Add( self.text_valuSet, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		
 		self.sizer11.Add( fgSizer681, 0, wx.EXPAND, 5 )
@@ -887,7 +899,7 @@ class Panel_EditAction_Base ( wx.Panel ):
 		self.m_choice4.Bind( wx.EVT_CHOICE, self.onChoice )
 		self.addOutputBtn.Bind( wx.EVT_BUTTON, self.onAddModuleIO )
 		self.addFeedbackBtn.Bind( wx.EVT_BUTTON, self.onAddModuleIO )
-		self.addOutputBtn1.Bind( wx.EVT_BUTTON, self.onAddModuleIO )
+		self.addOutputBtn1.Bind( wx.EVT_BUTTON, self.onSelectAttribute )
 		self.m_button40.Bind( wx.EVT_BUTTON, self.onApply )
 		self.m_button41.Bind( wx.EVT_BUTTON, self.onCancel )
 	
@@ -903,6 +915,8 @@ class Panel_EditAction_Base ( wx.Panel ):
 		event.Skip()
 	
 	
+	def onSelectAttribute( self, event ):
+		event.Skip()
 	
 	def onApply( self, event ):
 		event.Skip()
@@ -1394,5 +1408,27 @@ class Panel_DeviceAnimationSetting_Base ( wx.Panel ):
 	
 	def onCancel( self, event ):
 		event.Skip()
+	
+
+###########################################################################
+## Class MyPanel12
+###########################################################################
+
+class MyPanel12 ( wx.Panel ):
+	
+	def __init__( self, parent ):
+		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL )
+		
+		bSizer22 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_richText2 = wx.richtext.RichTextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0|wx.VSCROLL|wx.HSCROLL|wx.NO_BORDER|wx.WANTS_CHARS )
+		bSizer22.Add( self.m_richText2, 1, wx.EXPAND |wx.ALL, 5 )
+		
+		
+		self.SetSizer( bSizer22 )
+		self.Layout()
+	
+	def __del__( self ):
+		pass
 	
 

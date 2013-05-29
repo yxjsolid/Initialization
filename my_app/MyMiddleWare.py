@@ -27,10 +27,12 @@ class MyFrame( MainBase.FrameBase ):
         self.parent = parent
         self.construceFrame()
         self.saveFileName = r".\save.txt"
+        LogWriter.txt = self.panel.log_txt
             
     def construceFrame(self):
         self.panel = testMySplitterPanel(self)
         self.viewPanel_sub = self.panel.viewPanel_sub
+
         return
 
     def addDevice(self):
@@ -142,6 +144,9 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
     def __init__( self, frame , device=None):
         MainBase.Panel_AddDevice_Base.__init__( self, frame )
 
+
+        print "Panel_AddDevice  1111"
+
         if device is None:
             self.thisDevice = Device_Transport()
         else:
@@ -149,12 +154,13 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
         self.frame = frame
         self.deviceInfoPanelSetup()
 
+
         self.moduleIoViewCtrl = ModuleIoListControl(self)
         self.attrCtrl = AttributeViewControl(self)
         self.actionListCtrl = ActionViewControl(self)
         self.actGrpCtrl = ActionGroupViewControl(self)
         self.onLoadUpdate()
-        
+
     def deviceInfoPanelSetup(self):
         self.label_name.SetLabel(ADD_DEVICE_LABEL_NAME)
         self.label_pos.SetLabel(ADD_DEVICE_LABEL_POS)
@@ -218,7 +224,7 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
         self.thisDevice.location = location
   
         self.thisDevice.setControls(actGrpList)
-        self.thisDevice.attrList = self.attrCtrl.attrObjList
+        #self.thisDevice.attrList = self.attrCtrl.attrObjList
         wx.GetApp().deviceController.addTransport(self.thisDevice)
         self.closeWindow()
         
@@ -561,8 +567,8 @@ class ActionGroupViewControl():
         #------------------------------------------------------------------
 
 class ActionViewControl():
-    def __init__(self, parent):
-        self.parent = parent
+    def __init__(self, deviceEditor):
+        self.deviceEditor = deviceEditor
         self.ioModuleList = []
         self.SetupActionList()
 
@@ -570,7 +576,7 @@ class ActionViewControl():
     # action list related
 
     def SetupActionList(self):
-        actionList = self.parent.action_list
+        actionList = self.deviceEditor.action_list
 
         actionList.InsertColumn(0, "")
         #actionList.InsertColumn(1, ACTION_COL_ACT, wx.LIST_FORMAT_RIGHT)
@@ -587,7 +593,7 @@ class ActionViewControl():
 
 
     def listInsertNewAction(self, index, action):
-        actionList = self.parent.action_list
+        actionList = self.deviceEditor.action_list
 
         """ ref SetStringItem """
         actionCount = actionList.GetItemCount()
@@ -604,20 +610,20 @@ class ActionViewControl():
         else:
             index = actionList.InsertStringItem(index, str(actionCount+1),0)
 
-        actionList.SetStringItem(index, 1, action.moduleOutput.name, 0)
-        actionList.SetStringItem(index, 2, action.moduleFeedback.name, 0)
-        actionList.SetStringItem(index, 3, action.feedbackTimeout, 0)
-        actionList.SetItemData(index, action)
+        actionList.SetStringItem(index, 1, action.getName(), 0)
+        #actionList.SetStringItem(index, 2, action.moduleFeedback.name, 0)
+        #actionList.SetStringItem(index, 3, action.feedbackTimeout, 0)
+        #actionList.SetItemData(index, action)
 
     def listRemoveAction(self, action):
-        actionList = self.parent.action_list
+        actionList = self.deviceEditor.action_list
 
         item = actionList.GetFocusedItem()
 
         actionList.DeleteItem(item)
 
     def refreshActionList(self, ctrlModule):
-        actionList = self.parent.action_list
+        actionList = self.deviceEditor.action_list
         actionList.DeleteAllItems()
 
         for action in ctrlModule.actions:
@@ -631,8 +637,8 @@ class ActionViewControl():
         print action.moduleFeedback.name
 
     def onEditActionUpdate(self):
-        actionList = self.parent.action_list
-        actGrp = self.parent.actGrpCtrl.getCurrentActGrp()
+        actionList = self.deviceEditor.action_list
+        actGrp = self.deviceEditor.actGrpCtrl.getCurrentActGrp()
         index = -1
         actions = []
 
@@ -651,18 +657,18 @@ class ActionViewControl():
         return
 
     def onAddNewAction(self):
-        ctrlModule = self.parent.actGrpCtrl.getCurrentActGrp()
+        ctrlModule = self.deviceEditor.actGrpCtrl.getCurrentActGrp()
 
         if ctrlModule is None:
             print "Error: --> addNewAction"
 
         frame = wx.Frame(None, size=(350,400))
-        Panel_EditAction(frame, self.parent, targetObj=ctrlModule)
+        Panel_EditAction(frame, self.deviceEditor, targetObj=ctrlModule)
         frame.CenterOnScreen()
         frame.Show()
 
     def onDeleteAction(self):
-        actionList = self.parent.action_list
+        actionList = self.deviceEditor.action_list
         index = actionList.GetFocusedItem()
         actionList.DeleteItem(index)
 
@@ -676,7 +682,7 @@ class ActionViewControl():
         return
 
     def onActionMoveUp(self):
-        actionList = self.parent.action_list
+        actionList = self.deviceEditor.action_list
         index = actionList.GetFocusedItem()
         if index == -1:
             return
@@ -695,7 +701,7 @@ class ActionViewControl():
         return
 
     def onActionMoveDown(self):
-        actionList = self.parent.action_list
+        actionList = self.deviceEditor.action_list
         index = actionList.GetFocusedItem()
         if index == -1:
             return
@@ -723,10 +729,11 @@ class ActionViewControl():
 
         print ret
 
-#----------------------------------------------------------------
-# action list end
 
 class Panel_EditAction(MainBase.Panel_EditAction_Base):
+    #0: IO , 1:delay, 2:attr
+
+    ACTION_TYPE_IO, ACTION_TYPE_DELAY, ACTION_TYPE_ATTR = range(3)
     def __init__(self, frame, deviceEditor, targetObj=None):
         MainBase.Panel_EditAction_Base.__init__(self, frame)
         self.deviceEditor = deviceEditor
@@ -735,7 +742,9 @@ class Panel_EditAction(MainBase.Panel_EditAction_Base):
         self.selectActionType(0)
         self.buildOutputChoiceList()
         self.buildFeedbackChoiceList()
+        self.buildAttrChoiceList()
 
+        print "Panel_EditAction.ACTION_TYPE_IO", Panel_EditAction.ACTION_TYPE_IO
 
     def selectActionType(self, type):
         self.actionType = type
@@ -745,29 +754,11 @@ class Panel_EditAction(MainBase.Panel_EditAction_Base):
         self.mainSizer.Hide(self.sizeTimeDelay)
         self.mainSizer.Hide(self.SizerAttr)
 
-        if type == 0:
+        if type == Panel_EditAction.ACTION_TYPE_IO:
             self.mainSizer.Show(self.SizerIO)
-        elif type == 1:
+        elif type == Panel_EditAction.ACTION_TYPE_DELAY:
             self.mainSizer.Show(self.sizeTimeDelay)
-        elif type == 2:
-            self.mainSizer.Show(self.SizerAttr)
-
-        self.mainSizer.Layout()
-
-    def selectActionType1(self, type):
-        self.actionType = type
-        #0: IO , 1:delay, 2:attr
-        if type == 0:
-            self.mainSizer.Show(self.SizerIO)
-            self.mainSizer.Hide(self.sizeTimeDelay)
-            self.mainSizer.Hide(self.SizerAttr)
-        elif type == 1:
-            self.mainSizer.Hide(self.SizerIO)
-            self.mainSizer.Show(self.sizeTimeDelay)
-            self.mainSizer.Hide(self.SizerAttr)
-        elif type == 2:
-            self.mainSizer.Hide(self.SizerIO)
-            self.mainSizer.Hide(self.sizeTimeDelay)
+        elif type == Panel_EditAction.ACTION_TYPE_ATTR:
             self.mainSizer.Show(self.SizerAttr)
 
         self.mainSizer.Layout()
@@ -781,16 +772,17 @@ class Panel_EditAction(MainBase.Panel_EditAction_Base):
             return None
 
         return choiceObj.GetClientData(sel)
-    
-    def buildChoiceList(self, choiceObj):
+
+
+    def buildChoiceList(self, itemList, choiceObj):
         """select the previous selected item after update"""
         index = 0
-        io_modules = self.deviceEditor.getModuleIoViewControl().getIoModules()
         
         prevItem = self.getPrevSelected(choiceObj)
         choiceObj.Clear()
-        
-        for item in io_modules:
+
+        #wx.Choice(
+        for item in itemList:
             print "\n",item.name, sys.getrefcount(item)
             choiceObj.Append(item.name, item)
 
@@ -799,36 +791,71 @@ class Panel_EditAction(MainBase.Panel_EditAction_Base):
             index += 1
             print item.name, sys.getrefcount(item)
 
-
     def buildFeedbackChoiceList(self):
-        self.buildChoiceList(self.choice_feedback)
+        io_modules = self.deviceEditor.getModuleIoViewControl().getIoModules()
+        self.buildChoiceList(io_modules, self.choice_feedback)
     
     def buildOutputChoiceList(self):
-        self.buildChoiceList(self.choice_output)
- 
-    def createNewAction(self):
-        newActionObj = ModuleAction()
+        io_modules = self.deviceEditor.getModuleIoViewControl().getIoModules()
+        self.buildChoiceList(io_modules, self.choice_output)
+
+    def buildAttrChoiceList(self):
+        attrList = self.deviceEditor.thisDevice.getAttrList()
+        self.buildChoiceList(attrList, self.choice_attr)
+
+    def createIoAction(self):
+        newActionObj = DeviceActionIO()
         outObj = None
         feedbackObj = None
-        
-        sel = self.choice_output.GetSelection() 
+
+        sel = self.choice_output.GetSelection()
         if sel != wx.NOT_FOUND:
             outObj = self.choice_output.GetClientData(sel)
 
         outputValue = self.text_output.GetValue()
-       
-        sel = self.choice_feedback.GetSelection() 
+
+        sel = self.choice_feedback.GetSelection()
         if sel != wx.NOT_FOUND:
             feedbackObj = self.choice_feedback.GetClientData(sel)
 
         timeout = self.text_timeout.GetValue()
-
         newActionObj.moduleOutput = outObj
         newActionObj.outputValue = outputValue
         newActionObj.moduleFeedback = feedbackObj
         newActionObj.feedbackTimeout = timeout
 
         return newActionObj
+
+    def createAttrSetAction(self):
+        newActionObj = DeviceActionAttrSet()
+
+        sel = self.choice_attr.GetSelection()
+        if sel != wx.NOT_FOUND:
+            attrObj = self.choice_attr.GetClientData(sel)
+        else:
+            attrObj = None
+
+        newActionObj.attribute = attrObj
+        newActionObj.valueToSet = int(self.text_valuSet.GetValue())
+
+        return newActionObj
+
+    def createDelayAction(self):
+        newActionObj = DeviceActionDelay()
+
+
+        return newActionObj
+
+    def createNewAction(self, actionType):
+        obj = None
+        if actionType == Panel_EditAction.ACTION_TYPE_IO:
+            obj = self.createIoAction()
+        elif actionType == Panel_EditAction.ACTION_TYPE_DELAY:
+            obj = self.createDelayAction()
+        elif actionType == Panel_EditAction.ACTION_TYPE_ATTR:
+            obj = self.createAttrSetAction()
+
+        return obj
   
     def onEditUpdate(self, targetObj=None):
         print "Panel_NewAction -> onEditUpdate"
@@ -858,14 +885,32 @@ class Panel_EditAction(MainBase.Panel_EditAction_Base):
         frame1.CenterOnScreen()
         frame1.Show()
 
+    def refreshDisplay(self):
+        if self.attribute:
+            txt = self.attribute.genAttributeDisplayName()
+            self.txt_attribute.SetValue(txt)
+            self.setApplyBtnEnabled(1)
+
+    # def callbackGetAttributeSelect(self, attr):
+    #     print "callbackGetAttributeSelect"
+    #     print attr
+    #     self.attribute = attr
+    #     self.refreshDisplay()
+    #     return
+    #
+    # def onSelectAttributeBind( self, event ):
+    #     print "onSelectOperationOn"
+    #     window = MyPopupWindow(size=(600,400), title="setting")
+    #     Panel_AttributeSelect(window.frame, self, self.callbackGetAttributeSelect)
+    #     window.windowPopup()
+
     def closeWindow(self):
         self.frame.Close()
 
     def onApply(self, evt):
-        newAction = self.createNewAction()
+        newAction = self.createNewAction(self.actionType)
         self.targetObj.addNewAction(newAction)
         self.deviceEditor.actionListCtrl.listInsertNewAction(-1, newAction)
-
         self.closeWindow()
         return
 
@@ -875,9 +920,8 @@ class Panel_EditAction(MainBase.Panel_EditAction_Base):
 
 
 class AttributeViewControl():
-    def __init__(self, parent):
-        self.parent = parent
-        self.attrObjList = []
+    def __init__(self, deviceEditor):
+        self.deviceEditor = deviceEditor
         self.SetupAttributeList()
         #self.addTestObj()
 
@@ -890,7 +934,7 @@ class AttributeViewControl():
         self.listInsertNewAttribute(1, attrObj)
 
     def SetupAttributeList(self):
-        attrList = self.parent.attribute_list
+        attrList = self.deviceEditor.attribute_list
         attrList.InsertColumn(0, "")
         #actionList.InsertColumn(1, ACTION_COL_ACT, wx.LIST_FORMAT_RIGHT)
         attrList.InsertColumn(1, ATTR_COL_NAME)
@@ -913,25 +957,29 @@ class AttributeViewControl():
         frame.Show()
 
     def addNewAttribute(self, attrObj):
-        attrObj.parent = self.parent.thisDevice
-        self.attrObjList.append(attrObj)
-        self.listInsertNewAttribute(1, attrObj)
+        attrObj.parent = self.deviceEditor.thisDevice
+        self.deviceEditor.thisDevice.attrList.append(attrObj)
+        #self.listInsertNewAttribute(1, attrObj)
+        self.appendAttributeList(attrObj)
         return
+
+    def appendAttributeList(self, attrObj):
+        self.listInsertNewAttribute(1, attrObj)
 
     def listCtrlUpdate(self):
         self.refreshAttributeList()
 
     def refreshAttributeList(self):
-        listCtrl = self.parent.attribute_list
+        listCtrl = self.deviceEditor.attribute_list
         listCtrl.DeleteAllItems()
 
-        for obj in self.attrObjList:
+        for obj in self.deviceEditor.thisDevice.attrList:
             self.listInsertNewAttribute(-1, obj)
 
         return
 
     def listInsertNewAttribute(self, index, attrObj):
-        attrList = self.parent.attribute_list
+        attrList = self.deviceEditor.attribute_list
 
         """ ref SetStringItem """
         actionCount = attrList.GetItemCount()
@@ -954,8 +1002,8 @@ class AttributeViewControl():
         attrList.SetItemData(index, None)
 
     def onAttrListUpdate(self):
-        for attr in self.parent.thisDevice.attrList:
-            self.addNewAttribute(attr)
+        for attr in self.deviceEditor.thisDevice.attrList:
+            self.appendAttributeList(attr)
 
         return
 
@@ -1237,7 +1285,6 @@ class Panel_DeviceAnimationSetting(MainBase.Panel_DeviceAnimationSetting_Base):
             self.radioFalse.SetValue(True)
 
         self.refreshDisplay()
-
 
     def refreshDisplay(self):
         if self.attribute:

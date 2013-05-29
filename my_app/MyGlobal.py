@@ -90,3 +90,36 @@ class MyPopupWindow():
 # class Panel_ButtonSetting():
 #     def __init__(self, frame):
 #         return
+
+
+# %a 本地简化星期名称
+# %A 本地完整星期名称
+# %b 本地简化的月份名称
+# %B 本地完整的月份名称
+# %c 本地相应的日期表示和时间表示
+# %j 年内的一天（001-366）
+# %p 本地A.M.或P.M.的等价符
+# %U 一年中的星期数（00-53）星期天为星期的开始
+# %w 星期（0-6），星期天为星期的开始
+# %W 一年中的星期数（00-53）星期一为星期的开始
+# %x 本地相应的日期表示
+# %X 本地相应的时间表示
+# %Z 当前时区的名称
+# %% %号本身
+
+
+class MyLogWriter():
+    def __init__(self):
+        self.txt = None
+        return
+
+    def writeLog(self, log):
+        import time
+        tmstr =  time.strftime("%Y-%m-%d %X \t", time.localtime())
+        self.txt.WriteText(tmstr)
+        self.txt.WriteText(log)
+        self.txt.WriteText("\n")
+        return
+
+
+LogWriter = MyLogWriter()
