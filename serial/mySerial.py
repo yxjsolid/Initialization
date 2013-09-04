@@ -91,15 +91,14 @@ class SerialHandler:
                     dataNew = self.l_serial.read(n)
                     data += dataNew
 
-                    print "\n\n######################\n"
-                    print binascii.b2a_hex(dataNew)
-                    print binascii.b2a_hex(data)
+                    #print "\n\n######################\n"
+                    #print n,"data", "new",dataNew
+                    #print binascii.b2a_hex(dataNew)
+                    #print binascii.b2a_hex(data)
 
                     if self.dataHandler is not None:
                         self.dataHandler.receiveSerialRawData(data)
 
-
-                    self.printHex(data)
             except Exception, ex:
                 print "FirstReader:",ex
 

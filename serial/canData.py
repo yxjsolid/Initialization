@@ -1,5 +1,5 @@
 from ctypes import *
-
+import binascii
 
 '''
 typedef struct canFrameStruct
@@ -10,41 +10,48 @@ typedef struct canFrameStruct
 }canFrameStruct;
 '''
 
+
+class RSDataPaser():
+    DATA_STARTER = "$KA"
+    DATA_SPLITER = ","
+    DATA_ENDER = "*"
+
+    def __init__(self):
+        self.rawDataList = []
+        return
+
+    def doPaser(self, data):
+        dataLeft = data
+
+        while self.__class__.DATA_STARTER in dataLeft and self.__class__.DATA_ENDER in dataLeft:
+            startIndex = dataLeft.index(self.__class__.DATA_STARTER)
+            endIndex = dataLeft.index(self.__class__.DATA_ENDER)
+
+            starterSize = len(self.__class__.DATA_STARTER)
+            enderSize = len(self.__class__.DATA_ENDER)
+
+            #print
+            #print "startIndex", startIndex
+
+            if startIndex < endIndex:
+                rawData = dataLeft[startIndex + starterSize:endIndex].replace(self.__class__.DATA_SPLITER, "")
+                dataLeft = dataLeft[endIndex + enderSize:]
+                self.rawDataList.append(rawData)
+
+                #print "doPaser, raw: ", rawData
+                #print "left:[%s]" % dataLeft
+
+
+        #print "before return"
+        return dataLeft, self.rawDataList
+
+
+
+
 class CAN_DATA(Structure):
     _fields_ = [("info", c_ubyte),
                 ("sig", c_ubyte*4),
                 ("canData", c_ubyte*8)]
-
-
-can = CAN_DATA()
-print sizeof(can)
-
-
-can.info = 0x62
-can.sig[0] = 0x63
-
-
-
-
-
-
-
-buffer=(c_ubyte*sizeof(CAN_DATA))()
-
-
-buffer[0] = 9
-
-myaa = range(9)
-
-for index,num in enumerate(myaa):
-    buffer[index] = num
-
-print buffer[0]
-print buffer[1]
-print buffer[2]
-memmove(byref(can), byref(buffer), sizeof(can))
-print "can.info", can.info
-
 
 
 class CanProxy():
@@ -52,6 +59,8 @@ class CanProxy():
 
         self.canData = CanData
         self.dataSender = Sender
+        self.receivedData = ""
+        self.receivedRawDataList = []
         return
 
     def sendCanData(self):
@@ -72,8 +81,27 @@ class CanProxy():
         return 1
 
     def receiveSerialRawData(self, data):
-        print "receiveSerialRawData"
-        print self.printHex(data)
+        self.receivedData += data
+        #print "[%s]" % self.receivedData
+
+        paser = RSDataPaser()
+        self.receivedData, returenRawDataList = paser.doPaser(self.receivedData)
+
+        for index, elem in enumerate(returenRawDataList):
+            print
+            print "##################"
+            print "received:",index, elem
+            self.receivedRawDataList.append(elem)
+        #print "receiveSerialRawData"
+        #print self.printHex(data)
+
+            self.dumpAllRawData()
+
+    def dumpAllRawData(self):
+        print
+        print "dump all raw data:"
+        for index, elem in enumerate(self.receivedRawDataList):
+            print index, elem
 
     def dumpCanData(self):
         if self.canData is None:
