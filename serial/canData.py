@@ -11,7 +11,7 @@ typedef struct canFrameStruct
 '''
 
 
-class RSDataPaser():
+class RSDataFormater():
     DATA_STARTER = "$KA"
     DATA_SPLITER = ","
     DATA_ENDER = "*"
@@ -20,8 +20,8 @@ class RSDataPaser():
         self.rawDataList = []
         return
 
-    def doPaser(self, data):
-        dataLeft = data
+    def doPaser(self, dataIn):
+        dataLeft = dataIn
 
         while self.__class__.DATA_STARTER in dataLeft and self.__class__.DATA_ENDER in dataLeft:
             startIndex = dataLeft.index(self.__class__.DATA_STARTER)
@@ -40,13 +40,26 @@ class RSDataPaser():
 
                 #print "doPaser, raw: ", rawData
                 #print "left:[%s]" % dataLeft
-
-
         #print "before return"
         return dataLeft, self.rawDataList
 
 
+    def doConstruct(self, dataIn):
+        dataOut = self.__class__.DATA_STARTER + self.__class__.DATA_SPLITER
 
+        for index,ch in enumerate(dataIn):
+            dataOut += chr(ch)
+            if index%2 > 0:
+                dataOut += self.__class__.DATA_SPLITER
+
+        print dataOut
+        print len(dataIn)
+
+        if len(dataIn)%2 != 0:
+            dataOut += self.__class__.DATA_SPLITER
+
+        dataOut += self.__class__.DATA_ENDER
+        return dataOut
 
 class CAN_DATA(Structure):
     _fields_ = [("info", c_ubyte),
@@ -54,18 +67,50 @@ class CAN_DATA(Structure):
                 ("canData", c_ubyte*8)]
 
 
-class CanProxy():
-    def __init__(self, CanData=None, Sender=None):
+    def sturctureToByteArray(self):
+        byteArray = bytearray(sizeof(CAN_DATA))
+        canBuff = (c_ubyte*sizeof(CAN_DATA))()
+        memmove(byref(canBuff), byref(self), sizeof(CAN_DATA))
 
+        for index, elem in enumerate(canBuff):
+            byteArray[index] = elem
+
+        print "can data raw:[%r]" % byteArray
+        return byteArray
+
+    def buildTestData(self):
+        self.info = ord('a')
+        self.sig[0] = ord('b')
+        self.sig[1] = ord('c')
+        self.sig[2] = ord('d')
+        self.sig[3] = ord('e')
+
+        val = ord('f')
+        for i in range(8):
+            self.canData[i] = val + i
+
+
+class CanProxy():
+    def __init__(self, CanData=None, SerialHandler=None):
+
+        self.serialHandler = SerialHandler
         self.canData = CanData
-        self.dataSender = Sender
         self.receivedData = ""
         self.receivedRawDataList = []
         return
 
-    def sendCanData(self):
-        if self.dataSender:
-            self.dataSender(self.canData)
+    def serialSendCanData(self, canData):
+
+        #serialData = canData.
+
+        dataArray = canData.sturctureToByteArray()
+
+
+        dataArray = RSDataFormater().doConstruct(dataArray)
+
+
+        if self.serialHandler:
+            self.serialHandler.SendData(dataArray)
 
     def receiveCanData(self, bufIn, bufSize):
         if bufSize > sizeof(CAN_DATA):
@@ -84,8 +129,8 @@ class CanProxy():
         self.receivedData += data
         #print "[%s]" % self.receivedData
 
-        paser = RSDataPaser()
-        self.receivedData, returenRawDataList = paser.doPaser(self.receivedData)
+        formater = RSDataFormater()
+        self.receivedData, returenRawDataList = formater.doPaser(self.receivedData)
 
         for index, elem in enumerate(returenRawDataList):
             print
@@ -96,6 +141,17 @@ class CanProxy():
         #print self.printHex(data)
 
             self.dumpAllRawData()
+
+    def serialSendCanDataTest(self):
+
+        #data = getSomeCanTestData()
+
+        canDataTest = CAN_DATA()
+        canDataTest.buildTestData()
+
+        self.serialSendCanData(canDataTest)
+        return
+
 
     def dumpAllRawData(self):
         print
@@ -119,3 +175,31 @@ class CanProxy():
     def printHex(self, s):
         s1 = binascii.b2a_hex(s)
         print s1
+
+
+
+def getSomeCanTestData():
+    canTest = CAN_DATA()
+    canTest.buildTestData()
+    buf = canTest.sturctureToByteArray()
+    print "getSomeCanTestData 1 ", buf
+
+    formater = RSDataFormater()
+    data1 = formater.doConstruct(buf)
+
+    print "getSomeCanTestData 2 ", data1
+
+if __name__ == '__main__':
+
+    canTest = CAN_DATA()
+    canTest.buildTestData()
+
+    buf = canTest.sturctureToByteArray()
+    print buf
+
+
+
+    formater = RSDataFormater()
+    data1 = formater.doConstruct(buf)
+
+    print data1

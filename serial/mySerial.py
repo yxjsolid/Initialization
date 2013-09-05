@@ -65,21 +65,9 @@ class SerialHandler:
             print "stop event"
             return
 
-
-
     def SendData(self, i_msg):
-        lmsg = ''
-        isOK = False
-        if isinstance(i_msg, unicode):
-            lmsg = i_msg.encode('gb18030')
-        else:
-            lmsg = i_msg
-        try:
-            pass
-        except Exception, ex:
-            pass
-        return isOK
-
+        self.l_serial.write(i_msg)
+        return
     def FirstReader(self):
         self.InitHead()
 
@@ -111,6 +99,12 @@ class SerialHandler:
         if self.l_serial.isOpen():
             self.l_serial.close()
 
+
+    def sendSomeTestData(self):
+        self.dataHandler.serialSendCanDataTest()
+        return
+
+
     def printHex(self, s):
         s1 = binascii.b2a_hex(s)
         print s1
@@ -118,12 +112,12 @@ class SerialHandler:
 if __name__ == '__main__':
 
     rt = SerialHandler(Port=2)
-    dataHandler = CanProxy()
-
+    dataHandler = CanProxy(SerialHandler=rt)
     rt.dataHandler = dataHandler
 
     try:
         if rt.start():
+            rt.sendSomeTestData()
             rt.waiting()
             rt.stop()
         else:
