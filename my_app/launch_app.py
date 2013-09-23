@@ -4,15 +4,18 @@ import wx
 import sys
 import MyGlobal as gl
 from  MyMiddleWare import *
+
+
+
 from MyDevice import *
 
 
 class MyApp(wx.App):
     deviceController = None
+
     def __init__(self, redirect=True, filename=None):
         print "App __init__"
         wx.App.__init__(self, redirect, filename)
-
 
     def getAllDeviceList(self):
         return self.deviceController.getDevices()

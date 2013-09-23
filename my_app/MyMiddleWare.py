@@ -10,6 +10,7 @@ import MainBase
 from MyDevice import *
 from ViewSelectPanel import *
 import pickle
+from MiddleWare_IO_Station import *
 
 mydata = wxPythonInAction.Chapter_15.data.tree
 
@@ -33,6 +34,15 @@ class MyFrame( MainBase.FrameBase ):
         self.panel = testMySplitterPanel(self)
         self.viewPanel_sub = self.panel.viewPanel_sub
 
+        return
+
+    def editIOStation(self):
+        print "add device"
+
+        frame1 = wx.Frame(parent=self.parent, size=(800,400))
+        Panel_EditIOStation(frame1)
+        frame1.CenterOnScreen()
+        frame1.Show()
         return
 
     def addDevice(self):
@@ -92,14 +102,16 @@ class MyFrame( MainBase.FrameBase ):
         ret = {
         MainBase.ID_MENU_SAVE:          lambda: self.onSave(),
         MainBase.ID_MENU_LOAD:          lambda: self.onLoad(),
+        MainBase.ID_MENU_EDIT_IO:       lambda: self.editIOStation(),
         MainBase.ID_MENU_ADD_DEVICE:    lambda: self.addDevice(),
         MainBase.ID_MENU_EDIT_DEVICE:   lambda: self.editDevice(),
         MainBase.ID_MENU_DELETE_DEVICE: lambda: self.addDevice(),
         }[eventId]()
         return
 
+
 class testMySplitterPanel( MainBase.SplitterPanelBase ):
-    def __init__( self, parent ):
+    def __init__(self, parent):
         MainBase.SplitterPanelBase.__init__( self, parent )
         self.parent = parent
         self.buildViewSelectPanel()
@@ -1473,5 +1485,6 @@ class Panel_AttributeSelect(MainBase.Panel_OperationSelect_Base):
 
     def closeWindow(self):
         self.frame.Close()
+
 
 
