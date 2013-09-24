@@ -572,10 +572,10 @@ class Panel_AddDevice_Base ( wx.Panel ):
 	
 
 ###########################################################################
-## Class Panel_Edit_IO_Station_base
+## Class Panel_Edit_Can_Station_base
 ###########################################################################
 
-class Panel_Edit_IO_Station_base ( wx.Panel ):
+class Panel_Edit_Can_Station_base ( wx.Panel ):
 	
 	def __init__( self, parent ):
 		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 698,429 ), style = wx.TAB_TRAVERSAL )
@@ -656,7 +656,7 @@ class Panel_Edit_IO_Station_base ( wx.Panel ):
 		self.m_panel79.SetSizer( fgSizer341 )
 		self.m_panel79.Layout()
 		fgSizer341.Fit( self.m_panel79 )
-		self.m_splitter9.SplitVertically( self.m_panel80, self.m_panel79, 150 )
+		self.m_splitter9.SplitVertically( self.m_panel80, self.m_panel79, 361 )
 		bSizer33.Add( self.m_splitter9, 1, wx.EXPAND, 5 )
 		
 		
@@ -745,7 +745,7 @@ class Panel_Edit_IO_Station_base ( wx.Panel ):
 		event.Skip()
 	
 	def m_splitter9OnIdle( self, event ):
-		self.m_splitter9.SetSashPosition( 150 )
+		self.m_splitter9.SetSashPosition( 361 )
 		self.m_splitter9.Unbind( wx.EVT_IDLE )
 	
 
@@ -920,7 +920,7 @@ class Panel_EditAction_Base2 ( wx.Panel ):
 class Panel_IoBoard_Base ( wx.Panel ):
 	
 	def __init__( self, parent ):
-		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 344,267 ), style = wx.TAB_TRAVERSAL )
+		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 344,211 ), style = wx.TAB_TRAVERSAL )
 		
 		fgSizer86 = wx.FlexGridSizer( 2, 1, 0, 0 )
 		fgSizer86.AddGrowableCol( 0 )
@@ -938,25 +938,25 @@ class Panel_IoBoard_Base ( wx.Panel ):
 		self.m_staticText47.Wrap( -1 )
 		bSizer57.Add( self.m_staticText47, 1, wx.ALIGN_CENTER|wx.ALL, 5 )
 		
-		m_choice4Choices = [ _(u"信号量输出"), _(u"信号量输入") ]
-		self.m_choice4 = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_choice4Choices, 0 )
-		self.m_choice4.SetSelection( 0 )
-		bSizer57.Add( self.m_choice4, 2, wx.ALIGN_CENTER|wx.ALL|wx.EXPAND, 5 )
+		boardType_choiceChoices = [ _(u"信号量输出"), _(u"信号量输入") ]
+		self.boardType_choice = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, boardType_choiceChoices, 0 )
+		self.boardType_choice.SetSelection( 0 )
+		bSizer57.Add( self.boardType_choice, 2, wx.ALIGN_CENTER|wx.ALL|wx.EXPAND, 5 )
 		
 		
 		self.mainSizer.Add( bSizer57, 0, wx.BOTTOM, 15 )
 		
-		self.boardId = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, _(u"编号") ), wx.HORIZONTAL )
+		bSizer571 = wx.BoxSizer( wx.HORIZONTAL )
 		
-		self.m_staticText73 = wx.StaticText( self, wx.ID_ANY, _(u"子板编号:"), wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText73.Wrap( -1 )
-		self.boardId.Add( self.m_staticText73, 0, wx.ALL, 5 )
+		self.m_staticText731 = wx.StaticText( self, wx.ID_ANY, _(u"子板编号:"), wx.DefaultPosition, wx.Size( 70,-1 ), 0 )
+		self.m_staticText731.Wrap( -1 )
+		bSizer571.Add( self.m_staticText731, 0, wx.ALL, 5 )
 		
-		self.m_textCtrl45 = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.boardId.Add( self.m_textCtrl45, 0, wx.ALL, 5 )
+		self.boardId_text = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer571.Add( self.boardId_text, 0, wx.ALL, 5 )
 		
 		
-		self.mainSizer.Add( self.boardId, 1, wx.EXPAND, 5 )
+		self.mainSizer.Add( bSizer571, 1, wx.EXPAND, 5 )
 		
 		
 		fgSizer86.Add( self.mainSizer, 1, wx.EXPAND|wx.TOP|wx.LEFT, 15 )
@@ -977,7 +977,7 @@ class Panel_IoBoard_Base ( wx.Panel ):
 		self.Layout()
 		
 		# Connect Events
-		self.m_choice4.Bind( wx.EVT_CHOICE, self.onChoice )
+		self.boardType_choice.Bind( wx.EVT_CHOICE, self.onIoBoardTypeChoice )
 		self.m_button40.Bind( wx.EVT_BUTTON, self.onApply )
 		self.m_button41.Bind( wx.EVT_BUTTON, self.onCancel )
 	
@@ -986,7 +986,7 @@ class Panel_IoBoard_Base ( wx.Panel ):
 	
 	
 	# Virtual event handlers, overide them in your derived class
-	def onChoice( self, event ):
+	def onIoBoardTypeChoice( self, event ):
 		event.Skip()
 	
 	def onApply( self, event ):

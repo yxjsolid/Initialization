@@ -40,7 +40,7 @@ class MyFrame( MainBase.FrameBase ):
         print "add device"
 
         frame1 = wx.Frame(parent=self.parent, size=(800,400))
-        Panel_EditIOStation(frame1)
+        Panel_CanStation(frame1)
         frame1.CenterOnScreen()
         frame1.Show()
         return
@@ -82,18 +82,16 @@ class MyFrame( MainBase.FrameBase ):
         print "onSave"
         saveFile = open(self.saveFileName, "w")
 
-        deviceController = wx.GetApp().deviceController
-        pickle.dump(deviceController, saveFile)
+        cfgObj = wx.GetApp().getConfigure()
+        pickle.dump(cfgObj, saveFile)
         saveFile.close()
         return
 
     def onLoad(self):
         print "onLoad"
         saveFile = open(self.saveFileName, "r")
-        deviceController = pickle.load(saveFile)
-        wx.GetApp().deviceController = deviceController
-        for device in deviceController.transports:
-            print device.name
+        cfgObj = pickle.load(saveFile)
+        wx.GetApp().setConfigure(cfgObj)
 
         self.viewPanel_sub.onEditUpdate()
 
@@ -879,6 +877,7 @@ class Panel_EditAction(MainBase.Panel_EditAction_Base):
         self.deviceEditor.onEditUpdate()
 
     def onChoice(self, event):
+        print "onChoice"
         type = event.GetInt()
         self.selectActionType(type)
     

@@ -8,6 +8,7 @@ import wxPythonInAction.Chapter_15.data
 import MainBase
 #from MainBase import *
 from MyDevice import *
+from MyCanStation import *
 from ViewSelectPanel import *
 import pickle
 
@@ -16,14 +17,11 @@ import pickle
 class CanStationViewControl():
     def __init__(self, canStationEditor):
         self.canStationEditor = canStationEditor
-        self.viewTree = self.canStationEditor.getOperationViewTree()
-        self.ioModuleList = []
+        self.viewTree = self.canStationEditor.getCanStationViewTree()
         self.setupCanStationTreeView()
 
     def setupCanStationTreeView(self):
         tree = self.viewTree
-
-
 
         tree.AddColumn(LABEL_CAN_STATION_ID)
         tree.AddColumn(LABEL_CAN_STATION_NAME)
@@ -41,18 +39,23 @@ class CanStationViewControl():
     def addNewCanStation(self):
         tree = self.viewTree
         name = OPERATION_NAME_DEFAULT + str(tree.GetCount()+1)
-        ctrl = DeviceOperation(self.canStationEditor.thisDevice, name)
-        self.appendActGrp(ctrl)
+        station = DeviceCanStation()
+        station.name = name
+        self.appendCanStationList(station)
 
-    def appendActGrp(self, ctrl):
+    def appendCanStationList(self, station):
         tree = self.viewTree
-        child = tree.AppendItem(tree.root, ctrl.name)
-        tree.SetItemText(child, ctrl.info,1)
-        tree.SetItemPyData(child, ctrl)
+        child = tree.AppendItem(tree.root, str(station.id))
+
+        tree.SetItemText(child, station.name, 1)
+        tree.SetItemText(child, station.info, 2)
+        tree.SetItemPyData(child, station)
 
     def onCanStationUpdate(self):
-        for ctrl in self.canStationEditor.thisDevice.operations:
-            self.appendActGrp(ctrl)
+        canStationList = wx.GetApp().getStationMgmt().getCanStationList()
+
+        for station in canStationList:
+            self.appendCanStationList(station)
 
         return
 
@@ -71,25 +74,39 @@ class CanStationViewControl():
         else:
             print "not ok"
 
-    def getActionGroupList(self):
-        ActGrps = []
+    def setDefaultSelection(self):
+        tree = self.viewTree
+
+        #help(tree)
+        root = tree.GetRootItem()
+
+        item = tree.GetNext(root)
+        if item.IsOk():
+
+            print "get item ok!!!!!!!"
+            tree.SelectItem(item)
+
+    def getCanStationList(self):
+        stationList = []
         tree = self.viewTree
         item = tree.GetRootItem()
         while True:
             item = tree.GetNext(item)
             if item.IsOk():
-                ActGrp = tree.GetItemPyData(item)
-                ActGrps.append(ActGrp)
-                print ActGrp.name
+                station = tree.GetItemPyData(item)
+                stationList.append(station)
+                print station.name
             else:
                 break
-        return ActGrps
+        return stationList
 
-    def setActGrp(self, ctrl,index, txtIn):
+    def setCanStation(self, station, index, txtIn):
         if index is 0:
-            ctrl.name = txtIn
+            station.id = txtIn
         elif index is 1:
-            ctrl.info = txtIn
+            station.name = txtIn
+        elif index is 2:
+            station.info = txtIn
 
     def deleteCanStation(self):
         tree = self.viewTree
@@ -154,7 +171,7 @@ class CanStationViewControl():
         station = self.getCurrentCanStation()
         print "\n\n onCanStationItemSelChanged:"
 
-        self.canStationEditor.stationBoardViewCtrl.updateIoBoardView(station)
+        self.canStationEditor.ioBoardViewCtrl.updateIoBoardView(station)
 
 
     def onCanStationItemBeginEdit(self, event):
@@ -165,9 +182,9 @@ class CanStationViewControl():
     def onCanStationItemEndEdit(self, event):
         tree = self.viewTree
         item = event.GetItem()
-        ctrl = tree.GetItemPyData(item)
+        station = tree.GetItemPyData(item)
         newLable =  event.GetLabel()
-        self.setActGrp(ctrl, tree.editColumn, newLable)
+        self.setCanStation(station, tree.editColumn, newLable)
     def onCanStationItemDelete(self, event):
         print "onActGrpItemDelete"
 
@@ -181,51 +198,46 @@ class CanStationViewControl():
         frame1.Show()
         #------------------------------------------------------------------
 
-class StationBoardViewControl():
+class IoBoardViewControl():
     def __init__(self, canStationEditor):
         self.canStationEditor = canStationEditor
         self.ioModuleList = []
-        self.SetupStationBoardList()
+        self.SetupIoBoardList()
 
     ###################################################################
     # action list related
 
-    def SetupStationBoardList(self):
+    def SetupIoBoardList(self):
         ioBoardList = self.canStationEditor.ioBoard_list
 
-        ioBoardList.InsertColumn(0, "")
-        #actionList.InsertColumn(1, ACTION_COL_ACT, wx.LIST_FORMAT_RIGHT)
-        ioBoardList.InsertColumn(1, ACTION_COL_ACT, wx.LIST_FORMAT_RIGHT)
-        ioBoardList.InsertColumn(2, ACTION_COL_FEEDBACK)
-        ioBoardList.InsertColumn(3, ACTION_COL_FEEDBACK_TIMEOUT)
+
+        ioBoardList.InsertColumn(0, LABEL_IO_BOARD_COLUM_ID, wx.LIST_FORMAT_RIGHT)
+        ioBoardList.InsertColumn(1, LABEL_IO_BOARD_COLUM_TYPE)
 
         #self.list.SetColumnWidth(0, wx.LIST_AUTOSIZE)
-
         ioBoardList.SetColumnWidth(0, wx.LIST_AUTOSIZE_USEHEADER)
         ioBoardList.SetColumnWidth(1, wx.LIST_AUTOSIZE_USEHEADER)
-        ioBoardList.SetColumnWidth(2, wx.LIST_AUTOSIZE_USEHEADER)
-        ioBoardList.SetColumnWidth(3, wx.LIST_AUTOSIZE_USEHEADER)
 
 
-    def listInsertNewAction(self, index, action):
-        actionList = self.canStationEditor.action_list
+    def listInsertIoBoard(self, index, board):
+        ioBoardList = self.canStationEditor.ioBoard_list
 
         """ ref SetStringItem """
-        actionCount = actionList.GetItemCount()
+        boardCnt = ioBoardList.GetItemCount()
 
-        if index > actionCount+1:
+        if index > boardCnt+1:
             print "error"
             return
 
         if index == -1:
-            if actionCount == 0:
-                index = actionList.InsertStringItem(sys.maxint, str(actionCount+1),0)
+            if boardCnt == 0:
+                index = ioBoardList.InsertStringItem(sys.maxint, board.getBoardIdStr(), 0)
             else:
-                index = actionList.InsertStringItem(actionCount, str(actionCount+1),0)
+                index = ioBoardList.InsertStringItem(boardCnt, board.getBoardIdStr(), 0)
         else:
-            index = actionList.InsertStringItem(index, str(actionCount+1),0)
+            index = ioBoardList.InsertStringItem(index, board.getBoardIdStr(), 0)
 
-        actionList.SetStringItem(index, 1, action.getName(), 0)
+        ioBoardList.SetStringItem(index, 1, board.getBoardTypeStr(), 0)
         #actionList.SetStringItem(index, 2, action.moduleFeedback.name, 0)
         #actionList.SetStringItem(index, 3, action.feedbackTimeout, 0)
         #actionList.SetItemData(index, action)
@@ -237,19 +249,21 @@ class StationBoardViewControl():
 
         actionList.DeleteItem(item)
 
-    def refreshIoBoardList(self, ctrlModule):
+    def refreshIoBoardList(self, canStation):
         ioBoardList = self.canStationEditor.ioBoard_list
         ioBoardList.DeleteAllItems()
 
-        for action in ctrlModule.actions:
-            self.listInsertNewAction(-1, action)
+        if canStation is None:
+            return
+
+        for ioBoard in canStation.InputBoardList:
+            self.listInsertIoBoard(-1, ioBoard)
+
+        for ioBoard in canStation.OutputBoardList:
+            self.listInsertIoBoard(-1, ioBoard)
 
         return
 
-    def dumpAction(self, action):
-        print "dumpAction"
-        print action.moduleOutput.name
-        print action.moduleFeedback.name
 
     def onEditActionUpdate(self):
         actionList = self.canStationEditor.action_list
@@ -277,8 +291,8 @@ class StationBoardViewControl():
         if station is None:
             print "Error: --> onAddNewIoBoard"
 
-        frame = wx.Frame(None, size=(350,400))
-        Panel_EditIoBoard(frame, self.canStationEditor, targetObj=station)
+        frame = wx.Frame(None, size=(350, 400))
+        Panel_EditIoBoard(frame, self.canStationEditor, targetStation=station)
         frame.CenterOnScreen()
         frame.Show()
 
@@ -349,25 +363,23 @@ class StationBoardViewControl():
             self.canStationEditor.ioBoard_toolbar.EnableTool(MainBase.ioBoard_new, 0)
         else:
             self.canStationEditor.ioBoard_toolbar.EnableTool(MainBase.ioBoard_new, 1)
-            self.refreshIoBoardList(station)
+
+        self.refreshIoBoardList(station)
 
 
-class Panel_EditIOStation(MainBase.Panel_Edit_IO_Station_base):
+class Panel_CanStation(MainBase.Panel_Edit_Can_Station_base):
     def __init__( self, frame , device=None):
-        MainBase.Panel_Edit_IO_Station_base.__init__( self, frame )
+        MainBase.Panel_Edit_Can_Station_base.__init__( self, frame )
 
 
-        print "Panel_AddDevice  1111"
+        print "Panel_EditIOStation  1111"
 
-        if device is None:
-            self.thisDevice = Device_Transport()
-        else:
-            self.thisDevice = device
         self.frame = frame
 
         self.canStationViewCtrl = CanStationViewControl(self)
-        self.stationBoardViewCtrl = StationBoardViewControl(self)
+        self.ioBoardViewCtrl = IoBoardViewControl(self)
 
+        self.onLoadUpdate()
 
         # self.deviceInfoPanelSetup()
         #
@@ -378,24 +390,14 @@ class Panel_EditIOStation(MainBase.Panel_Edit_IO_Station_base):
         # self.actGrpCtrl = ActionGroupViewControl(self)
         # self.onLoadUpdate()
 
-    def deviceInfoPanelSetup(self):
-        self.label_name.SetLabel(ADD_DEVICE_LABEL_NAME)
-        self.label_pos.SetLabel(ADD_DEVICE_LABEL_POS)
-        self.label_desc.SetLabel(ADD_DEVICE_LABEL_DESC)
-
-    def setupDeviceInfo(self, device):
-        self.text_name.SetValue(device.name)
-        self.text_pos.SetValue(device.info)
-        self.text_desc.SetValue(device.location)
-
     def onIoBoardToolClicked(self, event):
-        self.stationBoardViewCtrl.onIoBoardToolClicked(event)
+        self.ioBoardViewCtrl.onIoBoardToolClicked(event)
 
     def onLoadUpdate(self):
-        self.setupDeviceInfo(self.thisDevice)
-        self.moduleIoViewCtrl.onModuleIOListUpdate()
-        self.actGrpCtrl.onActGrpUpdate()
-        self.attrCtrl.onAttrListUpdate()
+        self.canStationViewCtrl.onCanStationUpdate()
+        self.canStationViewCtrl.setDefaultSelection()
+
+
         return
 
     def onEditUpdate(self, targetObj=None):
@@ -406,22 +408,6 @@ class Panel_EditIOStation(MainBase.Panel_Edit_IO_Station_base):
         return
 
 
-    """
-    Attribute list control
-    """
-    def onAddAttribute(self, event):
-        print "onAddAttribute"
-        #self.attrCtrl.onAddNewAttribute()
-        self.attrCtrl.popupAttrEditWnd()
-        return
-
-    def onEditAttribute(self, event):
-        print "onEditAttribute"
-        return
-
-    def onDeleteAttribute(self, event):
-        print "onDeleteAttribute"
-        return
 
     """
     # main
@@ -431,31 +417,19 @@ class Panel_EditIOStation(MainBase.Panel_Edit_IO_Station_base):
     def onApply(self, event):
         print "my onApply"
 
-        name = self.text_name.GetValue()
-        info = self.text_pos.GetValue()
-        location = self.text_desc.GetValue()
-        actGrpList = self.actGrpCtrl.getActionGroupList()
 
-        self.thisDevice.name = name
-        self.thisDevice.info = info
-        self.thisDevice.location = location
+        canStationList = self.canStationViewCtrl.getCanStationList()
 
-        self.thisDevice.setControls(actGrpList)
-        #self.thisDevice.attrList = self.attrCtrl.attrObjList
-        wx.GetApp().deviceController.addTransport(self.thisDevice)
+        wx.GetApp().getStationMgmt().setCanStationList(canStationList)
         self.closeWindow()
 
         """ViewSelectPanel.onEditUpdate()"""
-        wx.GetApp().viewPanel_sub.onEditUpdate()
+        #wx.GetApp().viewPanel_sub.onEditUpdate()
 
     def onCancel(self, event):
         print "my onCancel"
 
-
-    """
-    Operation related
-    """
-    def getOperationViewTree(self):
+    def getCanStationViewTree(self):
         return self.canStationTree
 
     def onCanStationToolClicked(self, event):
@@ -475,59 +449,38 @@ class Panel_EditIOStation(MainBase.Panel_Edit_IO_Station_base):
 
     ######################################################
     ######################################################
-    def onAddModuleIO(self, event):
-        print "onAddModuleIO"
-        #frame1 = wx.Frame(parent=self.parent, size=(800,400))
-        frame1 = wx.Frame(parent=None, size=(800,400))
-        Panel_EditModuleIO(frame1, self, self)
-        frame1.CenterOnScreen()
-        frame1.Show()
 
-    def onDeleteModuleIO(self, event):
-        print "onDeleteModuleIO"
-        ioViewCtrl = self.getModuleIoViewControl()
-        ioViewCtrl.deleteIoModule()
-        ioViewCtrl.onModuleIOListUpdate()
-
-    def getModuleIoViewList(self):
-        return self.moudleIo_list
-    def getModuleIoViewControl(self):
-        return self.moduleIoViewCtrl
 
 
 class Panel_EditIoBoard(MainBase.Panel_IoBoard_Base):
-    #0: IO , 1:delay, 2:attr
 
-    ACTION_TYPE_IO, ACTION_TYPE_DELAY, ACTION_TYPE_ATTR = range(3)
-    def __init__(self, frame, canStationEditor, targetObj=None):
+    def __init__(self, frame, canStationEditor, targetStation=None):
         MainBase.Panel_IoBoard_Base.__init__(self, frame)
         self.canStationEditor = canStationEditor
-        self.targetObj = targetObj
+        self.targetStation = targetStation
         self.frame = frame
-        #self.selectActionType(0)
-        #self.buildOutputChoiceList()
-        #self.buildFeedbackChoiceList()
-        #self.buildAttrChoiceList()
+        self.buildBoardTypeChoice()
 
-#        print "Panel_EditAction.ACTION_TYPE_IO", Panel_EditAction.ACTION_TYPE_IO
+
+    def buildBoardTypeChoice(self):
+        self.boardType_choice.Clear()
+        # self.boardType_choice.Append(DeviceIoBoard.board_type_choices[DeviceIoBoard.BOARD_TYPE_INPUT])
+        # self.boardType_choice.Append(DeviceIoBoard.board_type_choices[DeviceIoBoard.BOARD_TYPE_OUTPUT])
+
+
+        index = DeviceIoBoard.BOARD_TYPE_INPUT
+        self.boardType_choice.Insert(DeviceIoBoard.board_type_choices[index], index)
+        self.boardType_choice.SetSelection(index)
+
+
+        index = DeviceIoBoard.BOARD_TYPE_OUTPUT
+        self.boardType_choice.Insert(DeviceIoBoard.board_type_choices[index], index)
+
+
 
     def selectActionType(self, type):
-        self.actionType = type
+        self.boardType = type
         #0: IO , 1:delay, 2:attr
-
-        self.mainSizer.Hide(self.SizerIO)
-        self.mainSizer.Hide(self.sizeTimeDelay)
-        self.mainSizer.Hide(self.SizerAttr)
-
-        if type == Panel_EditAction.ACTION_TYPE_IO:
-            self.mainSizer.Show(self.SizerIO)
-        elif type == Panel_EditAction.ACTION_TYPE_DELAY:
-            self.mainSizer.Show(self.sizeTimeDelay)
-        elif type == Panel_EditAction.ACTION_TYPE_ATTR:
-            self.mainSizer.Show(self.SizerAttr)
-
-        self.mainSizer.Layout()
-
         # def editActionUpdate(self):
         #self.buildChoiceList()
 
@@ -556,71 +509,15 @@ class Panel_EditIoBoard(MainBase.Panel_IoBoard_Base):
             index += 1
             print item.name, sys.getrefcount(item)
 
-    def buildFeedbackChoiceList(self):
-        io_modules = self.deviceEditor.getModuleIoViewControl().getIoModules()
-        self.buildChoiceList(io_modules, self.choice_feedback)
-
-    def buildOutputChoiceList(self):
-        io_modules = self.deviceEditor.getModuleIoViewControl().getIoModules()
-        self.buildChoiceList(io_modules, self.choice_output)
-
-    def buildAttrChoiceList(self):
-        attrList = self.deviceEditor.thisDevice.getAttrList()
-        self.buildChoiceList(attrList, self.choice_attr)
-
-    def createIoAction(self):
-        newActionObj = DeviceActionIO()
-        outObj = None
-        feedbackObj = None
-
-        sel = self.choice_output.GetSelection()
-        if sel != wx.NOT_FOUND:
-            outObj = self.choice_output.GetClientData(sel)
-
-        outputValue = self.text_output.GetValue()
-
-        sel = self.choice_feedback.GetSelection()
-        if sel != wx.NOT_FOUND:
-            feedbackObj = self.choice_feedback.GetClientData(sel)
-
-        timeout = self.text_timeout.GetValue()
-        newActionObj.moduleOutput = outObj
-        newActionObj.outputValue = outputValue
-        newActionObj.moduleFeedback = feedbackObj
-        newActionObj.feedbackTimeout = timeout
-
-        return newActionObj
-
-    def createAttrSetAction(self):
-        newActionObj = DeviceActionAttrSet()
-
-        sel = self.choice_attr.GetSelection()
-        if sel != wx.NOT_FOUND:
-            attrObj = self.choice_attr.GetClientData(sel)
-        else:
-            attrObj = None
-
-        newActionObj.attribute = attrObj
-        newActionObj.valueToSet = int(self.text_valuSet.GetValue())
-
-        return newActionObj
-
-    def createDelayAction(self):
-        newActionObj = DeviceActionDelay()
 
 
-        return newActionObj
 
-    def createNewAction(self, actionType):
-        obj = None
-        if actionType == Panel_EditAction.ACTION_TYPE_IO:
-            obj = self.createIoAction()
-        elif actionType == Panel_EditAction.ACTION_TYPE_DELAY:
-            obj = self.createDelayAction()
-        elif actionType == Panel_EditAction.ACTION_TYPE_ATTR:
-            obj = self.createAttrSetAction()
+    def createIoBoard(self, boardType, boardId):
+        board = DeviceIoBoard()
+        board.boardId = boardId
+        board.boardType = boardType
 
-        return obj
+        return board
 
     def onEditUpdate(self, targetObj=None):
         print "Panel_NewAction -> onEditUpdate"
@@ -631,9 +528,10 @@ class Panel_EditIoBoard(MainBase.Panel_IoBoard_Base):
         targetObj.SetSelection(targetObj.GetCount()-1)
         self.deviceEditor.onEditUpdate()
 
-    def onChoice(self, event):
-        type = event.GetInt()
-        self.selectActionType(type)
+    def onIoBoardTypeChoice(self, event):
+
+        print "onIoBoardTypeChoice"
+        self.boardType = event.GetInt()
 
     def onAddModuleIO(self, event):
         print "onAddModuleIO"
@@ -673,9 +571,21 @@ class Panel_EditIoBoard(MainBase.Panel_IoBoard_Base):
         self.frame.Close()
 
     def onApply(self, evt):
-        newAction = self.createNewAction(self.actionType)
-        self.targetObj.addNewAction(newAction)
-        self.deviceEditor.actionListCtrl.listInsertNewAction(-1, newAction)
+
+        boardId = self.boardId_text.GetValue()
+        boardType = self.boardType_choice.GetSelection()
+
+        print "boardId -->", boardId, "boardTYpe --> ", boardType
+        newBoard = self.createIoBoard(boardType, boardId)
+
+        self.targetStation.addNewIoBoard(newBoard)
+
+
+
+        self.canStationEditor.ioBoardViewCtrl.refreshIoBoardList(self.targetStation)
+
+
+        #self.canStationEditor.actionListCtrl.listInsertNewAction(-1, newAction)
         self.closeWindow()
         return
 

@@ -9,13 +9,37 @@ from  MyMiddleWare import *
 
 from MyDevice import *
 
+class CfgContainer():
+    def __init__(self):
+        self.stationManagement = None
+        self.deviceController = None
+
+
 
 class MyApp(wx.App):
     deviceController = None
 
+
     def __init__(self, redirect=True, filename=None):
         print "App __init__"
         wx.App.__init__(self, redirect, filename)
+        self.cfgContainer = CfgContainer()
+
+        self.cfgContainer.stationManagement = StationManagement()
+        self.cfgContainer.deviceController = None
+
+    def getDeviceCtrl(self):
+        return self.getConfigure().deviceController
+
+    def getStationMgmt(self):
+        return self.getConfigure().stationManagement
+
+    def getConfigure(self):
+        return self.cfgContainer
+
+    def setConfigure(self, cfg):
+        self.cfgContainer = cfg
+
 
     def getAllDeviceList(self):
         return self.deviceController.getDevices()
