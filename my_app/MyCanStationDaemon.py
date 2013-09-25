@@ -5,7 +5,8 @@ import sys,threading,time
 import datetime
 from MyGlobal import *
 from MyCanStation import *
-from serial.canData import *
+from mySerial.canData import *
+from mySerial.mySerial import *
 
 
 class CanStationDaemonMgmt():
@@ -19,7 +20,9 @@ class CanStationDaemonMgmt():
         return
 
     def getStationDaemon(self, stationId):
-        return self.daemonDict[stationId]
+        print "getStationDaemon, sattionId ", stationId
+
+        return self.daemonDict[stationId][1]
 
 
 class CanStationDaemon():
@@ -33,6 +36,8 @@ class CanStationDaemon():
         return
 
     def handleCanFrameReceived(self, canFrame):
+
+        print "CanStationDaemon --> handleCanFrameReceived"
 
         return
 
@@ -80,7 +85,20 @@ def buildCanStationTest(idIn):
 if __name__ == '__main__':
     daemonMgmt = CanStationDaemonMgmt()
 
-    canProxy = CanProxy(daemonMgmtIn=daemonMgmt)
+    rt = SerialHandler(Port=3)
+
+    try:
+        rt.start()
+    except Exception,se:
+        print str(se)
+
+
+
+    canProxy = CanProxy(SerialHandler=rt, daemonMgmtIn=daemonMgmt)
+
+    rt.dataHandler = canProxy
+
+
     canStation = buildCanStationTest(5)
 
     daemon = CanStationDaemon(canStation, canProxy)

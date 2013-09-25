@@ -62,19 +62,42 @@ class USB2CAN_DATA(Structure):
 
         canBuff = (c_ubyte * sizeof(USB2CAN_DATA))()
         for index, num in enumerate(rawData):
-            canBuff[index] = num
+            canBuff[index] = ord(num)
 
         memmove(byref(self), byref(canBuff), sizeof(USB2CAN_DATA))
 
-        self.dumpCanData()
+        return
+
+    def convertCanIdToUsb(self, canFrame):
+        idTmp = canFrame.sig[0] << 24
+        idTmp |= canFrame.sig[1] << 16
+        idTmp |= canFrame.sig[2] << 8
+        idTmp |= canFrame.sig[3]
+        idTmp >>= 3
+
+        memmove(byref(self.id), byref(c_uint32(idTmp)), 4)
+
+        return
+
+    def convertUsbIdToCan(self, canFrame):
+        idTmp = self.id[3] << 24
+        idTmp |= self.id[2] << 16
+        idTmp |= self.id[1] << 8
+        idTmp |= self.id[0]
+        idTmp <<= 3
+
+        sigTmp = (c_ubyte * 4)()
+        memmove(byref(sigTmp), byref(c_uint32(idTmp)), 4)
+
+        canFrame.sig[0] = sigTmp[3]
+        canFrame.sig[1] = sigTmp[2]
+        canFrame.sig[2] = sigTmp[1]
+        canFrame.sig[3] = sigTmp[0]
 
         return
 
     def convertFromCanFrame(self, canFrame):
-        self.id[0] = canFrame.sig[0]
-        self.id[1] = canFrame.sig[1]
-        self.id[2] = canFrame.sig[2]
-        self.id[3] = canFrame.sig[3]
+        self.convertCanIdToUsb(canFrame)
 
         self.data[0] = canFrame.canData[0]
         self.data[1] = canFrame.canData[1]
@@ -93,11 +116,9 @@ class USB2CAN_DATA(Structure):
     def convertToCanFrame(self):
         canFrame = CAN_FRAME()
 
+        self.convertUsbIdToCan(canFrame)
+
         canFrame.info = self.len
-        canFrame.sig[0] = self.id[0]
-        canFrame.sig[1] = self.id[1]
-        canFrame.sig[2] = self.id[2]
-        canFrame.sig[3] = self.id[3]
         canFrame.canData[0] = self.data[0]
         canFrame.canData[1] = self.data[1]
         canFrame.canData[2] = self.data[2]
@@ -109,17 +130,42 @@ class USB2CAN_DATA(Structure):
 
         return canFrame
 
+
+
+
+
     def buildTestData(self):
-        self.id[0] = 0
-        self.id[1] = 0
-        self.id[2] = 0
-        self.id[3] = 0
+        self.convertCanIdToUsb()
+
+        print "sizeof(c_uint)", sizeof(c_uint)
+
+        print "sizeof(USB2CAN_DATA)", sizeof(USB2CAN_DATA)
+
+#        self.id = 0xff
+
+        #dd = c_uint
+
+
+
+
+
+        #byteArray = bytearray(sizeof(USB2CAN_DATA))
+        # dataBuffer = (c_ubyte * 4)()
+        #
+        # memmove(byref(dataBuffer),      byref(self.id) + 3, 1)
+        # memmove(byref(dataBuffer) + 1,  byref(self.id) + 2, 1)
+        # memmove(byref(dataBuffer) + 2,  byref(self.id) + 1, 1)
+        # memmove(byref(dataBuffer) + 3,  byref(self.id), 1)
+
+
+
+
         self.len = 8
         self.ch = 0x66
         self.format = 1
         self.type = 0
 
-        val = 0xaa
+        val = 5
         for i in range(8):
             self.data[i] = val
 
@@ -208,15 +254,14 @@ class USB2CANParser():
     def analyzeRawDataReceived(self, dataIn):
         validFrameList = []
 
-        print
-        print
-        print "self.receivedData %r" % dataIn
+        #print
+        #print
+        #print "self.receivedData %r" % dataIn
 
         startStr = chr(self.m_FrameHead) + chr(self.m_FrameHead)
 
         frameList = dataIn.split(startStr)
         print frameList
-
 
         for index, frame in enumerate(frameList):
 
@@ -235,9 +280,9 @@ class USB2CANParser():
 
 
 
-        print "dataLeft: %r" % dataLeft
-        print "validFrameList : "
-        print validFrameList
+        #print "dataLeft: %r" % dataLeft
+        #print "validFrameList : "
+        #print validFrameList
 
         #for rawFrame in validFrameList:
             #self.getFrameFromRawData(rawFrame)
@@ -367,7 +412,8 @@ class CAN_FRAME(Structure):
         return stationId
 
     def getCanFrameType(self):
-        return self.sig[0] & 0x7f
+        #return self.sig[0] & 0x7f
+        return self.sig[0]
 
     def getCanFrameData(self, index):
         return self.canData[index]
@@ -403,7 +449,7 @@ class CanProxy():
         dataToSend.convertFromCanFrame(frame)
 
         if self.serialHandler:
-            self.serialHandler.SendData(datatoSend.dumpDataToSend())
+            self.serialHandler.SendData(dataToSend.dumpDataToSend())
 
     def receiveCanFrame(self, rawData):
         if len(rawData) != sizeof(USB2CAN_DATA):
@@ -426,14 +472,14 @@ class CanProxy():
         # formater = RSDataFormater()
         # self.receivedData, returenRawDataList = formater.doPaser(self.receivedData)
 
-        formater = USB2CANFormater()
-        self.receivedData, returnRawDataList = formater.analyzeRawDataReceived(self.receivedData)
+        parser = USB2CANParser()
+        self.receivedData, returnRawDataList = parser.analyzeRawDataReceived(self.receivedData)
         #self.receivedData, returenRawDataList = formater.analyzeDataReceived(self.receivedData)
 
         for index, elem in enumerate(returnRawDataList):
-            print
-            print "##################"
-            print "received:",index, elem
+            #print
+            #print "##################"
+            #print "received:",index, elem
             self.receivedRawDataList.append(elem)
             self.receiveCanFrame(elem)
             #print "receiveSerialRawData"
@@ -484,13 +530,15 @@ def getSomeCanTestData():
 if __name__ == '__main__':
 
 
-    usb2can = USB2CAN_DATA()
 
-    usb2can.buildTestData()
-    #bytearray = usb2can.getByteArray()
 
-    usb2can.dumpDataToSend()
+    canFrame = CAN_FRAME()
+    canFrame.sig[0] = 1
+    canFrame.sig[1] = 2
+    canFrame.sig[2] = 3
+    canFrame.sig[3] = 4
 
+    canFrame.structureToByteArray()
 
 
 """

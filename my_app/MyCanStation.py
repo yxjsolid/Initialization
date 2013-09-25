@@ -2,7 +2,7 @@
 
 import wx
 from MyGlobal import *
-from serial.canData import *
+from mySerial.canData import *
 
 
 class StationManagement():

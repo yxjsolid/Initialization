@@ -26,11 +26,15 @@ class SerialHandler:
         self.stop()
 
     def start(self):
+        print "start111,", self.l_serial
+
         self.l_serial = serial.Serial()
         self.l_serial.port = self.port
         self.l_serial.baudrate = 9600
         self.l_serial.timeout = 2
         #self.l_serial.setStopbits()
+
+        print "start222,", self.l_serial
 
         try:
             self.l_serial.open()
@@ -71,16 +75,16 @@ class SerialHandler:
             print "stop event"
             return
 
-    def serialLock(self):
+    def doSerialLock(self):
         return self.serialLock.acquire()
 
-    def serialRelease(self):
+    def doSerialRelease(self):
         self.serialLock.release()
 
     def SendData(self, i_msg):
-        if self.serialLock():
+        if self.doSerialLock():
             self.l_serial.write(i_msg)
-            self.serialRelease()
+            self.doSerialRelease()
 
         print "serial send done"
         return
@@ -91,29 +95,29 @@ class SerialHandler:
         self.InitHead()
 
         while self.alive:
-            try:
-                data = ''
-                n = self.l_serial.inWaiting()
-                if n:
+            #try:
+            data = ''
+            n = self.l_serial.inWaiting()
+            if n:
 
-                    if self.serialLock():
-                        dataNew = self.l_serial.read(n)
-                        self.serialRelease()
+                if self.doSerialLock():
+                    dataNew = self.l_serial.read(n)
+                    self.doSerialRelease()
 
-                    data += dataNew
+                data += dataNew
 
-                    print "FirstReader 111 ", data
+                print "FirstReader 111 ", data
 
-                    #print "\n\n######################\n"
-                    #print n,"data", "new",dataNew
-                    #print binascii.b2a_hex(dataNew)
-                    #print binascii.b2a_hex(data)
+                #print "\n\n######################\n"
+                #print n,"data", "new",dataNew
+                #print binascii.b2a_hex(dataNew)
+                #print binascii.b2a_hex(data)
 
-                    if self.dataHandler is not None:
-                        self.dataHandler.receiveSerialRawData(data)
+                if self.dataHandler is not None:
+                    self.dataHandler.receiveSerialRawData(data)
 
-            except Exception, ex:
-                print "FirstReader:",ex
+            #except Exception, ex:
+                #print "FirstReader:",ex
 
         self.waitEnd.set()
         self.alive = False
@@ -136,50 +140,50 @@ class SerialHandler:
 
 if __name__ == '__main__':
 
-    rt = SerialHandler(Port=4)
+    rt = SerialHandler(Port=3)
     dataHandler = CanProxy(SerialHandler=rt)
     rt.dataHandler = dataHandler
 
 
 
 
-    try:
-        if rt.start():
-            help( rt.l_serial)
+    #try:
+    if rt.start():
+        #help( rt.l_serial)
 
-            # print rt.l_serial.getCD()
-            # print rt.l_serial.getCTS()
-            # print rt.l_serial.getDSR()
-            # print rt.l_serial.getRI()
-            # print rt.l_serial.rtscts
-            #
-            # print rt.l_serial.getByteSize()
-            # print rt.l_serial.getDsrDtr()
-            # print rt.l_serial.getRtsCts()
-            # print rt.l_serial.getStopbits()
-            # print rt.l_serial.getXonXoff()
-            # print rt.l_serial.dsrdtr
-            # print rt.l_serial.rtscts
-            # print rt.l_serial.stopbits
+        # print rt.l_serial.getCD()
+        # print rt.l_serial.getCTS()
+        # print rt.l_serial.getDSR()
+        # print rt.l_serial.getRI()
+        # print rt.l_serial.rtscts
+        #
+        # print rt.l_serial.getByteSize()
+        # print rt.l_serial.getDsrDtr()
+        # print rt.l_serial.getRtsCts()
+        # print rt.l_serial.getStopbits()
+        # print rt.l_serial.getXonXoff()
+        # print rt.l_serial.dsrdtr
+        # print rt.l_serial.rtscts
+        # print rt.l_serial.stopbits
 
-            #rt.l_serial.setXonXoff(1)
-            #print "xonxoff", rt.l_serial.getXonXoff()
-
-
-            #help(rt.l_serial.write)
-            rt.sendSomeTestData()
-
-            rt.waiting()
+        #rt.l_serial.setXonXoff(1)
+        #print "xonxoff", rt.l_serial.getXonXoff()
 
 
-            rt.stop()
-        else:
-            pass
-    except Exception,se:
-        print str(se)
+        #help(rt.l_serial.write)
+        rt.sendSomeTestData()
 
-    if rt.alive:
+        rt.waiting()
+
+
         rt.stop()
+    #     else:
+    #         pass
+    # except Exception,se:
+    #     print str(se)
+    #
+    # if rt.alive:
+    #     rt.stop()
 
     print 'End OK .'
     del rt
