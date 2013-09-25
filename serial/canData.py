@@ -1,47 +1,47 @@
 from ctypes import *
 import binascii
 
-'''
-typedef struct canFrameStruct
-{
-	uint8 info;
-	uint8 sig[4];
-	uint8 canData[8];
-}canFrameStruct;
-'''
+# '''
+# typedef struct canFrameStruct
+# {
+# 	uint8 info;
+# 	uint8 sig[4];
+# 	uint8 canData[8];
+# }canFrameStruct;
+# '''
+#
+# """
+# typedef struct  {
+# BYTE  id[4];
+# BYTE  data[8];            //channel
+# BYTE  len;                //
+# BYTE  ch;                 // 0xff:config
+# BYTE  format;             // 00:sff  01:eff
+# BYTE  type;               // 00:data 01:far
+# BYTE  checkSum
+# }  CAN_msg;
+# """
 
 
-"""
-typedef struct  {
-BYTE  id[4];
-BYTE  data[8];            //channel
-BYTE  len;                //
-BYTE  ch;                 // 0xff:config
-BYTE  format;             // 00:sff  01:eff
-BYTE  type;               // 00:data 01:far
-BYTE  checkSum
-}  CAN_msg;
-"""
 class USB2CAN_DATA(Structure):
-    _fields_ = [("id",      c_ubyte*4),
-                ("data",    c_ubyte*8),
-                ("len",     c_ubyte),
-                ("ch",      c_ubyte),
-                ("format",  c_ubyte),
-                ("type",    c_ubyte),
-                ("checkSum",c_ubyte)]
+    _fields_ = [("id",       c_ubyte * 4),
+                ("data",     c_ubyte * 8),
+                ("len",      c_ubyte),
+                ("ch",       c_ubyte),
+                ("format",   c_ubyte),
+                ("type",     c_ubyte),
+                ("checkSum", c_ubyte)]
 
     def __init__(self):
-
         Structure.__init__(self)
-        self.formater = USB2CANFormater()
+        self.dataParser = USB2CANParser()
         return
 
     def getByteArray(self):
         checkSum = c_ubyte(0)
 
         byteArray = bytearray(sizeof(USB2CAN_DATA))
-        dataBuffer = (c_ubyte*sizeof(USB2CAN_DATA))()
+        dataBuffer = (c_ubyte * sizeof(USB2CAN_DATA))()
         memmove(byref(dataBuffer), byref(self), sizeof(USB2CAN_DATA))
 
         for index, elem in enumerate(dataBuffer):
@@ -54,6 +54,60 @@ class USB2CAN_DATA(Structure):
 
         print "can data raw:[%r]" % byteArray
         return byteArray
+
+    def convertFromUsbRawData(self, rawData):
+        if len(rawData) != sizeof(USB2CAN_DATA):
+            print "receiveFrame -> error data len not match"
+            return 0
+
+        canBuff = (c_ubyte * sizeof(USB2CAN_DATA))()
+        for index, num in enumerate(rawData):
+            canBuff[index] = num
+
+        memmove(byref(self), byref(canBuff), sizeof(USB2CAN_DATA))
+
+        self.dumpCanData()
+
+        return
+
+    def convertFromCanFrame(self, canFrame):
+        self.id[0] = canFrame.sig[0]
+        self.id[1] = canFrame.sig[1]
+        self.id[2] = canFrame.sig[2]
+        self.id[3] = canFrame.sig[3]
+
+        self.data[0] = canFrame.canData[0]
+        self.data[1] = canFrame.canData[1]
+        self.data[2] = canFrame.canData[2]
+        self.data[3] = canFrame.canData[3]
+        self.data[4] = canFrame.canData[4]
+        self.data[5] = canFrame.canData[5]
+        self.data[6] = canFrame.canData[6]
+        self.data[7] = canFrame.canData[7]
+
+        self.len = canFrame.info
+        self.ch = 0x66
+        self.format = 1
+        self.type = 0
+
+    def convertToCanFrame(self):
+        canFrame = CAN_FRAME()
+
+        canFrame.info = self.len
+        canFrame.sig[0] = self.id[0]
+        canFrame.sig[1] = self.id[1]
+        canFrame.sig[2] = self.id[2]
+        canFrame.sig[3] = self.id[3]
+        canFrame.canData[0] = self.data[0]
+        canFrame.canData[1] = self.data[1]
+        canFrame.canData[2] = self.data[2]
+        canFrame.canData[3] = self.data[3]
+        canFrame.canData[4] = self.data[4]
+        canFrame.canData[5] = self.data[5]
+        canFrame.canData[6] = self.data[6]
+        canFrame.canData[7] = self.data[7]
+
+        return canFrame
 
     def buildTestData(self):
         self.id[0] = 0
@@ -70,10 +124,10 @@ class USB2CAN_DATA(Structure):
             self.data[i] = val
 
     def dumpDataToSend(self):
-        return self.formater.genDataToSend(self.getByteArray())
+        return self.dataParser.genDataToSend(self.getByteArray())
 
 
-class USB2CANFormater():
+class USB2CANParser():
     def __init__(self):
         self.m_FrameHead = 0xAA
         self.m_FrameTail = 0x55
@@ -99,7 +153,6 @@ class USB2CANFormater():
         print "byteArray %r" % arrayToSend
         return arrayToSend
 
-
     def getFrameFromRawData(self, rawFrame):
         specialStr = chr(self.m_FrameCtrl) + chr(self.m_FrameCtrl)
         startStr = chr(self.m_FrameHead) + chr(self.m_FrameHead)
@@ -112,16 +165,13 @@ class USB2CANFormater():
             newelem = elem.replace(chr(self.m_FrameCtrl), "")
             rawList.append(newelem)
 
-        sep= chr(self.m_FrameCtrl)
+        sep = chr(self.m_FrameCtrl)
         rawList = sep.join(rawList)
-
 
         print "rawList:"
         print "%r " % rawList
 
-
-
-
+        return rawList
 
     def checkRawFrameData(self, frame):
         dataLeft = ""
@@ -155,8 +205,6 @@ class USB2CANFormater():
 
 
 
-
-
     def analyzeRawDataReceived(self, dataIn):
         validFrameList = []
 
@@ -164,8 +212,7 @@ class USB2CANFormater():
         print
         print "self.receivedData %r" % dataIn
 
-
-        startStr = chr(self.m_FrameHead)+chr(self.m_FrameHead)
+        startStr = chr(self.m_FrameHead) + chr(self.m_FrameHead)
 
         frameList = dataIn.split(startStr)
         print frameList
@@ -184,7 +231,7 @@ class USB2CANFormater():
             validFrame, dataLeft = self.checkRawFrameData(frameTmp)
 
             if validFrame is not None:
-                validFrameList.append(validFrame)
+                validFrameList.append(self.getFrameFromRawData(validFrame))
 
 
 
@@ -192,8 +239,8 @@ class USB2CANFormater():
         print "validFrameList : "
         print validFrameList
 
-        for rawFrame in validFrameList:
-            self.getFrameFromRawData(rawFrame)
+        #for rawFrame in validFrameList:
+            #self.getFrameFromRawData(rawFrame)
 
 
         return dataLeft, validFrameList
@@ -232,7 +279,6 @@ class RSDataFormater():
         #print "before return"
         return dataLeft, self.rawDataList
 
-
     def doConstruct(self, dataIn):
         dataOut = self.__class__.DATA_STARTER + self.__class__.DATA_SPLITER
 
@@ -250,20 +296,32 @@ class RSDataFormater():
         dataOut += self.__class__.DATA_ENDER
         return dataOut
 
-class CAN_DATA(Structure):
-    _fields_ = [("info", c_ubyte),
-                ("sig", c_ubyte*4),
-                ("canData", c_ubyte*8)]
 
-    def sturctureToByteArray(self):
-        byteArray = bytearray(sizeof(CAN_DATA))
-        canBuff = (c_ubyte*sizeof(CAN_DATA))()
-        memmove(byref(canBuff), byref(self), sizeof(CAN_DATA))
+class CAN_FRAME(Structure):
+    _fields_ = [("info",    c_ubyte),
+                ("sig",     c_ubyte * 4),
+                ("canData", c_ubyte * 8)]
 
+    CAN_FRAME_STATUS_CHECK = 1
+
+    def structureToByteArray(self):
+        byteArray = bytearray(sizeof(CAN_FRAME))
+        canBuff = (c_ubyte * sizeof(CAN_FRAME))()
+        memmove(byref(canBuff), byref(self), sizeof(CAN_FRAME))
+
+        print "sizeof(CAN_FRAME) = ", sizeof(CAN_FRAME)
+
+
+        outstr = ""
         for index, elem in enumerate(canBuff):
             byteArray[index] = elem
 
+            outstr += "0x%02x, " % elem
+
+
+
         print "can data raw:[%r]" % byteArray
+        print "outstr = ", outstr
         return byteArray
 
     def buildTestData(self):
@@ -277,32 +335,88 @@ class CAN_DATA(Structure):
         for i in range(8):
             self.canData[i] = val + i
 
+    def setCanFrameLen(self, length):
+        self.info = length
+
+    def setCanStationId(self, stationId):
+        self.sig[2] = stationId >> 5
+        self.sig[3] = (stationId & 0x1f) << 3
+
+    def setInputBoardCnt(self, cnt):
+        self.sig[1] &= 0x0f
+        self.sig[1] |= cnt << 4
+
+    def setOutputBoardCnt(self, cnt):
+        self.sig[1] &= 0xf0
+        self.sig[1] |= cnt
+
+    def setCanFrameType(self, frameType):
+        self.sig[0] = frameType
+
+    def setCanFrameData(self, index, data):
+        self.canData[index] = data
+
+    def getCanFrameLen(self):
+        return self.info
+
+    def getCanStationId(self):
+        stationId = (self.sig[3] >> 3) & 0x1f
+        stationId |= (self.sig[2] & 0x7) << 5
+        print "getCanStationid = ", stationId
+
+        return stationId
+
+    def getCanFrameType(self):
+        return self.sig[0] & 0x7f
+
+    def getCanFrameData(self, index):
+        return self.canData[index]
+
+    def dumpCanData(self):
+        print "info = ", self.info
+        for index,num in enumerate(self.sig):
+            print "sig[%d] = %x" % (index, num)
+
+        for index,num in enumerate(self.canData):
+            print "canData[%d] = %x" % (index, num)
+
 
 class CanProxy():
-    def __init__(self, CanData=None, SerialHandler=None):
+    def __init__(self, CanData=None, SerialHandler=None, daemonMgmtIn=None):
 
         self.serialHandler = SerialHandler
         self.canData = CanData
+        self.daemonMgmt = daemonMgmtIn
         self.receivedData = ""
         self.receivedRawDataList = []
         return
 
-    def serialSendCanData(self, canData):
-        datatoSend = canData.dumpDataToSend()
-        if self.serialHandler:
-            self.serialHandler.SendData(datatoSend)
+    def handleCanFrameReceived(self, canFrame):
+        print "handleCanFrameReceived"
+        stationId = canFrame.getCanStationId()
+        self.daemonMgmt.getStationDaemon(stationId).handleCanFrameReceived(canFrame)
+        
+        return
 
-    def receiveCanData(self, bufIn, bufSize):
-        if bufSize > sizeof(CAN_DATA):
-            print "CanProxy-> bufIn size too large"
+    def sendCanFrame(self, frame):
+        dataToSend = USB2CAN_DATA()
+        dataToSend.convertFromCanFrame(frame)
+
+        if self.serialHandler:
+            self.serialHandler.SendData(datatoSend.dumpDataToSend())
+
+    def receiveCanFrame(self, rawData):
+        if len(rawData) != sizeof(USB2CAN_DATA):
+            print "receiveFrame -> error data len not match"
             return 0
 
-        canBuff = (c_ubyte*sizeof(CAN_DATA))()
-        for index,num in enumerate(bufIn):
-            canBuff[index] = num
-        memmove(byref(self.canData), byref(canBuff), sizeof(CAN_DATA))
+        usb2canData = USB2CAN_DATA()
+        usb2canData.convertFromUsbRawData(rawData)
 
-        self.dumpCanData()
+        canFrame = usb2canData.convertToCanFrame()
+        canFrame.dumpCanData()
+
+        self.handleCanFrameReceived(canFrame)
         return 1
 
     def receiveSerialRawData(self, data):
@@ -312,37 +426,32 @@ class CanProxy():
         # formater = RSDataFormater()
         # self.receivedData, returenRawDataList = formater.doPaser(self.receivedData)
 
-
-
         formater = USB2CANFormater()
-
-        self.receivedData, returenRawDataList = formater.analyzeRawDataReceived(self.receivedData)
+        self.receivedData, returnRawDataList = formater.analyzeRawDataReceived(self.receivedData)
         #self.receivedData, returenRawDataList = formater.analyzeDataReceived(self.receivedData)
 
-
-
-        for index, elem in enumerate(returenRawDataList):
+        for index, elem in enumerate(returnRawDataList):
             print
             print "##################"
             print "received:",index, elem
             self.receivedRawDataList.append(elem)
-        #print "receiveSerialRawData"
-        #print self.printHex(data)
+            self.receiveCanFrame(elem)
+            #print "receiveSerialRawData"
+            #print self.printHex(data)
 
             self.dumpAllRawData()
 
     def serialSendCanDataTest(self):
 
-
-
         #canDataTest = CAN_DATA()
         #canDataTest.buildTestData()
-
         usb2can = USB2CAN_DATA()
         usb2can.buildTestData()
         #usb2can.dumpDataToSend()
+        dataToSend = usb2can.dumpDataToSend()
+        if self.serialHandler:
+            self.serialHandler.SendData(dataToSend)
 
-        self.serialSendCanData(usb2can)
         return
 
 
@@ -352,17 +461,7 @@ class CanProxy():
         for index, elem in enumerate(self.receivedRawDataList):
             print index, elem
 
-    def dumpCanData(self):
-        if self.canData is None:
-            print "CanProxy->dumpCanData error canData is Null"
-            return
 
-        print "info = ", self.canData.info
-        for index,num in enumerate(canData.sig):
-            print "sig[%d] = %x" % (index, num)
-
-        for index,num in enumerate(canData.canData):
-            print "canData[%d] = %x" % (index, num)
 
 
     def printHex(self, s):
@@ -372,9 +471,9 @@ class CanProxy():
 
 
 def getSomeCanTestData():
-    canTest = CAN_DATA()
+    canTest = CAN_FRAME()
     canTest.buildTestData()
-    buf = canTest.sturctureToByteArray()
+    buf = canTest.structureToByteArray()
     print "getSomeCanTestData 1 ", buf
 
     formater = RSDataFormater()

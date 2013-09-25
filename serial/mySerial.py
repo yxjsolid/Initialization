@@ -13,6 +13,8 @@ class SerialHandler:
         self.port = Port
         self.dataHandler = DataHandler
 
+        self.serialLock = threading.Lock()
+
     def waiting(self):
         if not self.waitEnd is None:
             self.waitEnd.wait()
@@ -69,8 +71,16 @@ class SerialHandler:
             print "stop event"
             return
 
+    def serialLock(self):
+        return self.serialLock.acquire()
+
+    def serialRelease(self):
+        self.serialLock.release()
+
     def SendData(self, i_msg):
-        self.l_serial.write(i_msg)
+        if self.serialLock():
+            self.l_serial.write(i_msg)
+            self.serialRelease()
 
         print "serial send done"
         return
@@ -85,7 +95,11 @@ class SerialHandler:
                 data = ''
                 n = self.l_serial.inWaiting()
                 if n:
-                    dataNew = self.l_serial.read(n)
+
+                    if self.serialLock():
+                        dataNew = self.l_serial.read(n)
+                        self.serialRelease()
+
                     data += dataNew
 
                     print "FirstReader 111 ", data

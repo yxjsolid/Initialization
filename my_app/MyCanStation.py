@@ -2,7 +2,7 @@
 
 import wx
 from MyGlobal import *
-
+from serial.canData import *
 
 
 class StationManagement():
@@ -27,10 +27,9 @@ class DeviceCanStation():
     def __init__(self, name=LABEL_STATION_NAME, info=LABEL_STATION_INFO):
         self.name = name
         self.info = info
-        self.id = 0
+        self.stationId = 0
         self.InputBoardList = []
         self.OutputBoardList = []
-
 
     def addNewIoBoard(self, board):
 
@@ -40,6 +39,52 @@ class DeviceCanStation():
             self.OutputBoardList.append(board)
         else:
             print "addNewIoBoard error"
+
+    def prepareNewCanFrame(self, frameType):
+        canFrame = CAN_FRAME()
+        canFrame.setCanFrameType(frameType)
+        canFrame.setCanStationId(self.stationId)
+
+        return canFrame
+
+    def getStatusCheckData(self):
+        statusCheckFrames = []
+        canFrame = self.prepareNewCanFrame(CAN_FRAME.CAN_FRAME_STATUS_CHECK)
+
+        frameLen = 0
+        inputBoardCnt = 0
+        for inputBoard in self.InputBoardList:
+            frameLen += 1
+            inputBoardCnt += 1
+            if frameLen == 9:
+                canFrame.setCanFrameLen(8)
+                canFrame.setInputBoardCnt(8)
+                statusCheckFrames.append(canFrame)
+
+                canFrame = self.prepareNewCanFrame(CAN_FRAME.CAN_FRAME_STATUS_CHECK)
+                frameLen = 1
+                inputBoardCnt = 1
+
+            canFrame.setCanFrameData(frameLen - 1, inputBoard.boardId)
+            canFrame.setInputBoardCnt(frameLen)
+            canFrame.setCanFrameLen(frameLen)
+
+        for outputBoard in self.OutputBoardList:
+            frameLen += 1
+            if frameLen == 9:
+                canFrame.setCanFrameLen(8)
+                canFrame.setOutputBoardCnt(8 - inputBoardCnt)
+                statusCheckFrames.append(canFrame)
+
+                canFrame = self.prepareNewCanFrame(CAN_FRAME.CAN_FRAME_STATUS_CHECK)
+                frameLen = 1
+
+            canFrame.setCanFrameData(frameLen - 1, outputBoard.boardId)
+            canFrame.setOutputBoardCnt(frameLen - inputBoardCnt)
+            canFrame.setCanFrameLen(frameLen)
+
+        statusCheckFrames.append(canFrame)
+        return statusCheckFrames
 
 
 
