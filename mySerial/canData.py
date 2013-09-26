@@ -412,8 +412,14 @@ class CAN_FRAME(Structure):
         return stationId
 
     def getCanFrameType(self):
-        #return self.sig[0] & 0x7f
-        return self.sig[0]
+        return self.sig[0] & 0x7f
+        #return self.sig[0]
+
+    def getInputBoardCnt(self):
+        return (self.sig[1] & 0xf0) >> 4
+
+    def getOutputBoardCnt(self):
+        return self.sig[1] & 0x0f
 
     def getCanFrameData(self, index):
         return self.canData[index]

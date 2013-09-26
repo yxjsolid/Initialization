@@ -36,8 +36,12 @@ class CanStationDaemon():
         return
 
     def handleCanFrameReceived(self, canFrame):
-
         print "CanStationDaemon --> handleCanFrameReceived"
+        frameType = canFrame.getCanFrameType()
+
+        if frameType == CAN_FRAME.CAN_FRAME_STATUS_CHECK:
+            self.statusCheckTaskEvent.set()
+            self.station.handleStatusCheckReply(canFrame)
 
         return
 
@@ -49,8 +53,12 @@ class CanStationDaemon():
         for frame in frameList:
             frame.structureToByteArray()
             self.canProxy.sendCanFrame(frame)
-            self.statusCheckTaskEvent.wait(5)
+            self.station.setPendingStatusCheck()
+
+            self.statusCheckTaskEvent.wait(1)
             print "doStatusCheck -> ",  self.statusCheckTaskEvent.isSet()
+
+            if not self.statusCheckTaskEvent.isSet():
 
         self.startStatusCheckTimer(interval)
 
@@ -89,15 +97,12 @@ if __name__ == '__main__':
 
     try:
         rt.start()
-    except Exception,se:
+    except Exception, se:
         print str(se)
-
-
 
     canProxy = CanProxy(SerialHandler=rt, daemonMgmtIn=daemonMgmt)
 
     rt.dataHandler = canProxy
-
 
     canStation = buildCanStationTest(5)
 
