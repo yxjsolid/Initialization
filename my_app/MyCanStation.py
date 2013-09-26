@@ -75,13 +75,16 @@ class DeviceCanStation():
         self.clearPendingStatusCheck()
 
         for i in range(inBoardCnt):
-            boardId = canFrame.getCanFrameData(self, i * 2)
-            boardStatus = canFrame.getCanFrameData(self, i * 2 + 1)
+            boardId = canFrame.getCanFrameData(i * 2)
+            boardStatus = canFrame.getCanFrameData(i * 2 + 1)
+
+            print "boardid = ", boardId
+
             board = self.getInputBoard(boardId)
             board.updateBoardStatus(boardId, boardStatus)
 
         for i in range(outBoardCnt):
-            boardId = canFrame.getCanFrameData(self, i)
+            boardId = canFrame.getCanFrameData(i)
             board = self.getOutputBoard(boardId)
             board.updateBoardStatus(boardId, 0)
 

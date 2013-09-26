@@ -58,7 +58,7 @@ class CanStationDaemon():
             self.statusCheckTaskEvent.wait(1)
             print "doStatusCheck -> ",  self.statusCheckTaskEvent.isSet()
 
-            if not self.statusCheckTaskEvent.isSet():
+            #if not self.statusCheckTaskEvent.isSet():
 
         self.startStatusCheckTimer(interval)
 
@@ -78,10 +78,10 @@ def buildCanStationTest(idIn):
     canStation = DeviceCanStation()
     canStation.stationId = idIn
 
-    canStation.InputBoardList.append(buildTestIoBoard(3, DeviceIoBoard.BOARD_TYPE_INPUT))
-    canStation.InputBoardList.append(buildTestIoBoard(3, DeviceIoBoard.BOARD_TYPE_INPUT))
-    canStation.InputBoardList.append(buildTestIoBoard(3, DeviceIoBoard.BOARD_TYPE_INPUT))
-    canStation.InputBoardList.append(buildTestIoBoard(6, DeviceIoBoard.BOARD_TYPE_INPUT))
+    #canStation.InputBoardList.append(buildTestIoBoard(3, DeviceIoBoard.BOARD_TYPE_INPUT))
+    #canStation.InputBoardList.append(buildTestIoBoard(3, DeviceIoBoard.BOARD_TYPE_INPUT))
+    #canStation.InputBoardList.append(buildTestIoBoard(3, DeviceIoBoard.BOARD_TYPE_INPUT))
+    #canStation.InputBoardList.append(buildTestIoBoard(6, DeviceIoBoard.BOARD_TYPE_INPUT))
 
     canStation.OutputBoardList.append(buildTestIoBoard(1, DeviceIoBoard.BOARD_TYPE_OUTPUT))
     canStation.OutputBoardList.append(buildTestIoBoard(2, DeviceIoBoard.BOARD_TYPE_OUTPUT))

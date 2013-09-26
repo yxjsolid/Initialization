@@ -440,7 +440,7 @@ class CanProxy():
         self.canData = CanData
         self.daemonMgmt = daemonMgmtIn
         self.receivedData = ""
-        self.receivedRawDataList = []
+        #self.receivedRawDataList = []
         return
 
     def handleCanFrameReceived(self, canFrame):
@@ -486,12 +486,12 @@ class CanProxy():
             #print
             #print "##################"
             #print "received:",index, elem
-            self.receivedRawDataList.append(elem)
+            #self.receivedRawDataList.append(elem)
             self.receiveCanFrame(elem)
             #print "receiveSerialRawData"
             #print self.printHex(data)
 
-            self.dumpAllRawData()
+            #self.dumpAllRawData()
 
     def serialSendCanDataTest(self):
 
