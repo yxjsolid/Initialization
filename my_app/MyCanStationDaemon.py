@@ -111,6 +111,6 @@ if __name__ == '__main__':
 
     daemonMgmt.addStationDaemon(canStation, daemon)
 
-    #daemon.doStatusCheck(1)
+    daemon.doStatusCheck(1)
 
     canStation.setBoardIo(1, 0x0)

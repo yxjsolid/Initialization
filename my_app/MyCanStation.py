@@ -265,7 +265,7 @@ class DeviceIoBoard():
         if not self.statusCheckTaskEvent.isSet():
             print self.getBoardTypeStr(), " id: [%d] ", self.boardId, " timeout"
 
-        #self.startStatusCheckTimer(interval)
+        self.startStatusCheckTimer(interval)
 
     def startStatusCheckTimer(self, interval):
         t = threading.Timer(interval, self.doStatusCheck, (interval, ))
