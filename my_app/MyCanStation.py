@@ -75,8 +75,8 @@ class DeviceCanStation():
         self.pendingStatusCheck = 0
 
     def stationHandleCanFrameReply(self, canFrame):
-        boardType = canFrame.canData[0]
-        boardId = canFrame.canData[1]
+        boardType = canFrame.getCMDBoardType()
+        boardId = canFrame.getCMDBoardID()
         board = self.getBoard(boardType, boardId)
         board.boardHandleCanFrameReply(canFrame)
 
@@ -159,15 +159,31 @@ class DeviceCanStation():
     #     statusCheckFrames.append(canFrame)
     #     return statusCheckFrames
 
+    def setBoardIo(self, boardId, IO_DATA):
+        board = self.getOutputBoard(boardId)
+        board.doSetIoCmd(IO_DATA)
+
+
 class DeviceIoBoard():
 
-    BOARD_TYPE_INPUT, BOARD_TYPE_OUTPUT = range(2)
-    board_type_choices = [LABEL_IO_BOARD_INPUT, LABEL_IO_BOARD_OUTPUT]
+    BOARD_TYPE_UNKNOWN = 0
+    BOARD_TYPE_INPUT = 1
+    BOARD_TYPE_OUTPUT = 2
+    board_type_choices = [LABEL_IO_BOARD_TYPE_UNKNOWN, LABEL_IO_BOARD_INPUT, LABEL_IO_BOARD_OUTPUT]
 
-    BOARD_STAT_INIT = 0
-    BOARD_STAT_CONNECT = 1
-    BOARD_STAT_TIMEOUT = 2
-    BOARD_STAT_RECOVER = 3
+    # BOARD_STAT_INIT = 0
+    # BOARD_STAT_CONNECT = 1
+    # BOARD_STAT_TIMEOUT = 2
+    # BOARD_STAT_RECOVER = 3
+
+    Board_status_Init = 0
+    Board_status_Connected = 1
+    Board_status_Disconnected = 2
+    Board_status_Recover = 3
+    Board_status_recover_Reply = 4
+    Board_status_Ok = 5
+
+
 
     def __init__(self, stationIn=None):
         self.boardType = 0
@@ -178,6 +194,7 @@ class DeviceIoBoard():
         self.pendingReq = 0
         self.station = stationIn
         self.statusCheckTaskEvent = threading.Event()
+        self.setIoEvent = threading.Event()
 
         return
 
@@ -206,16 +223,36 @@ class DeviceIoBoard():
 
         return canFrame
 
+
+    def genSetIoCmdData(self, IO_DATA):
+        canFrame = self.prepareNewCanFrame()
+        canFrame.setCanFrameLen(5)
+
+        canFrame.setCMDType(CAN_FRAME.CAN_FRAME_SET_ACTION)
+        canFrame.setCMDBoardType(self.boardType)
+        canFrame.setCMDBoardID(self.boardId)
+        canFrame.setCMDBoardStatus(self.boardStatus)
+        canFrame.setCmdData(IO_DATA)
+
+        return canFrame
+
+    def doSetIoCmd(self, IO_DATA):
+        frame = self.genSetIoCmdData(IO_DATA)
+        self.station.daemon.canProxy.sendCanFrame(frame)
+        self.setIoEvent.wait(1)
+        if not self.setIoEvent.isSet():
+            print self.getBoardTypeStr(), " id: [%d] setCmd", self.boardId, " timeout"
+
     def genStatusCheckData(self):
         canFrame = self.prepareNewCanFrame()
         canFrame.setCanFrameLen(5)
 
+        canFrame.setCMDType(CAN_FRAME.CAN_FRAME_STATUS_CHECK)
         canFrame.setCMDBoardType(self.boardType)
         canFrame.setCMDBoardID(self.boardId)
-        canFrame.setCMDType(CAN_FRAME.CAN_FRAME_STATUS_CHECK)
         canFrame.setCMDBoardStatus(self.boardStatus)
-        #canFrame.setCMDBoardType(self.boardType)
 
+        #canFrame.dumpCanData()
         return canFrame
 
     def doStatusCheck(self, interval):
@@ -224,20 +261,27 @@ class DeviceIoBoard():
         frame = self.genStatusCheckData()
         self.station.daemon.canProxy.sendCanFrame(frame)
         self.setPendingRequest()
-        self.statusCheckTaskEvent.wait(1)
+        self.statusCheckTaskEvent.wait(3)
         if not self.statusCheckTaskEvent.isSet():
             print self.getBoardTypeStr(), " id: [%d] ", self.boardId, " timeout"
 
-        self.startStatusCheckTimer(interval)
+        #self.startStatusCheckTimer(interval)
 
     def startStatusCheckTimer(self, interval):
         t = threading.Timer(interval, self.doStatusCheck, (interval, ))
         t.start()
 
     def boardHandleCanFrameReply(self, canFrame):
-        print self.getBoardTypeStr(), " id: [%d] ", self.boardId, " get reply"
+
+        self.statusCheckTaskEvent.set()
         self.boardStatus = canFrame.getCMDBoardStatus()
         self.IoStatus = canFrame.getCmdData()
-        self.clearPendingRequest()
 
+        if self.boardStatus == DeviceIoBoard.Board_status_Disconnected:
+            print self.getBoardTypeStr(), " id: [%r] " % self.boardId, "disconnected"
+        else:
+            print self.getBoardTypeStr(), " id: [%d] ", self.boardId, " get reply"
+            print "self.IoStatus = %x " % self.IoStatus
+
+        self.clearPendingRequest()
         return

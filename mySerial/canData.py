@@ -214,8 +214,8 @@ class USB2CANParser():
         sep = chr(self.m_FrameCtrl)
         rawList = sep.join(rawList)
 
-        print "rawList:"
-        print "%r " % rawList
+        #print "rawList:"
+        #print "%r " % rawList
 
         return rawList
 
@@ -261,7 +261,7 @@ class USB2CANParser():
         startStr = chr(self.m_FrameHead) + chr(self.m_FrameHead)
 
         frameList = dataIn.split(startStr)
-        print frameList
+        #print frameList
 
         for index, frame in enumerate(frameList):
 
@@ -348,6 +348,7 @@ class CAN_FRAME(Structure):
                 ("canData", c_ubyte * 8)]
 
     CAN_FRAME_STATUS_CHECK = 1
+    CAN_FRAME_SET_ACTION = 2
 
     def structureToByteArray(self):
         byteArray = bytearray(sizeof(CAN_FRAME))
@@ -387,14 +388,23 @@ class CAN_FRAME(Structure):
         self.sig[2] = stationId >> 5
         self.sig[3] = (stationId & 0x1f) << 3
 
+    def setCMDType(self, cmdType):
+        self.canData[0] = cmdType
+
+    def getCMDType(self):
+        return self.canData[0]
+
     def setCMDBoardType(self, boardType):
-        self.canData[0] = boardType
+        self.canData[1] = boardType
+
+    def getCMDBoardType(self):
+        return self.canData[1]
 
     def setCMDBoardID(self, boardID):
-        self.canData[1] = boardID
+        self.canData[2] = boardID
 
-    def setCMDType(self, cmdType):
-        self.canData[2] = cmdType
+    def getCMDBoardID(self):
+        return self.canData[2]
 
     def setCMDBoardStatus(self, boardStatus):
         self.canData[3] = boardStatus
@@ -405,7 +415,7 @@ class CAN_FRAME(Structure):
     def setCmdData(self, cmdData):
         self.canData[4] = cmdData
 
-    def getCmdData(self, cmdData):
+    def getCmdData(self):
         return self.canData[4]
 
     def setInputBoardCnt(self, cnt):
@@ -446,6 +456,7 @@ class CAN_FRAME(Structure):
         return self.canData[index]
 
     def dumpCanData(self):
+        return
         print "info = ", self.info
         for index,num in enumerate(self.sig):
             print "sig[%d] = %x" % (index, num)
@@ -479,6 +490,8 @@ class CanProxy():
             self.serialHandler.SendData(dataToSend.dumpDataToSend())
 
     def receiveCanFrame(self, rawData):
+        print "receiveCanFrame"
+
         if len(rawData) != sizeof(USB2CAN_DATA):
             print "receiveFrame -> error data len not match"
             return 0
@@ -494,7 +507,7 @@ class CanProxy():
 
     def receiveSerialRawData(self, data):
         self.receivedData += data
-       # print "[%r]" % self.receivedData
+        #print "[%r]" % self.receivedData
 
         # formater = RSDataFormater()
         # self.receivedData, returenRawDataList = formater.doPaser(self.receivedData)

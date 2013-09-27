@@ -82,11 +82,11 @@ def buildCanStationTest(idIn):
     #canStation.InputBoardList.append(buildTestIoBoard(3, DeviceIoBoard.BOARD_TYPE_INPUT))
     #canStation.InputBoardList.append(buildTestIoBoard(6, DeviceIoBoard.BOARD_TYPE_INPUT))
 
-
+    canStation.addNewIoBoard(buildTestIoBoard(1, DeviceIoBoard.BOARD_TYPE_INPUT))
 
     canStation.addNewIoBoard(buildTestIoBoard(1, DeviceIoBoard.BOARD_TYPE_OUTPUT))
-    canStation.addNewIoBoard(buildTestIoBoard(2, DeviceIoBoard.BOARD_TYPE_OUTPUT))
-    canStation.addNewIoBoard(buildTestIoBoard(3, DeviceIoBoard.BOARD_TYPE_OUTPUT))
+    #canStation.addNewIoBoard(buildTestIoBoard(2, DeviceIoBoard.BOARD_TYPE_OUTPUT))
+    #canStation.addNewIoBoard(buildTestIoBoard(3, DeviceIoBoard.BOARD_TYPE_OUTPUT))
 
     return canStation
 
@@ -111,4 +111,6 @@ if __name__ == '__main__':
 
     daemonMgmt.addStationDaemon(canStation, daemon)
 
-    daemon.doStatusCheck(1)
+    #daemon.doStatusCheck(1)
+
+    canStation.setBoardIo(1, 0x0)

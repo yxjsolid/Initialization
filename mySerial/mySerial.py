@@ -64,7 +64,7 @@ class SerialHandler:
         print "InitHead"
 
         try:
-            time.sleep(1)
+            #time.sleep(0.1)
             print "InitHead"
             #start to read
             self.l_serial.flushInput()
@@ -90,7 +90,7 @@ class SerialHandler:
         return
     def FirstReader(self):
 
-        print "FirstReader"
+        #print "FirstReader"
 
         self.InitHead()
 
@@ -106,7 +106,7 @@ class SerialHandler:
 
                 data += dataNew
 
-                print "FirstReader 111 ", data
+               # print "FirstReader 111 ", data
 
                 #print "\n\n######################\n"
                 #print n,"data", "new",dataNew
