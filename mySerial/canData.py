@@ -387,6 +387,27 @@ class CAN_FRAME(Structure):
         self.sig[2] = stationId >> 5
         self.sig[3] = (stationId & 0x1f) << 3
 
+    def setCMDBoardType(self, boardType):
+        self.canData[0] = boardType
+
+    def setCMDBoardID(self, boardID):
+        self.canData[1] = boardID
+
+    def setCMDType(self, cmdType):
+        self.canData[2] = cmdType
+
+    def setCMDBoardStatus(self, boardStatus):
+        self.canData[3] = boardStatus
+
+    def getCMDBoardStatus(self):
+        return self.canData[3]
+
+    def setCmdData(self, cmdData):
+        self.canData[4] = cmdData
+
+    def getCmdData(self, cmdData):
+        return self.canData[4]
+
     def setInputBoardCnt(self, cnt):
         self.sig[1] &= 0x0f
         self.sig[1] |= cnt << 4
@@ -395,8 +416,8 @@ class CAN_FRAME(Structure):
         self.sig[1] &= 0xf0
         self.sig[1] |= cnt
 
-    def setCanFrameType(self, frameType):
-        self.sig[0] = frameType
+    # def setCanFrameType(self, frameType):
+    #     self.sig[0] = frameType
 
     def setCanFrameData(self, index, data):
         self.canData[index] = data
@@ -446,7 +467,7 @@ class CanProxy():
     def handleCanFrameReceived(self, canFrame):
         print "handleCanFrameReceived"
         stationId = canFrame.getCanStationId()
-        self.daemonMgmt.getStationDaemon(stationId).handleCanFrameReceived(canFrame)
+        self.daemonMgmt.getStationDaemon(stationId).daemonHandleCanFrameReceived(canFrame)
         
         return
 

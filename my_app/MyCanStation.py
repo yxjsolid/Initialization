@@ -2,6 +2,8 @@
 
 import wx
 from MyGlobal import *
+import sys,threading,time
+import datetime
 from mySerial.canData import *
 
 
@@ -31,15 +33,26 @@ class DeviceCanStation():
         self.InputBoardList = []
         self.OutputBoardList = []
         self.pendingStatusCheck = 0
+        self.daemon = None
 
     def addNewIoBoard(self, board):
 
         if board.boardType == DeviceIoBoard.BOARD_TYPE_INPUT:
             self.InputBoardList.append(board)
+            board.station = self
         elif board.boardType == DeviceIoBoard.BOARD_TYPE_OUTPUT:
             self.OutputBoardList.append(board)
+            board.station = self
         else:
             print "addNewIoBoard error"
+
+    def getBoard(self, boardType, boardId):
+
+        if boardType == DeviceIoBoard.BOARD_TYPE_INPUT:
+            return self.getInputBoard(boardId)
+
+        if boardType == DeviceIoBoard.BOARD_TYPE_OUTPUT:
+            return self.getOutputBoard(boardId)
 
     def getInputBoard(self, boardId):
         for board in self.InputBoardList:
@@ -61,12 +74,13 @@ class DeviceCanStation():
     def clearPendingStatusCheck(self):
         self.pendingStatusCheck = 0
 
-    def prepareNewCanFrame(self, frameType):
-        canFrame = CAN_FRAME()
-        canFrame.setCanFrameType(frameType)
-        canFrame.setCanStationId(self.stationId)
+    def stationHandleCanFrameReply(self, canFrame):
+        boardType = canFrame.canData[0]
+        boardId = canFrame.canData[1]
+        board = self.getBoard(boardType, boardId)
+        board.boardHandleCanFrameReply(canFrame)
 
-        return canFrame
+        return
 
     def handleStatusCheckReply(self, canFrame):
         inBoardCnt = canFrame.getInputBoardCnt()
@@ -90,47 +104,60 @@ class DeviceCanStation():
 
         return
 
-    def getStatusCheckData(self):
-        statusCheckFrames = []
-        canFrame = self.prepareNewCanFrame(CAN_FRAME.CAN_FRAME_STATUS_CHECK)
+    def doStatusCheck(self, interval):
 
-        frameLen = 0
-        inputBoardCnt = 0
-        for inputBoard in self.InputBoardList:
-            inputBoard.setPendingRequest()
-            frameLen += 1
-            inputBoardCnt += 1
-            if frameLen == 9:
-                canFrame.setCanFrameLen(8)
-                canFrame.setInputBoardCnt(8)
-                statusCheckFrames.append(canFrame)
+        for board in self.InputBoardList:
+            board.doStatusCheck(interval)
 
-                canFrame = self.prepareNewCanFrame(CAN_FRAME.CAN_FRAME_STATUS_CHECK)
-                frameLen = 1
-                inputBoardCnt = 1
+        for board in self.OutputBoardList:
+            board.doStatusCheck(interval)
 
-            canFrame.setCanFrameData(frameLen - 1, inputBoard.boardId)
-            canFrame.setInputBoardCnt(frameLen)
-            canFrame.setCanFrameLen(frameLen)
+        return
 
-        for outputBoard in self.OutputBoardList:
-            outputBoard.setPendingRequest()
-            frameLen += 1
-            if frameLen == 9:
-                canFrame.setCanFrameLen(8)
-                canFrame.setOutputBoardCnt(8 - inputBoardCnt)
-                statusCheckFrames.append(canFrame)
+    def stationHandleCanFrameReceived(self, canFrame):
 
-                canFrame = self.prepareNewCanFrame(CAN_FRAME.CAN_FRAME_STATUS_CHECK)
-                frameLen = 1
+        return
 
-            canFrame.setCanFrameData(frameLen - 1, outputBoard.boardId)
-            canFrame.setOutputBoardCnt(frameLen - inputBoardCnt)
-            canFrame.setCanFrameLen(frameLen)
-
-        statusCheckFrames.append(canFrame)
-        return statusCheckFrames
-
+    # def getStatusCheckData(self):
+    #     statusCheckFrames = []
+    #     canFrame = self.prepareNewCanFrame(CAN_FRAME.CAN_FRAME_STATUS_CHECK)
+    #
+    #     frameLen = 0
+    #     inputBoardCnt = 0
+    #     for inputBoard in self.InputBoardList:
+    #         inputBoard.setPendingRequest()
+    #         frameLen += 1
+    #         inputBoardCnt += 1
+    #         if frameLen == 9:
+    #             canFrame.setCanFrameLen(8)
+    #             canFrame.setInputBoardCnt(8)
+    #             statusCheckFrames.append(canFrame)
+    #
+    #             canFrame = self.prepareNewCanFrame(CAN_FRAME.CAN_FRAME_STATUS_CHECK)
+    #             frameLen = 1
+    #             inputBoardCnt = 1
+    #
+    #         canFrame.setCanFrameData(frameLen - 1, inputBoard.boardId)
+    #         canFrame.setInputBoardCnt(frameLen)
+    #         canFrame.setCanFrameLen(frameLen)
+    #
+    #     for outputBoard in self.OutputBoardList:
+    #         outputBoard.setPendingRequest()
+    #         frameLen += 1
+    #         if frameLen == 9:
+    #             canFrame.setCanFrameLen(8)
+    #             canFrame.setOutputBoardCnt(8 - inputBoardCnt)
+    #             statusCheckFrames.append(canFrame)
+    #
+    #             canFrame = self.prepareNewCanFrame(CAN_FRAME.CAN_FRAME_STATUS_CHECK)
+    #             frameLen = 1
+    #
+    #         canFrame.setCanFrameData(frameLen - 1, outputBoard.boardId)
+    #         canFrame.setOutputBoardCnt(frameLen - inputBoardCnt)
+    #         canFrame.setCanFrameLen(frameLen)
+    #
+    #     statusCheckFrames.append(canFrame)
+    #     return statusCheckFrames
 
 class DeviceIoBoard():
 
@@ -142,13 +169,15 @@ class DeviceIoBoard():
     BOARD_STAT_TIMEOUT = 2
     BOARD_STAT_RECOVER = 3
 
-    def __init__(self):
+    def __init__(self, stationIn=None):
         self.boardType = 0
         self.boardId = 0
         self.isOk = 0
         self.boardStatus = 0
         self.IoStatus = 0
         self.pendingReq = 0
+        self.station = stationIn
+        self.statusCheckTaskEvent = threading.Event()
 
         return
 
@@ -169,3 +198,46 @@ class DeviceIoBoard():
 
     def getBoardTypeStr(self):
         return DeviceIoBoard.board_type_choices[self.boardType]
+
+    def prepareNewCanFrame(self):
+        canFrame = CAN_FRAME()
+        #canFrame.setCanFrameType(frameType)
+        canFrame.setCanStationId(self.station.stationId)
+
+        return canFrame
+
+    def genStatusCheckData(self):
+        canFrame = self.prepareNewCanFrame()
+        canFrame.setCanFrameLen(5)
+
+        canFrame.setCMDBoardType(self.boardType)
+        canFrame.setCMDBoardID(self.boardId)
+        canFrame.setCMDType(CAN_FRAME.CAN_FRAME_STATUS_CHECK)
+        canFrame.setCMDBoardStatus(self.boardStatus)
+        #canFrame.setCMDBoardType(self.boardType)
+
+        return canFrame
+
+    def doStatusCheck(self, interval):
+        print datetime.datetime.now(),  "doStatusCheck "
+
+        frame = self.genStatusCheckData()
+        self.station.daemon.canProxy.sendCanFrame(frame)
+        self.setPendingRequest()
+        self.statusCheckTaskEvent.wait(1)
+        if not self.statusCheckTaskEvent.isSet():
+            print self.getBoardTypeStr(), " id: [%d] ", self.boardId, " timeout"
+
+        self.startStatusCheckTimer(interval)
+
+    def startStatusCheckTimer(self, interval):
+        t = threading.Timer(interval, self.doStatusCheck, (interval, ))
+        t.start()
+
+    def boardHandleCanFrameReply(self, canFrame):
+        print self.getBoardTypeStr(), " id: [%d] ", self.boardId, " get reply"
+        self.boardStatus = canFrame.getCMDBoardStatus()
+        self.IoStatus = canFrame.getCmdData()
+        self.clearPendingRequest()
+
+        return

@@ -29,42 +29,41 @@ class CanStationDaemon():
     def __init__(self, stationIn=None, canProxyIn=None):
         self.station = stationIn
         self.canProxy = canProxyIn
-        self.statusCheckTask = None
 
-        self.statusCheckTaskEvent = threading.Event()
+        self.station.daemon = self
+        # self.statusCheckTask = None
+        #
+        # self.statusCheckTaskEvent = threading.Event()
 
         return
 
-    def handleCanFrameReceived(self, canFrame):
-        print "CanStationDaemon --> handleCanFrameReceived"
-        frameType = canFrame.getCanFrameType()
+    def daemonHandleCanFrameReceived(self, canFrame):
+        print "CanStationDaemon --> daemonHandleCanFrameReceived"
 
-        if frameType == CAN_FRAME.CAN_FRAME_STATUS_CHECK:
-            self.statusCheckTaskEvent.set()
-            self.station.handleStatusCheckReply(canFrame)
-
+        self.station.stationHandleCanFrameReply(canFrame)
         return
 
     def doStatusCheck(self, interval):
         print datetime.datetime.now(),  "doStatusCheck "
 
-        frameList = self.station.getStatusCheckData()
-
-        for frame in frameList:
-            frame.structureToByteArray()
-            self.canProxy.sendCanFrame(frame)
-            self.station.setPendingStatusCheck()
-
-            self.statusCheckTaskEvent.wait(1)
-            print "doStatusCheck -> ",  self.statusCheckTaskEvent.isSet()
-
-            #if not self.statusCheckTaskEvent.isSet():
-
-        self.startStatusCheckTimer(interval)
-
-    def startStatusCheckTimer(self, interval):
-        t = threading.Timer(interval, self.doStatusCheck, (interval, ))
-        t.start()
+        self.station.doStatusCheck(interval)
+    #     frameList = self.station.getStatusCheckData()
+    #
+    #     for frame in frameList:
+    #         frame.structureToByteArray()
+    #         self.canProxy.sendCanFrame(frame)
+    #         self.station.setPendingStatusCheck()
+    #
+    #         self.statusCheckTaskEvent.wait(1)
+    #         print "doStatusCheck -> ",  self.statusCheckTaskEvent.isSet()
+    #
+    #         #if not self.statusCheckTaskEvent.isSet():
+    #
+    #     self.startStatusCheckTimer(interval)
+    #
+    # def startStatusCheckTimer(self, interval):
+    #     t = threading.Timer(interval, self.doStatusCheck, (interval, ))
+    #     t.start()
 
 
 def buildTestIoBoard(idIn, typeIn):
@@ -83,9 +82,11 @@ def buildCanStationTest(idIn):
     #canStation.InputBoardList.append(buildTestIoBoard(3, DeviceIoBoard.BOARD_TYPE_INPUT))
     #canStation.InputBoardList.append(buildTestIoBoard(6, DeviceIoBoard.BOARD_TYPE_INPUT))
 
-    canStation.OutputBoardList.append(buildTestIoBoard(1, DeviceIoBoard.BOARD_TYPE_OUTPUT))
-    canStation.OutputBoardList.append(buildTestIoBoard(2, DeviceIoBoard.BOARD_TYPE_OUTPUT))
-    canStation.OutputBoardList.append(buildTestIoBoard(3, DeviceIoBoard.BOARD_TYPE_OUTPUT))
+
+
+    canStation.addNewIoBoard(buildTestIoBoard(1, DeviceIoBoard.BOARD_TYPE_OUTPUT))
+    canStation.addNewIoBoard(buildTestIoBoard(2, DeviceIoBoard.BOARD_TYPE_OUTPUT))
+    canStation.addNewIoBoard(buildTestIoBoard(3, DeviceIoBoard.BOARD_TYPE_OUTPUT))
 
     return canStation
 
