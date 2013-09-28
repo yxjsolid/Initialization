@@ -43,9 +43,34 @@ MODULE_TYPE_SIG_OUT : u"信号量输出",
 }
 
 
-LABEL_CAN_STATION_NAME = "Name"
-LABEL_CAN_STATION_ID = "ID"
-LABEL_CAN_STATION_DESC = "desc"
+EDIT_IO_NODE_LABEL_OUTPUT = u"开关量输出"
+EDIT_IO_NODE_LABEL_INPUT = u"开关量输入"
+EDIT_IO_NODE_LABEL_GROUP_DEFAULT = u"默认分组"
+
+EDIT_IO_NODE_LABEL_GROUP_INPUT_NAME = u"新分组名称:"
+
+EDIT_IO_NODE_LABEL_DEL_GROUP_CONFIRM = u"确定删除分组及其所有数据点?"
+
+EDIT_IO_NODE_LABEL_NEW_GROUP = u"新建分组"
+EDIT_IO_NODE_LABEL_DEL_GROUP = u"删除分组"
+EDIT_IO_NODE_LABEL_RENAME_GROUP = u"重命名分组"
+EDIT_IO_NODE_LABEL_EXPAND_GROUP = u"展开分组"
+EDIT_IO_NODE_LABEL_COLLAPSE_GROUP = u"闭合分组"
+
+
+IO_NODE_ADD_NEW = u"添加数据点"
+IO_NODE_EDIT = u"编辑数据点"
+
+IO_NODE_LIST_COL_NAME = u"数据点名称"
+IO_NODE_LIST_COL_DESC = u"描述"
+IO_NODE_LIST_COL_IO = u"I/O连接"
+
+
+
+
+LABEL_CAN_STATION_NAME = u"名称"
+LABEL_CAN_STATION_ID = u"编号"
+LABEL_CAN_STATION_DESC = u"站点描述"
 
 LABEL_IO_BOARD_COLUM_ID = u"子板号"
 LABEL_IO_BOARD_COLUM_TYPE = u"子板类型"
@@ -90,6 +115,13 @@ image_fish = rescoure_dir + "fugu.png"
         frame1.Show()
 
 """
+
+
+def globalGetCfg():
+    cfgObj = wx.GetApp().getConfigure()
+    return cfgObj
+
+
 
 
 class MyPopupWindow():

@@ -45,7 +45,7 @@ class CanStationViewControl():
 
     def appendCanStationList(self, station):
         tree = self.viewTree
-        child = tree.AppendItem(tree.root, str(station.id))
+        child = tree.AppendItem(tree.root, str(station.stationId))
 
         tree.SetItemText(child, station.name, 1)
         tree.SetItemText(child, station.info, 2)
@@ -367,18 +367,14 @@ class IoBoardViewControl():
         self.refreshIoBoardList(station)
 
 
-class Panel_CanStation(MainBase.Panel_Edit_Can_Station_base):
+class Panel_CanStation(MainBase.Panel_Edit_Can_Station_Base):
     def __init__( self, frame , device=None):
-        MainBase.Panel_Edit_Can_Station_base.__init__( self, frame )
-
-
+        MainBase.Panel_Edit_Can_Station_Base.__init__( self, frame )
         print "Panel_EditIOStation  1111"
 
         self.frame = frame
-
         self.canStationViewCtrl = CanStationViewControl(self)
         self.ioBoardViewCtrl = IoBoardViewControl(self)
-
         self.onLoadUpdate()
 
         # self.deviceInfoPanelSetup()
@@ -461,28 +457,18 @@ class Panel_EditIoBoard(MainBase.Panel_IoBoard_Base):
         self.frame = frame
         self.buildBoardTypeChoice()
 
-
     def buildBoardTypeChoice(self):
         self.boardType_choice.Clear()
-        # self.boardType_choice.Append(DeviceIoBoard.board_type_choices[DeviceIoBoard.BOARD_TYPE_INPUT])
-        # self.boardType_choice.Append(DeviceIoBoard.board_type_choices[DeviceIoBoard.BOARD_TYPE_OUTPUT])
-
 
         index = DeviceIoBoard.BOARD_TYPE_INPUT
-        self.boardType_choice.Insert(DeviceIoBoard.board_type_choices[index], index)
-        self.boardType_choice.SetSelection(index)
-
+        self.boardType_choice.Insert(DeviceIoBoard.board_type_choices[index], 0, index)
+        self.boardType_choice.SetSelection(0)
 
         index = DeviceIoBoard.BOARD_TYPE_OUTPUT
-        self.boardType_choice.Insert(DeviceIoBoard.board_type_choices[index], index)
+        self.boardType_choice.Insert(DeviceIoBoard.board_type_choices[index], 1, index)
 
-
-
-    def selectActionType(self, type):
-        self.boardType = type
-        #0: IO , 1:delay, 2:attr
-        # def editActionUpdate(self):
-        #self.buildChoiceList()
+    def selectActionType(self, boardType):
+        self.boardType = boardType
 
     def getPrevSelected(self, choiceObj):
         sel = choiceObj.GetSelection()
@@ -490,7 +476,6 @@ class Panel_EditIoBoard(MainBase.Panel_IoBoard_Base):
             return None
 
         return choiceObj.GetClientData(sel)
-
 
     def buildChoiceList(self, itemList, choiceObj):
         """select the previous selected item after update"""
@@ -508,9 +493,6 @@ class Panel_EditIoBoard(MainBase.Panel_IoBoard_Base):
                 choiceObj.Select(index)
             index += 1
             print item.name, sys.getrefcount(item)
-
-
-
 
     def createIoBoard(self, boardType, boardId):
         board = DeviceIoBoard()
@@ -571,21 +553,13 @@ class Panel_EditIoBoard(MainBase.Panel_IoBoard_Base):
         self.frame.Close()
 
     def onApply(self, evt):
-
         boardId = self.boardId_text.GetValue()
-        boardType = self.boardType_choice.GetSelection()
-
-        print "boardId -->", boardId, "boardTYpe --> ", boardType
+        selIndex = self.boardType_choice.GetSelection()
+        boardType = self.boardType_choice.GetClientData(selIndex)
         newBoard = self.createIoBoard(boardType, boardId)
 
         self.targetStation.addNewIoBoard(newBoard)
-
-
-
         self.canStationEditor.ioBoardViewCtrl.refreshIoBoardList(self.targetStation)
-
-
-        #self.canStationEditor.actionListCtrl.listInsertNewAction(-1, newAction)
         self.closeWindow()
         return
 

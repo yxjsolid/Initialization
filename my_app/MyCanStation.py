@@ -35,6 +35,13 @@ class DeviceCanStation():
         self.pendingStatusCheck = 0
         self.daemon = None
 
+    def getStationInfo(self):
+        infoFormat = "%s:%s  %s:%s"
+        stationInfoStr = infoFormat % (LABEL_CAN_STATION_ID, str(self.stationId), LABEL_CAN_STATION_NAME, self.name)
+
+        return stationInfoStr
+
+
     def addNewIoBoard(self, board):
 
         if board.boardType == DeviceIoBoard.BOARD_TYPE_INPUT:
@@ -166,7 +173,7 @@ class DeviceCanStation():
 
 class DeviceIoBoard():
 
-    BOARD_TYPE_UNKNOWN = 0
+    BOARD_TYPE_UNKNOW = 0
     BOARD_TYPE_INPUT = 1
     BOARD_TYPE_OUTPUT = 2
     board_type_choices = [LABEL_IO_BOARD_TYPE_UNKNOWN, LABEL_IO_BOARD_INPUT, LABEL_IO_BOARD_OUTPUT]
@@ -193,10 +200,12 @@ class DeviceIoBoard():
         self.IoStatus = 0
         self.pendingReq = 0
         self.station = stationIn
-        self.statusCheckTaskEvent = threading.Event()
-        self.setIoEvent = threading.Event()
 
         return
+
+    def doDeviceInit(self):
+        self.statusCheckTaskEvent = threading.Event()
+        self.setIoEvent = threading.Event()
 
     def updateBoardStatus(self, boardId, status):
         self.clearPendingRequest()

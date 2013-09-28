@@ -11,9 +11,9 @@ from MyDevice import *
 
 class CfgContainer():
     def __init__(self):
-        self.stationManagement = None
+        self.stationManagement = StationManagement()
         self.deviceController = None
-
+        self.IoNodeMgmt = IoNodeMgmt()
 
 
 class MyApp(wx.App):
@@ -25,8 +25,6 @@ class MyApp(wx.App):
         wx.App.__init__(self, redirect, filename)
         self.cfgContainer = CfgContainer()
 
-        self.cfgContainer.stationManagement = StationManagement()
-        self.cfgContainer.deviceController = None
 
     def getDeviceCtrl(self):
         return self.getConfigure().deviceController

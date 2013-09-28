@@ -11,6 +11,7 @@ from MyDevice import *
 from ViewSelectPanel import *
 import pickle
 from MiddleWare_IO_Station import *
+from MiddleWare_Edit_IO import *
 
 mydata = wxPythonInAction.Chapter_15.data.tree
 
@@ -41,6 +42,15 @@ class MyFrame( MainBase.FrameBase ):
 
         frame1 = wx.Frame(parent=self.parent, size=(800,400))
         Panel_CanStation(frame1)
+        frame1.CenterOnScreen()
+        frame1.Show()
+        return
+
+    def editIONode(self):
+        print "add device"
+
+        frame1 = wx.Frame(parent=self.parent, size=(800,400))
+        Panel_Manage_IO_Node(frame1)
         frame1.CenterOnScreen()
         frame1.Show()
         return
@@ -100,7 +110,8 @@ class MyFrame( MainBase.FrameBase ):
         ret = {
         MainBase.ID_MENU_SAVE:          lambda: self.onSave(),
         MainBase.ID_MENU_LOAD:          lambda: self.onLoad(),
-        MainBase.ID_MENU_EDIT_IO:       lambda: self.editIOStation(),
+        MainBase.ID_MENU_EDIT_STATION:  lambda: self.editIOStation(),
+        MainBase.ID_MENU_EDIT_IO_NODE:  lambda: self.editIONode(),
         MainBase.ID_MENU_ADD_DEVICE:    lambda: self.addDevice(),
         MainBase.ID_MENU_EDIT_DEVICE:   lambda: self.editDevice(),
         MainBase.ID_MENU_DELETE_DEVICE: lambda: self.addDevice(),
