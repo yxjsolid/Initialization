@@ -50,7 +50,7 @@ IO_NODE_DEL = 1025
 class FrameBase ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"my app"), pos = wx.DefaultPosition, size = wx.Size( 1024,768 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"my app"), pos = wx.DefaultPosition, size = wx.Size( 500,500 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		
@@ -1038,18 +1038,18 @@ class Panel_Manage_IO_Node_Base ( wx.Panel ):
 		fgSizer341.SetFlexibleDirection( wx.BOTH )
 		fgSizer341.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		self.ioBoard_toolbar = wx.ToolBar( self.m_panel79, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TB_HORIZONTAL ) 
-		self.ioBoard_toolbar.AddLabelTool( IO_NODE_NEW, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_NEW, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
+		self.ioNode_toolbar = wx.ToolBar( self.m_panel79, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TB_HORIZONTAL ) 
+		self.ioNode_toolbar.AddLabelTool( IO_NODE_NEW, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_NEW, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
 		
-		self.ioBoard_toolbar.AddLabelTool( IO_NODE_EDIT, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_EXECUTABLE_FILE, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
+		self.ioNode_toolbar.AddLabelTool( IO_NODE_EDIT, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_EXECUTABLE_FILE, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
 		
-		self.ioBoard_toolbar.AddLabelTool( IO_NODE_DEL, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_DELETE, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
+		self.ioNode_toolbar.AddLabelTool( IO_NODE_DEL, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_DELETE, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
 		
-		self.ioBoard_toolbar.AddSeparator()
+		self.ioNode_toolbar.AddSeparator()
 		
-		self.ioBoard_toolbar.Realize() 
+		self.ioNode_toolbar.Realize() 
 		
-		fgSizer341.Add( self.ioBoard_toolbar, 0, wx.EXPAND, 5 )
+		fgSizer341.Add( self.ioNode_toolbar, 0, wx.EXPAND, 5 )
 		
 		self.ioNode_list = UlcListCtrl( self.m_panel79, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT )
 		fgSizer341.Add( self.ioNode_list, 0, wx.ALL|wx.EXPAND, 5 )

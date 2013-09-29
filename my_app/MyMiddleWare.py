@@ -23,9 +23,9 @@ def dumpModuleObj(module, pad=0):
 #---------------------------------------------------------------------------
 
 
-class MyFrame( MainBase.FrameBase ):
-    def __init__( self, parent ):
-        MainBase.FrameBase.__init__( self, parent )
+class MyFrame(MainBase.FrameBase):
+    def __init__(self, parent):
+        MainBase.FrameBase.__init__(self, parent)
         self.parent = parent
         self.construceFrame()
         self.saveFileName = r".\save.txt"
@@ -129,7 +129,7 @@ class testMySplitterPanel( MainBase.SplitterPanelBase ):
     
     def buildViewSelectPanel(self):
         container = self.viewSelectPanel
-        sizer = wx.BoxSizer( wx.VERTICAL )
+        sizer = wx.BoxSizer(wx.VERTICAL)
         
 #        self.viewPanel_sub = wx.Panel( self.viewPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 #        sizer.Add( self.viewPanel_sub, 1, wx.EXPAND |wx.ALL, 5 )

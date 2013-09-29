@@ -42,7 +42,7 @@
             <property name="minimum_size"></property>
             <property name="name">FrameBase</property>
             <property name="pos"></property>
-            <property name="size">1024,768</property>
+            <property name="size">500,500</property>
             <property name="style">wxDEFAULT_FRAME_STYLE</property>
             <property name="subclass"></property>
             <property name="title">my app</property>
@@ -9412,7 +9412,7 @@
                                                                         <property name="minimize_button">0</property>
                                                                         <property name="minimum_size"></property>
                                                                         <property name="moveable">1</property>
-                                                                        <property name="name">ioBoard_toolbar</property>
+                                                                        <property name="name">ioNode_toolbar</property>
                                                                         <property name="packing">1</property>
                                                                         <property name="pane_border">1</property>
                                                                         <property name="pane_position"></property>

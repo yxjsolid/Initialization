@@ -44,6 +44,17 @@ class IoCategoryViewControl():
         self.inputRoot = self.viewTree.AppendItem(self.root, EDIT_IO_NODE_LABEL_INPUT)
         self.outputRoot = self.viewTree.AppendItem(self.root, EDIT_IO_NODE_LABEL_OUTPUT)
 
+        if not self.viewTree.ItemHasChildren(self.inputRoot):
+            self.addNewCategory(self.viewTree, self.inputRoot, IoNodeCategory())
+
+        if not self.viewTree.ItemHasChildren(self.outputRoot):
+            self.addNewCategory(self.viewTree, self.outputRoot, IoNodeCategory())
+
+
+
+
+
+
 
     def doPopUpMenu(self, groupItem):
         treeView = self.viewTree
@@ -119,6 +130,8 @@ class IoCategoryViewControl():
     def onCategoryItemSelChanged(self, event):
         selItem = self.viewTree.GetSelection()
 
+        self.ioNodeEditor.ioNodeCtrl.updateToolStatus(0)
+
         if selItem == self.viewTree.GetRootItem():
             return
 
@@ -128,6 +141,7 @@ class IoCategoryViewControl():
             categoryList = self.getChildrenItem(self.viewTree, selItem)
         else:
             categoryList = [self.getSelectedCategoryObj()]
+            self.ioNodeEditor.ioNodeCtrl.updateToolStatus(1)
 
         self.ioNodeEditor.ioNodeCtrl.updateIoNodeView(categoryList)
         return
@@ -186,6 +200,7 @@ class IoNodeViewControl():
         self.ioNodeEditor = ioNodeEditorIn
         self.listView = self.ioNodeEditor.getIoNodeViewList()
         self.SetupIoNodeList()
+        self.updateToolStatus(0)
 
     def SetupIoNodeList(self):
         listView = self.listView
@@ -224,6 +239,17 @@ class IoNodeViewControl():
 
     def onEditIoNode(self):
         return
+
+    def updateToolStatus(self, isEnable):
+        if isEnable:
+            self.ioNodeEditor.ioNode_toolbar.EnableTool(MainBase.IO_NODE_NEW, 1)
+            self.ioNodeEditor.ioNode_toolbar.EnableTool(MainBase.IO_NODE_EDIT, 1)
+            self.ioNodeEditor.ioNode_toolbar.EnableTool(MainBase.IO_NODE_DEL, 1)
+        else:
+            self.ioNodeEditor.ioNode_toolbar.EnableTool(MainBase.IO_NODE_NEW, 0)
+            self.ioNodeEditor.ioNode_toolbar.EnableTool(MainBase.IO_NODE_EDIT, 0)
+            self.ioNodeEditor.ioNode_toolbar.EnableTool(MainBase.IO_NODE_DEL, 0)
+
 
     def updateIoNodeView(self, categoryList):
         self.listView.DeleteAllItems()

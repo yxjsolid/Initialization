@@ -23,16 +23,21 @@ class CanStationViewControl():
     def setupCanStationTreeView(self):
         tree = self.viewTree
 
-        tree.AddColumn(LABEL_CAN_STATION_ID)
+        #tree.AddColumn(LABEL_CAN_STATION_ID)
+        tree.AddColumn("#")
         tree.AddColumn(LABEL_CAN_STATION_NAME)
+        tree.AddColumn(LABEL_CAN_STATION_ID)
         tree.AddColumn(LABEL_CAN_STATION_DESC)
 
-        tree.SetMainColumn(0) # the one with the tree in it...
-        tree.SetColumnWidth(0, 150)
+        tree.SetMainColumn(1)
+        #
+        #tree.SetColumnWidth(0, 20)
 
-        tree.SetColumnEditable(0, True)
+        #tree.SetColumnEditable(0, False)
+        tree.SetColumnShown(0, False)
         tree.SetColumnEditable(1, True)
         tree.SetColumnEditable(2, True)
+        tree.SetColumnEditable(3, True)
 
         tree.root = tree.AddRoot("Root Item")
 
@@ -45,10 +50,16 @@ class CanStationViewControl():
 
     def appendCanStationList(self, station):
         tree = self.viewTree
-        child = tree.AppendItem(tree.root, str(station.stationId))
+        listCnt = tree.GetChildrenCount(tree.root)
+        child = tree.AppendItem(tree.root, "")
 
-        tree.SetItemText(child, station.name, 1)
-        tree.SetItemText(child, station.info, 2)
+        print "appendCanStationList, id", station.stationId
+
+        #tree.SetItemText(child, str(station.stationId), 0)
+        tree.SetItemText(child, str(listCnt + 1), 0)
+        tree.SetItemText(child, station.name,       1)
+        tree.SetItemText(child, str(station.stationId), 2)
+        tree.SetItemText(child, station.info, 3)
         tree.SetItemPyData(child, station)
 
     def onCanStationUpdate(self):
@@ -151,7 +162,7 @@ class CanStationViewControl():
 
         if next.IsOk():
             newItem = tree.InsertItem(tree.GetRootItem(), next, station.name)
-            tree.SetItemText(newItem, station.info,1)
+            tree.SetItemText(newItem, station.info, 1)
             tree.SetItemPyData(newItem, station)
 
             tree.Delete(item)
@@ -173,7 +184,6 @@ class CanStationViewControl():
 
         self.canStationEditor.ioBoardViewCtrl.updateIoBoardView(station)
 
-
     def onCanStationItemBeginEdit(self, event):
         print "\n\n onCanStationItemBeginEdit"
         tree = self.viewTree
@@ -185,6 +195,7 @@ class CanStationViewControl():
         station = tree.GetItemPyData(item)
         newLable =  event.GetLabel()
         self.setCanStation(station, tree.editColumn, newLable)
+
     def onCanStationItemDelete(self, event):
         print "onActGrpItemDelete"
 
@@ -198,6 +209,7 @@ class CanStationViewControl():
         frame1.Show()
         #------------------------------------------------------------------
 
+
 class IoBoardViewControl():
     def __init__(self, canStationEditor):
         self.canStationEditor = canStationEditor
@@ -210,14 +222,12 @@ class IoBoardViewControl():
     def SetupIoBoardList(self):
         ioBoardList = self.canStationEditor.ioBoard_list
 
-
         ioBoardList.InsertColumn(0, LABEL_IO_BOARD_COLUM_ID, wx.LIST_FORMAT_RIGHT)
         ioBoardList.InsertColumn(1, LABEL_IO_BOARD_COLUM_TYPE)
 
         #self.list.SetColumnWidth(0, wx.LIST_AUTOSIZE)
         ioBoardList.SetColumnWidth(0, wx.LIST_AUTOSIZE_USEHEADER)
         ioBoardList.SetColumnWidth(1, wx.LIST_AUTOSIZE_USEHEADER)
-
 
     def listInsertIoBoard(self, index, board):
         ioBoardList = self.canStationEditor.ioBoard_list
@@ -244,9 +254,7 @@ class IoBoardViewControl():
 
     def listRemoveAction(self, action):
         actionList = self.canStationEditor.action_list
-
         item = actionList.GetFocusedItem()
-
         actionList.DeleteItem(item)
 
     def refreshIoBoardList(self, canStation):
@@ -263,7 +271,6 @@ class IoBoardViewControl():
             self.listInsertIoBoard(-1, ioBoard)
 
         return
-
 
     def onEditActionUpdate(self):
         actionList = self.canStationEditor.action_list
@@ -410,10 +417,9 @@ class Panel_CanStation(MainBase.Panel_Edit_Can_Station_Base):
     """
     def closeWindow(self):
         self.frame.Close()
+
     def onApply(self, event):
         print "my onApply"
-
-
         canStationList = self.canStationViewCtrl.getCanStationList()
 
         wx.GetApp().getStationMgmt().setCanStationList(canStationList)
@@ -445,7 +451,6 @@ class Panel_CanStation(MainBase.Panel_Edit_Can_Station_Base):
 
     ######################################################
     ######################################################
-
 
 
 class Panel_EditIoBoard(MainBase.Panel_IoBoard_Base):
@@ -484,15 +489,11 @@ class Panel_EditIoBoard(MainBase.Panel_IoBoard_Base):
         prevItem = self.getPrevSelected(choiceObj)
         choiceObj.Clear()
 
-        #wx.Choice(
         for item in itemList:
-            print "\n",item.name, sys.getrefcount(item)
             choiceObj.Append(item.name, item)
-
             if item is prevItem:
                 choiceObj.Select(index)
             index += 1
-            print item.name, sys.getrefcount(item)
 
     def createIoBoard(self, boardType, boardId):
         board = DeviceIoBoard()

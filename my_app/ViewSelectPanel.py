@@ -210,10 +210,12 @@ class ViewSelectPanel(wx.Panel):
         self.dispanel = wx.Notebook( container, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
 
         pygamePanel = PygameDisplay(self.dispanel, -1)
+
         myHMIPanel = MyHmiPanel(self.dispanel, -1)
 
-        self.dispanel.AddPage( pygamePanel, (u"pygame"), False )
         self.dispanel.AddPage( myHMIPanel, (u"HMI"), False )
+        self.dispanel.AddPage( pygamePanel, (u"pygame"), False )
+
         sizer.Add( self.dispanel, 1, wx.EXPAND |wx.ALL, 5 )
 
         container.SetSizer(sizer)
