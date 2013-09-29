@@ -1,7 +1,7 @@
 import wx
 from wx.lib.mixins.listctrl import CheckListCtrlMixin
 from wx.lib.agw import ultimatelistctrl as ULC
-
+from wx.lib.agw import customtreectrl as CTL
 
 class UlcListCtrl(ULC.UltimateListCtrl):
     def __init__(self, parent, id, pos, size, style=0):
@@ -12,7 +12,10 @@ class UlcListCtrl(ULC.UltimateListCtrl):
                                                     |ULC.ULC_SHOW_TOOLTIPS)
         return
 
-
+#
+# class MyCustomTreeCtrl()
+#
+# customtreectrl( self.m_panel80, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TR_DEFAULT_STYLE|wx.TR_LINES_AT_ROOT )
 
 
 class CheckListCtrl(wx.ListCtrl, CheckListCtrlMixin):

@@ -64,7 +64,8 @@ IO_NODE_EDIT = u"编辑数据点"
 IO_NODE_LIST_COL_NAME = u"数据点名称"
 IO_NODE_LIST_COL_DESC = u"描述"
 IO_NODE_LIST_COL_IO = u"I/O连接"
-
+WINDOW_TITLE_DEL_IO_NODE = u"删除数据点"
+DIALOG_ALERT_DEL_IO_NODE = u"确定删除数据点？"
 
 
 

@@ -9,6 +9,7 @@
 
 from MyClass import UlcListCtrl
 from wx.gizmos import TreeListCtrl
+from wx.lib.agw.customtreectrl import CustomTreeCtrl
 import wx
 import wx.xrc
 import wx.richtext
@@ -386,7 +387,7 @@ class Panel_AddDevice_Base ( wx.Panel ):
 		self.io_module_panel.SetSizer( fgSizer51 )
 		self.io_module_panel.Layout()
 		fgSizer51.Fit( self.io_module_panel )
-		self.m_notebook4.AddPage( self.io_module_panel, _(u"输入输出"), True )
+		self.m_notebook4.AddPage( self.io_module_panel, _(u"输入输出"), False )
 		self.contorl_panel = wx.Panel( self.m_notebook4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		bSizer33 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -460,7 +461,7 @@ class Panel_AddDevice_Base ( wx.Panel ):
 		self.contorl_panel.SetSizer( bSizer33 )
 		self.contorl_panel.Layout()
 		bSizer33.Fit( self.contorl_panel )
-		self.m_notebook4.AddPage( self.contorl_panel, _(u"控制"), False )
+		self.m_notebook4.AddPage( self.contorl_panel, _(u"控制"), True )
 		
 		bSizer18.Add( self.m_notebook4, 1, wx.ALL|wx.EXPAND, 5 )
 		
@@ -1066,10 +1067,10 @@ class Panel_Manage_Can_Station_Base ( wx.Panel ):
 	
 
 ###########################################################################
-## Class Panel_Manage_IO_Node_Base
+## Class Panel_Manage_IO_Node_Base2
 ###########################################################################
 
-class Panel_Manage_IO_Node_Base ( wx.Panel ):
+class Panel_Manage_IO_Node_Base2 ( wx.Panel ):
 	
 	def __init__( self, parent ):
 		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 698,429 ), style = wx.TAB_TRAVERSAL )
@@ -1090,7 +1091,7 @@ class Panel_Manage_IO_Node_Base ( wx.Panel ):
 		self.m_splitter9 = wx.SplitterWindow( self.IoStation_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SP_3D )
 		self.m_splitter9.Bind( wx.EVT_IDLE, self.m_splitter9OnIdle )
 		
-		self.m_panel80 = wx.Panel( self.m_splitter9, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_panel80 = wx.Panel( self.m_splitter9, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.RAISED_BORDER|wx.TAB_TRAVERSAL )
 		fgSizer34 = wx.FlexGridSizer( 0, 0, 0, 0 )
 		fgSizer34.AddGrowableCol( 0 )
 		fgSizer34.AddGrowableRow( 0 )
@@ -1170,7 +1171,7 @@ class Panel_Manage_IO_Node_Base ( wx.Panel ):
 		self.Bind( wx.EVT_TOOL, self.onIoNodeToolClicked, id = IO_NODE_NEW )
 		self.Bind( wx.EVT_TOOL, self.onIoNodeToolClicked, id = IO_NODE_EDIT )
 		self.Bind( wx.EVT_TOOL, self.onIoNodeToolClicked, id = IO_NODE_DEL )
-		self.ioNode_list.Bind( wx.EVT_LIST_ITEM_SELECTED, self.onIoBoardListItemSelected )
+		self.ioNode_list.Bind( wx.EVT_LIST_ITEM_SELECTED, self.onIoNodeListItemSelected )
 		self.m_button6.Bind( wx.EVT_BUTTON, self.onApply )
 		self.m_button7.Bind( wx.EVT_BUTTON, self.onCancel )
 	
@@ -1187,7 +1188,143 @@ class Panel_Manage_IO_Node_Base ( wx.Panel ):
 	
 	
 	
-	def onIoBoardListItemSelected( self, event ):
+	def onIoNodeListItemSelected( self, event ):
+		event.Skip()
+	
+	def onApply( self, event ):
+		event.Skip()
+	
+	def onCancel( self, event ):
+		event.Skip()
+	
+	def m_splitter9OnIdle( self, event ):
+		self.m_splitter9.SetSashPosition( 361 )
+		self.m_splitter9.Unbind( wx.EVT_IDLE )
+	
+
+###########################################################################
+## Class Panel_Manage_IO_Node_Base
+###########################################################################
+
+class Panel_Manage_IO_Node_Base ( wx.Panel ):
+	
+	def __init__( self, parent ):
+		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 698,429 ), style = wx.TAB_TRAVERSAL )
+		
+		fgSizer4 = wx.FlexGridSizer( 2, 1, 0, 0 )
+		fgSizer4.AddGrowableCol( 0 )
+		fgSizer4.AddGrowableCol( 1 )
+		fgSizer4.AddGrowableRow( 0 )
+		fgSizer4.SetFlexibleDirection( wx.BOTH )
+		fgSizer4.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		bSizer18 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_notebook4 = wx.Notebook( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.IoStation_panel = wx.Panel( self.m_notebook4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		bSizer33 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_splitter9 = wx.SplitterWindow( self.IoStation_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SP_3D )
+		self.m_splitter9.Bind( wx.EVT_IDLE, self.m_splitter9OnIdle )
+		
+		self.m_panel80 = wx.Panel( self.m_splitter9, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.STATIC_BORDER|wx.TAB_TRAVERSAL )
+		fgSizer34 = wx.FlexGridSizer( 0, 0, 0, 0 )
+		fgSizer34.AddGrowableCol( 0 )
+		fgSizer34.AddGrowableRow( 0 )
+		fgSizer34.SetFlexibleDirection( wx.BOTH )
+		fgSizer34.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.io_category_tree = CustomTreeCtrl( self.m_panel80, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TR_DEFAULT_STYLE|wx.TR_LINES_AT_ROOT )
+		fgSizer34.Add( self.io_category_tree, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		self.m_panel80.SetSizer( fgSizer34 )
+		self.m_panel80.Layout()
+		fgSizer34.Fit( self.m_panel80 )
+		self.m_panel79 = wx.Panel( self.m_splitter9, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		fgSizer341 = wx.FlexGridSizer( 2, 0, 0, 0 )
+		fgSizer341.AddGrowableCol( 0 )
+		fgSizer341.AddGrowableCol( 1 )
+		fgSizer341.AddGrowableRow( 1 )
+		fgSizer341.SetFlexibleDirection( wx.BOTH )
+		fgSizer341.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.ioNode_toolbar = wx.ToolBar( self.m_panel79, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TB_HORIZONTAL ) 
+		self.ioNode_toolbar.AddLabelTool( IO_NODE_NEW, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_NEW, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
+		
+		self.ioNode_toolbar.AddLabelTool( IO_NODE_EDIT, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_EXECUTABLE_FILE, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
+		
+		self.ioNode_toolbar.AddLabelTool( IO_NODE_DEL, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_DELETE, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
+		
+		self.ioNode_toolbar.AddSeparator()
+		
+		self.ioNode_toolbar.Realize() 
+		
+		fgSizer341.Add( self.ioNode_toolbar, 0, wx.EXPAND, 5 )
+		
+		self.ioNode_list = UlcListCtrl( self.m_panel79, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT )
+		fgSizer341.Add( self.ioNode_list, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		self.m_panel79.SetSizer( fgSizer341 )
+		self.m_panel79.Layout()
+		fgSizer341.Fit( self.m_panel79 )
+		self.m_splitter9.SplitVertically( self.m_panel80, self.m_panel79, 361 )
+		bSizer33.Add( self.m_splitter9, 1, wx.EXPAND, 5 )
+		
+		
+		self.IoStation_panel.SetSizer( bSizer33 )
+		self.IoStation_panel.Layout()
+		bSizer33.Fit( self.IoStation_panel )
+		self.m_notebook4.AddPage( self.IoStation_panel, _(u"控制"), True )
+		
+		bSizer18.Add( self.m_notebook4, 1, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		fgSizer4.Add( bSizer18, 1, wx.EXPAND, 5 )
+		
+		self.m_panel27 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		gSizer3 = wx.GridSizer( 0, 2, 0, 0 )
+		
+		self.m_button6 = wx.Button( self.m_panel27, wx.ID_ANY, _(u"Apply"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		gSizer3.Add( self.m_button6, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
+		
+		self.m_button7 = wx.Button( self.m_panel27, wx.ID_ANY, _(u"Cancel"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		gSizer3.Add( self.m_button7, 0, wx.ALIGN_LEFT|wx.ALL, 5 )
+		
+		
+		self.m_panel27.SetSizer( gSizer3 )
+		self.m_panel27.Layout()
+		gSizer3.Fit( self.m_panel27 )
+		fgSizer4.Add( self.m_panel27, 1, wx.EXPAND |wx.ALL, 5 )
+		
+		
+		self.SetSizer( fgSizer4 )
+		self.Layout()
+		
+		# Connect Events
+		self.io_category_tree.Bind( wx.EVT_TREE_SEL_CHANGED, self.onCategoryItemSelChanged )
+		self.Bind( wx.EVT_TOOL, self.onIoNodeToolClicked, id = IO_NODE_NEW )
+		self.Bind( wx.EVT_TOOL, self.onIoNodeToolClicked, id = IO_NODE_EDIT )
+		self.Bind( wx.EVT_TOOL, self.onIoNodeToolClicked, id = IO_NODE_DEL )
+		self.ioNode_list.Bind( wx.EVT_LIST_ITEM_SELECTED, self.onIoNodeListItemSelected )
+		self.m_button6.Bind( wx.EVT_BUTTON, self.onApply )
+		self.m_button7.Bind( wx.EVT_BUTTON, self.onCancel )
+	
+	def __del__( self ):
+		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def onCategoryItemSelChanged( self, event ):
+		event.Skip()
+	
+	def onIoNodeToolClicked( self, event ):
+		event.Skip()
+	
+	
+	
+	def onIoNodeListItemSelected( self, event ):
 		event.Skip()
 	
 	def onApply( self, event ):

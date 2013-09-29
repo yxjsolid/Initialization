@@ -23,6 +23,8 @@ class IoNodeCategory():
 
         return
 
+    def removeIoNode(self, nodeObj):
+        self.ioNodeList.remove(nodeObj)
 
 class IoNodeMgmt():
     def __init__(self):

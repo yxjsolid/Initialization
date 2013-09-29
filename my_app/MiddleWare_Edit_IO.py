@@ -37,24 +37,31 @@ class IoCategoryViewControl():
         for cate in outList:
             self.addNewCategory(self.viewTree, self.outputRoot, cate)
 
-        return
-
-    def setupIoCategoryView(self):
-        self.root = self.viewTree.AddRoot("myroot")
-        self.inputRoot = self.viewTree.AppendItem(self.root, EDIT_IO_NODE_LABEL_INPUT)
-        self.outputRoot = self.viewTree.AppendItem(self.root, EDIT_IO_NODE_LABEL_OUTPUT)
-
         if not self.viewTree.ItemHasChildren(self.inputRoot):
             self.addNewCategory(self.viewTree, self.inputRoot, IoNodeCategory())
 
         if not self.viewTree.ItemHasChildren(self.outputRoot):
             self.addNewCategory(self.viewTree, self.outputRoot, IoNodeCategory())
 
+        return
 
+    def setupIoCategoryView(self):
 
+        #self.viewTree.SetAGWWindowStyleFlag(CT.TR_HIDE_ROOT | CT.TR_NO_LINES | CT.TR_ROW_LINES)
 
+        #self.viewTree.SetAGWWindowStyleFlag(CT.TR_NO_LINES)
 
+        #self.viewTree.AddColumn(OPERATION_LIST_LABEL_NAME)
 
+        #import w.lib.agw.customtreectrl as CT
+
+        #CT.CustomTreeCtrl
+        # tree.SetColumnEditable(0, True)
+        # tree.SetColumnEditable(1, True)
+        # tree.root = tree.AddRoot("Root Item")
+        self.root = self.viewTree.AddRoot("myroot")
+        self.inputRoot = self.viewTree.AppendItem(self.root, EDIT_IO_NODE_LABEL_INPUT)
+        self.outputRoot = self.viewTree.AppendItem(self.root, EDIT_IO_NODE_LABEL_OUTPUT)
 
     def doPopUpMenu(self, groupItem):
         treeView = self.viewTree
@@ -88,7 +95,6 @@ class IoCategoryViewControl():
         treeView.PopupMenu(menu)
         menu.Destroy()
 
-
     def OnRightDown(self, event):
         pt = event.GetPosition()
         item, flags = self.viewTree.HitTest(pt)
@@ -115,9 +121,9 @@ class IoCategoryViewControl():
         dlg = wx.TextEntryDialog(self.ioNodeEditor.frame, EDIT_IO_NODE_LABEL_GROUP_INPUT_NAME, EDIT_IO_NODE_LABEL_NEW_GROUP, name)
 
         if dlg.ShowModal() == wx.ID_OK:
-            newname = dlg.GetValue()
-            newitem = self.viewTree.SetItemText(currentItem, newname)
-            groupNode.name = newname
+            newName = dlg.GetValue()
+            self.viewTree.SetItemText(currentItem, newName)
+            groupNode.name = newName
 
         dlg.Destroy()
 
@@ -129,8 +135,7 @@ class IoCategoryViewControl():
 
     def onCategoryItemSelChanged(self, event):
         selItem = self.viewTree.GetSelection()
-
-        self.ioNodeEditor.ioNodeCtrl.updateToolStatus(0)
+        self.ioNodeEditor.ioNodeCtrl.updateAddNewToolStatus(0)
 
         if selItem == self.viewTree.GetRootItem():
             return
@@ -141,9 +146,9 @@ class IoCategoryViewControl():
             categoryList = self.getChildrenItem(self.viewTree, selItem)
         else:
             categoryList = [self.getSelectedCategoryObj()]
-            self.ioNodeEditor.ioNodeCtrl.updateToolStatus(1)
+            self.ioNodeEditor.ioNodeCtrl.updateAddNewToolStatus(1)
 
-        self.ioNodeEditor.ioNodeCtrl.updateIoNodeView(categoryList)
+        self.ioNodeEditor.ioNodeCtrl.updateIoNodeView(categoryList, True)
         return
 
     def OnItemAppend(self, event):
@@ -169,7 +174,7 @@ class IoCategoryViewControl():
 
         if dlg.ShowModal() == wx.ID_OK:
             newname = dlg.GetValue()
-            newitem = self.viewTree.SetItemText(currentItem, newname)
+            self.viewTree.SetItemText(currentItem, newname)
             groupNode.name = newname
 
         dlg.Destroy()
@@ -200,6 +205,7 @@ class IoNodeViewControl():
         self.ioNodeEditor = ioNodeEditorIn
         self.listView = self.ioNodeEditor.getIoNodeViewList()
         self.SetupIoNodeList()
+        self.updateAddNewToolStatus(0)
         self.updateToolStatus(0)
 
     def SetupIoNodeList(self):
@@ -218,50 +224,134 @@ class IoNodeViewControl():
     def onIoNodeToolClicked(self, event):
         eventId = event.GetId()
         ret = {
-            MainBase.IO_NODE_NEW:  lambda: self.onAddNewIoNode(),
-            MainBase.IO_NODE_EDIT:  lambda: self.onEditIoNode(),
-            MainBase.IO_NODE_DEL:   lambda: self.OnDeleteIoNOde(),
-            }[eventId]()
+            MainBase.IO_NODE_NEW: lambda: self.onAddNewIoNode(),
+            MainBase.IO_NODE_EDIT: lambda: self.onEditIoNode(),
+            MainBase.IO_NODE_DEL: lambda: self.OnDeleteIoNode(),
+            } [eventId]()
 
-        print ret
+    def getSelectedCategoryObj(self):
+        return self.ioNodeEditor.categoryCtrl.getSelectedCategoryObj()
 
     def onAddNewIoNode(self):
-
         categoryObj = self.ioNodeEditor.categoryCtrl.getSelectedCategoryObj()
-        window = MyPopupWindow(size=(600,400), title=IO_NODE_ADD_NEW)
-        Panel_Edit_IO_Node(window.frame, categoryObj, self.ioNodeEditor)
+        window = MyPopupWindow(size=(600, 400), title=IO_NODE_ADD_NEW)
+        Panel_Edit_IO_Node(window, self, cateObj=categoryObj)
         window.windowPopup()
         return
 
-    def OnDeleteIoNOde(self):
+    def getCurrentEditObj(self):
+        editItem = self.listView.GetFirstSelected()
+        categoryObj = self.listView.GetItemPyData(editItem)[0]
+        nodeObj = self.listView.GetItemPyData(editItem)[1]
 
-        return
+        return categoryObj, nodeObj
 
     def onEditIoNode(self):
+        # editItem = self.listView.GetFirstSelected()
+        #
+        # categoryObj = self.listView.GetItemPyData(editItem)[0]
+        # nodeObj = self.listView.GetItemPyData(editItem)[1]
+
+        categoryObj, nodeObj = self.getCurrentEditObj()
+
+        window = MyPopupWindow(size=(600, 400), title=IO_NODE_EDIT)
+        Panel_Edit_IO_Node(window, self, self.listView.GetFirstSelected(), categoryObj, nodeObj)
+        window.windowPopup()
+
         return
+
+    def onIoNodeDelUpdate(self, delIndex):
+        #station = self.getCurrentCanStation()
+        self.updateToolStatus(0)
+        categoryObj, nodeObj = self.getCurrentEditObj()
+        self.updateIoNodeView([categoryObj], False)
+
+        ctrl = self.listView
+        listCnt = ctrl.GetItemCount()
+
+        if listCnt > 0:
+            if delIndex > 0:
+                ctrl.Select(delIndex - 1)
+            else:
+                ctrl.Select(0)
+
+    def OnDeleteIoNode(self):
+        # ctrl = self.listView
+        # itemIndex = tree.GetFirstSelected()
+        delIndex = self.listView.GetFirstSelected()
+
+        categoryObj, nodeObj = self.getCurrentEditObj()
+
+        dlg = MainBase.ConfirmDIALOG(self.ioNodeEditor.frame)
+        dlg.SetTitle(WINDOW_TITLE_DEL_IO_NODE)
+        dlg.alert_msg_txt.SetLabel(DIALOG_ALERT_DEL_IO_NODE)
+
+        if dlg.ShowModal() == wx.ID_OK:
+            if nodeObj:
+                categoryObj.removeIoNode(nodeObj)
+        dlg.Destroy()
+
+        self.onIoNodeDelUpdate(delIndex)
+
+        return
+
+    def onIoNodeListItemSelected(self):
+        self.updateToolStatus(1)
+        return
+
+    def updateAddNewToolStatus(self, isEnable):
+        if isEnable:
+            self.ioNodeEditor.ioNode_toolbar.EnableTool(MainBase.IO_NODE_NEW, 1)
+        else:
+            self.ioNodeEditor.ioNode_toolbar.EnableTool(MainBase.IO_NODE_NEW, 0)
+            self.updateToolStatus(0)
 
     def updateToolStatus(self, isEnable):
         if isEnable:
-            self.ioNodeEditor.ioNode_toolbar.EnableTool(MainBase.IO_NODE_NEW, 1)
             self.ioNodeEditor.ioNode_toolbar.EnableTool(MainBase.IO_NODE_EDIT, 1)
             self.ioNodeEditor.ioNode_toolbar.EnableTool(MainBase.IO_NODE_DEL, 1)
         else:
-            self.ioNodeEditor.ioNode_toolbar.EnableTool(MainBase.IO_NODE_NEW, 0)
             self.ioNodeEditor.ioNode_toolbar.EnableTool(MainBase.IO_NODE_EDIT, 0)
             self.ioNodeEditor.ioNode_toolbar.EnableTool(MainBase.IO_NODE_DEL, 0)
 
+    def setDefaultSelect(self):
+        ctrl = self.listView
+        listCnt = ctrl.GetItemCount()
 
-    def updateIoNodeView(self, categoryList):
+        if listCnt > 0:
+            ctrl.Select(0)
+
+    def updateIoNodeView(self, categoryList, isOnLoad):
         self.listView.DeleteAllItems()
         for cateObj in categoryList:
             if cateObj:
                 for ioNode in cateObj.ioNodeList:
-                    self.listInsertIoNode(-1, ioNode)
+                    self.listInsertIoNode(-1, cateObj, ioNode)
+
+        if isOnLoad:
+            self.setDefaultSelect()
 
         return
 
-    def listInsertIoNode(self, index, ioNode):
+    def editUpdateIoNodeItem(self, itemIndex, categoryObj, nodeObj):
+        self.setNodeItem(itemIndex, categoryObj, nodeObj)
 
+    def appendIoNodeListView(self, nodeObj):
+        categoryObj = self.getSelectedCategoryObj()
+        categoryObj.ioNodeList.append(nodeObj)
+
+        ctrl = self.listView
+        nodeCnt = ctrl.GetItemCount()
+
+        if nodeCnt == 0:
+            index = ctrl.InsertStringItem(sys.maxint, "", 0)
+        else:
+            index = ctrl.InsertStringItem(nodeCnt, "", 0)
+
+        self.setNodeItem(index, categoryObj, nodeObj)
+        ctrl.Select(index)
+
+    def listInsertIoNode(self, index, categoryObj, ioNode):
         """ ref SetStringItem """
         nodeCnt = self.listView.GetItemCount()
 
@@ -277,13 +367,19 @@ class IoNodeViewControl():
         else:
             index = self.listView.InsertStringItem(index, str(index + 1), 0)
 
-        self.listView.SetStringItem(index, 1, ioNode.name, 0)
-        self.listView.SetStringItem(index, 2, ioNode.desc, 0)
-        self.listView.SetStringItem(index, 3, "IO", 0)
+        self.setNodeItem(index, categoryObj, ioNode)
+        self.listView.Select(index)
+
+    def setNodeItem(self, itemIndex, categoryObj, nodeObj):
+        self.listView.SetStringItem(itemIndex, 0, str(itemIndex + 1), 0)
+        self.listView.SetStringItem(itemIndex, 1, nodeObj.name, 0)
+        self.listView.SetStringItem(itemIndex, 2, nodeObj.desc, 0)
+        self.listView.SetStringItem(itemIndex, 3, "IO", 0)
+        self.listView.SetPyData(itemIndex, [categoryObj, nodeObj])
 
 
 class Panel_Manage_IO_Node(MainBase.Panel_Manage_IO_Node_Base):
-    def __init__( self, frame, device=None):
+    def __init__(self, frame):
         MainBase.Panel_Manage_IO_Node_Base.__init__(self, frame)
         self.frame = frame
         self.categoryCtrl = IoCategoryViewControl(self)
@@ -309,6 +405,9 @@ class Panel_Manage_IO_Node(MainBase.Panel_Manage_IO_Node_Base):
     def getOutputIoCategoryList(self):
         return self.categoryCtrl.getOutputIoCategoryList()
 
+    def onIoNodeListItemSelected(self, event):
+        return self.ioNodeCtrl.onIoNodeListItemSelected()
+
     def closeWindow(self):
         self.frame.Close()
 
@@ -326,17 +425,17 @@ class Panel_Manage_IO_Node(MainBase.Panel_Manage_IO_Node_Base):
 
 
 class Panel_Edit_IO_Node(MainBase.Panel_Edit_IO_Node_Base):
-    def __init__(self, frame, cateObj=None, parentEditor=None):
-        MainBase.Panel_Edit_IO_Node_Base.__init__(self, frame)
-        self.frame = frame
-        self.parent = parentEditor
+    def __init__(self, window, viewCtrlIn=None, editListItemIn=-1, cateObj=None, ioNodeIn=None):
+        MainBase.Panel_Edit_IO_Node_Base.__init__(self, window.frame)
+        self.window = window
+        self.viewCtrl = viewCtrlIn
 
         self.categoryObj = cateObj
+        self.editListItem = editListItemIn
+        self.onEditNode = ioNodeIn
+
         self.onLoadUpdate()
         return
-
-    def closeWindow(self):
-        self.frame.Close()
 
     def onApply(self, event):
         name = self.nodeNameTxt.GetValue()
@@ -344,20 +443,23 @@ class Panel_Edit_IO_Node(MainBase.Panel_Edit_IO_Node_Base):
         offInfo = self.offInfoTxt.GetValue()
         onInfo = self.onInfoTxt.GetValue()
 
-        newIoNode = IoNode()
-        newIoNode.name = name
-        newIoNode.desc = desc
-        newIoNode.offInfo = offInfo
-        newIoNode.onInfo = onInfo
+        if self.onEditNode is not None:
+            self.onEditNode.name = name
+            self.onEditNode.desc = desc
+            self.onEditNode.offInfo = offInfo
+            self.onEditNode.onInfo = onInfo
+            self.viewCtrl.editUpdateIoNodeItem(self.editListItem, self.categoryObj, self.onEditNode)
+            #self.viewCtrl.updateBoardListView(self.editListItem, self.onEditBoard)
+        else:
+            newIoNode = IoNode()
+            newIoNode.name = name
+            newIoNode.desc = desc
+            newIoNode.offInfo = offInfo
+            newIoNode.onInfo = onInfo
+            self.viewCtrl.appendIoNodeListView(newIoNode)
 
-        self.categoryObj.ioNodeList.append(newIoNode)
-
-        #self.updateIoNodeView(self.categoryObj)
-
-        self.parent.ioNodeCtrl.updateIoNodeView([self.categoryObj])
-
-        self.closeWindow()
-
+        #self.viewCtrl.updateIoNodeView([self.categoryObj], False)
+        self.window.closeWindow()
 
     def onLoadUpdate(self):
         cfgObj = wx.GetApp().getConfigure()
@@ -380,23 +482,16 @@ class Panel_Edit_IO_Node(MainBase.Panel_Edit_IO_Node_Base):
         choiceObj.Clear()
 
         for station in stationMgmt.stationList:
-            stationInfoStr =  station.getStationInfo()
-
+            stationInfoStr = station.getStationInfo()
             choiceObj.Append(stationInfoStr, station)
 
         choiceObj.SetSelection(0)
-
-            # if item is prevItem:
-            #     choiceObj.Select(index)
-            # index += 1
-            # print item.name, sys.getrefcount(item)
 
     def buildBoardChoice(self, station):
         """select the previous selected item after update"""
 
         choiceObj = self.boardChoice
         choiceObj.Clear()
-
 
         boardList = station.InputBoardList
 
@@ -410,6 +505,6 @@ class Panel_Edit_IO_Node(MainBase.Panel_Edit_IO_Node_Base):
         choiceObj.Clear()
 
         for i in range(8):
-            choiceObj.Append(str(i+1))
+            choiceObj.Append(str(i + 1))
 
         choiceObj.SetSelection(0)
