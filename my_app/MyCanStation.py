@@ -26,7 +26,7 @@ class StationManagement():
 
 
 class DeviceCanStation():
-    def __init__(self, name=LABEL_STATION_NAME, info=LABEL_STATION_INFO):
+    def __init__(self, name=CAN_STATION_DEFAULT_NAME, info=CAN_STATION_DEFAULT_DESC):
         self.name = name
         self.info = info
         self.stationId = 0

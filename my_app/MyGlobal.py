@@ -68,20 +68,30 @@ IO_NODE_LIST_COL_IO = u"I/O连接"
 
 
 
-LABEL_CAN_STATION_NAME = u"名称"
-LABEL_CAN_STATION_ID = u"编号"
+
+CAN_STATION_DEFAULT_NAME = u"默认站点"
+CAN_STATION_DEFAULT_DESC = u"未定义"
+
+LABEL_CAN_STATION_NAME = u"站点名称"
+LABEL_CAN_STATION_ID = u"站点编号"
 LABEL_CAN_STATION_DESC = u"站点描述"
+WINDOW_TITLE_ADD_STATION = u"添加站点"
+WINDOW_TITLE_EDIT_STATION = u"编辑站点"
+WINDOW_TITLE_DEL_STATION = u"删除站点"
+DIALOG_ALERT_DEL_STATION = u"确定删除站点及其所有子板？"
+
 
 LABEL_IO_BOARD_COLUM_ID = u"子板号"
 LABEL_IO_BOARD_COLUM_TYPE = u"子板类型"
-
+WINDOW_TITLE_ADD_BOARD = u"添加子板"
+WINDOW_TITLE_EDIT_BOARD = u"编辑子板"
+WINDOW_TITLE_DEL_BOARD = u"删除子板"
+DIALOG_ALERT_DEL_BOARD = u"确定删除子板？"
 
 LABEL_IO_BOARD_TYPE_UNKNOWN = u"子板类型错误"
 LABEL_IO_BOARD_OUTPUT = u"信号量输出"
 LABEL_IO_BOARD_INPUT = u"信号量输入"
 
-LABEL_STATION_NAME = u"子板"
-LABEL_STATION_INFO = u"未定义"
 
 MENU_ITEM_BUTTON_SETTING = u"动作属性"
 
@@ -134,6 +144,9 @@ class MyPopupWindow():
     def windowPopup(self):
         self.frame.CenterOnScreen()
         self.frame.Show()
+
+    def closeWindow(self):
+        self.frame.Close()
 
 # class Panel_ButtonSetting():
 #     def __init__(self, frame):

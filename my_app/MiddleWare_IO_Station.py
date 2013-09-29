@@ -12,103 +12,158 @@ from MyCanStation import *
 from ViewSelectPanel import *
 import pickle
 
-
-
 class CanStationViewControl():
     def __init__(self, canStationEditor):
         self.canStationEditor = canStationEditor
         self.viewTree = self.canStationEditor.getCanStationViewTree()
         self.setupCanStationTreeView()
+        self.updateToolStatus(0)
+        self.getCanStationCfg()
+
+    def updateToolStatus(self, isEnable):
+        if isEnable:
+            self.canStationEditor.canStation_toolbar.EnableTool(MainBase.canStation_edit, 1)
+            self.canStationEditor.canStation_toolbar.EnableTool(MainBase.canStation_del, 1)
+        else:
+            self.canStationEditor.canStation_toolbar.EnableTool(MainBase.canStation_edit, 0)
+            self.canStationEditor.canStation_toolbar.EnableTool(MainBase.canStation_del, 0)
 
     def setupCanStationTreeView(self):
         tree = self.viewTree
 
-        #tree.AddColumn(LABEL_CAN_STATION_ID)
-        tree.AddColumn("#")
-        tree.AddColumn(LABEL_CAN_STATION_NAME)
-        tree.AddColumn(LABEL_CAN_STATION_ID)
-        tree.AddColumn(LABEL_CAN_STATION_DESC)
+        tree.SetSingleStyle(wx.LC_EDIT_LABELS, True)
+        tree.InsertColumn(0, "#", wx.LIST_FORMAT_LEFT)
+        tree.InsertColumn(1, LABEL_CAN_STATION_NAME)
+        tree.InsertColumn(2, LABEL_CAN_STATION_ID)
+        tree.InsertColumn(3, LABEL_CAN_STATION_DESC)
 
-        tree.SetMainColumn(1)
-        #
-        #tree.SetColumnWidth(0, 20)
+        tree.SetColumnWidth(0, wx.LIST_AUTOSIZE)
+        tree.SetColumnWidth(1, 100)
+        tree.SetColumnWidth(2, 100)
+        tree.SetColumnWidth(3, 100)
 
-        #tree.SetColumnEditable(0, False)
-        tree.SetColumnShown(0, False)
-        tree.SetColumnEditable(1, True)
-        tree.SetColumnEditable(2, True)
-        tree.SetColumnEditable(3, True)
-
-        tree.root = tree.AddRoot("Root Item")
-
-    def addNewCanStation(self):
+    def clearAllStation(self):
         tree = self.viewTree
-        name = OPERATION_NAME_DEFAULT + str(tree.GetCount()+1)
-        station = DeviceCanStation()
-        station.name = name
-        self.appendCanStationList(station)
+        tree.DeleteAllItems()
 
     def appendCanStationList(self, station):
+        self.canStationList.append(station)
+
+    def setDefaultSelect(self):
         tree = self.viewTree
-        listCnt = tree.GetChildrenCount(tree.root)
-        child = tree.AppendItem(tree.root, "")
+        listCnt = tree.GetItemCount()
 
-        print "appendCanStationList, id", station.stationId
+        if listCnt > 0:
+            tree.Select(0)
 
-        #tree.SetItemText(child, str(station.stationId), 0)
-        tree.SetItemText(child, str(listCnt + 1), 0)
-        tree.SetItemText(child, station.name,       1)
-        tree.SetItemText(child, str(station.stationId), 2)
-        tree.SetItemText(child, station.info, 3)
-        tree.SetItemPyData(child, station)
+    def appendCanStationListView(self, station):
+        tree = self.viewTree
+        listCnt = tree.GetItemCount()
 
-    def onCanStationUpdate(self):
-        canStationList = wx.GetApp().getStationMgmt().getCanStationList()
+        if listCnt == 0:
+            index = tree.InsertStringItem(sys.maxint, str(listCnt + 1))
+        else:
+            index = tree.InsertStringItem(listCnt, str(listCnt + 1))
 
+        tree.SetStringItem(index, 1, station.name)
+        tree.SetStringItem(index, 2, str(station.stationId))
+        tree.SetStringItem(index, 3, station.info)
+        tree.SetItemPyData(index, station)
+
+        tree.Select(index)
+
+
+    def updateCanStationItem(self, itemIndex, station):
+        tree = self.viewTree
+
+        tree.SetStringItem(itemIndex, 0, str(itemIndex + 1))
+        tree.SetStringItem(itemIndex, 1, station.name)
+        tree.SetStringItem(itemIndex, 2, str(station.stationId))
+        tree.SetStringItem(itemIndex, 3, station.info)
+
+    def addNewCanStation(self):
+        window = MyPopupWindow(size=(400, 200), title=WINDOW_TITLE_ADD_STATION)
+        Panel_Edit_Can_Station(window, self)
+        window.windowPopup()
+
+    def editCanStation(self):
+        window = MyPopupWindow(size=(400, 200), title=WINDOW_TITLE_EDIT_STATION)
+        Panel_Edit_Can_Station(window, self, self.viewTree.GetFirstSelected(), self.getCurrentCanStation())
+        window.windowPopup()
+
+    def deleteCanStation(self):
+        tree = self.viewTree
+        itemIndex = tree.GetFirstSelected()
+
+        station = self.getCurrentCanStation()
+
+        dlg = MainBase.ConfirmDIALOG(self.canStationEditor.frame)
+        dlg.SetTitle(WINDOW_TITLE_DEL_STATION)
+        dlg.alert_msg_txt.SetLabel(DIALOG_ALERT_DEL_STATION)
+
+        if dlg.ShowModal() == wx.ID_OK:
+            if station:
+                self.canStationList.remove(station)
+        dlg.Destroy()
+
+        self.onCanStationDelUpdate(itemIndex)
+
+    def getCanStationCfg(self):
+        self.canStationList = wx.GetApp().getStationMgmt().getCanStationList()[:]
+
+    def onCanStationDelUpdate(self, delIndex):
+        self.onCanStationUpdate(False)
+        tree = self.viewTree
+        listCnt = tree.GetItemCount()
+
+        if listCnt > 0:
+            if delIndex > 0:
+                tree.Select(delIndex - 1)
+            else:
+                tree.Select(0)
+        else:
+            self.canStationEditor.ioBoardViewCtrl.updateIoBoardView(None, True)
+
+    def onCanStationUpdate(self, isOnload):
+        canStationList = self.canStationList
+        self.clearAllStation()
         for station in canStationList:
-            self.appendCanStationList(station)
+            if station:
+                self.appendCanStationListView(station)
 
+        if isOnload:
+            self.setDefaultSelect()
         return
 
     def getCurrentCanStation(self):
         tree = self.viewTree
-        item = tree.GetSelection()
-
-        if item != tree.GetRootItem():
-            print "not root"
+        item = tree.GetFirstSelected()
+        if item != -1:
             return tree.GetItemPyData(item)
-        else:
-            print " root"
 
-        if item.IsOk():
-            print "ok"
-        else:
-            print "not ok"
+        return None
 
     def setDefaultSelection(self):
         tree = self.viewTree
 
         #help(tree)
-        root = tree.GetRootItem()
-
-        item = tree.GetNext(root)
-        if item.IsOk():
-
-            print "get item ok!!!!!!!"
-            tree.SelectItem(item)
+        # root = tree.GetRootItem()
+        #
+        # item = tree.GetNext(root)
+        # if item.IsOk():
+        #
+        #     print "get item ok!!!!!!!"
+        #     tree.SelectItem(item)
 
     def getCanStationList(self):
         stationList = []
         tree = self.viewTree
-        item = tree.GetRootItem()
-        while True:
-            item = tree.GetNext(item)
-            if item.IsOk():
-                station = tree.GetItemPyData(item)
-                stationList.append(station)
-                print station.name
-            else:
-                break
+        listCnt = tree.GetItemCount()
+
+        for index in range(listCnt):
+            station = tree.GetItemPyData(index)
+            stationList.append(station)
+
         return stationList
 
     def setCanStation(self, station, index, txtIn):
@@ -118,20 +173,6 @@ class CanStationViewControl():
             station.name = txtIn
         elif index is 2:
             station.info = txtIn
-
-    def deleteCanStation(self):
-        tree = self.viewTree
-        item = tree.GetSelection()
-
-        #print "\n\n deleteActGrp"
-        if item != tree.GetRootItem():
-            prev = tree.GetPrev(item)
-            next = tree.GetNext(item)
-            tree.Delete(item)
-            if prev.IsOk():
-                tree.SelectItem(prev)
-            elif next.IsOk():
-                tree.SelectItem(next)
 
     def moveUpCanStation(self):
         tree = self.viewTree
@@ -173,16 +214,19 @@ class CanStationViewControl():
         print "onCanStationToolClicked:", eventId
         ret = {
             MainBase.canStation_new:  lambda: self.addNewCanStation(),
+            MainBase.canStation_edit:  lambda: self.editCanStation(),
             MainBase.canStation_del:  lambda: self.deleteCanStation(),
-            MainBase.canStation_up:   lambda: self.moveUpCanStation(),
-            MainBase.canStation_down: lambda: self.moveDownCanStation(),
+            # MainBase.canStation_up:   lambda: self.moveUpCanStation(),
+            # MainBase.canStation_down: lambda: self.moveDownCanStation(),
             }[eventId]()
 
-    def onCanStationItemSelChanged(self, event):
+    #def onCanStationItemSelChanged(self, event):
+    def onCanStationItemSelected(self, event):
         station = self.getCurrentCanStation()
-        print "\n\n onCanStationItemSelChanged:"
+        self.updateToolStatus(1)
 
-        self.canStationEditor.ioBoardViewCtrl.updateIoBoardView(station)
+        #self.canStationEditor.ioBoardViewCtrl.updateAddNewToolStatus(1)
+        self.canStationEditor.ioBoardViewCtrl.updateIoBoardView(station, True)
 
     def onCanStationItemBeginEdit(self, event):
         print "\n\n onCanStationItemBeginEdit"
@@ -213,21 +257,50 @@ class CanStationViewControl():
 class IoBoardViewControl():
     def __init__(self, canStationEditor):
         self.canStationEditor = canStationEditor
+        self.viewCtrl = self.canStationEditor.getBoardViewCtrl()
+
         self.ioModuleList = []
         self.SetupIoBoardList()
+        self.updateAddNewToolStatus(0)
+        self.updateToolStatus(0)
+        return
 
-    ###################################################################
-    # action list related
+    def updateAddNewToolStatus(self, isEnable):
+        if isEnable:
+            self.canStationEditor.ioBoard_toolbar.EnableTool(MainBase.ioBoard_new, 1)
+        else:
+            self.canStationEditor.ioBoard_toolbar.EnableTool(MainBase.ioBoard_new, 0)
+            self.updateToolStatus(0)
+
+    def updateToolStatus(self, isEnable):
+        if isEnable:
+            self.canStationEditor.ioBoard_toolbar.EnableTool(MainBase.ioBoard_edit, 1)
+            self.canStationEditor.ioBoard_toolbar.EnableTool(MainBase.ioBoard_del, 1)
+        else:
+            self.canStationEditor.ioBoard_toolbar.EnableTool(MainBase.ioBoard_edit, 0)
+            self.canStationEditor.ioBoard_toolbar.EnableTool(MainBase.ioBoard_del, 0)
 
     def SetupIoBoardList(self):
         ioBoardList = self.canStationEditor.ioBoard_list
 
-        ioBoardList.InsertColumn(0, LABEL_IO_BOARD_COLUM_ID, wx.LIST_FORMAT_RIGHT)
+        ioBoardList.InsertColumn(0, LABEL_IO_BOARD_COLUM_ID, wx.LIST_FORMAT_LEFT)
         ioBoardList.InsertColumn(1, LABEL_IO_BOARD_COLUM_TYPE)
 
-        #self.list.SetColumnWidth(0, wx.LIST_AUTOSIZE)
-        ioBoardList.SetColumnWidth(0, wx.LIST_AUTOSIZE_USEHEADER)
-        ioBoardList.SetColumnWidth(1, wx.LIST_AUTOSIZE_USEHEADER)
+        ioBoardList.SetColumnWidth(0, 100)
+        ioBoardList.SetColumnWidth(1, 100)
+        #ioBoardList.SetColumnWidth(2, 100)
+
+    def removeBoardObj(self, board):
+        canStation = self.getCurrentCanStation()
+
+        if canStation is None:
+            return
+
+        if board in canStation.InputBoardList:
+            canStation.InputBoardList.remove(board)
+
+        if board in canStation.OutputBoardList:
+            canStation.OutputBoardList.remove(board)
 
     def listInsertIoBoard(self, index, board):
         ioBoardList = self.canStationEditor.ioBoard_list
@@ -248,18 +321,46 @@ class IoBoardViewControl():
             index = ioBoardList.InsertStringItem(index, board.getBoardIdStr(), 0)
 
         ioBoardList.SetStringItem(index, 1, board.getBoardTypeStr(), 0)
-        #actionList.SetStringItem(index, 2, action.moduleFeedback.name, 0)
-        #actionList.SetStringItem(index, 3, action.feedbackTimeout, 0)
-        #actionList.SetItemData(index, action)
+        ioBoardList.SetItemPyData(index, board)
+        ioBoardList.Select(index)
 
-    def listRemoveAction(self, action):
-        actionList = self.canStationEditor.action_list
-        item = actionList.GetFocusedItem()
-        actionList.DeleteItem(item)
+    def getCurrentBoardObj(self):
+        viewCtrl = self.viewCtrl
+        item = viewCtrl.GetFirstSelected()
+        if item != -1:
+            return viewCtrl.GetItemPyData(item)
 
-    def refreshIoBoardList(self, canStation):
-        ioBoardList = self.canStationEditor.ioBoard_list
-        ioBoardList.DeleteAllItems()
+        return None
+
+    def setDefaultSelect(self):
+        tree = self.viewCtrl
+        listCnt = tree.GetItemCount()
+
+        if listCnt > 0:
+            tree.Select(0)
+
+    def updateBoardListView(self, itemIndex, board):
+        ctrl = self.viewCtrl
+        ctrl.SetStringItem(itemIndex, 0, board.getBoardIdStr())
+        ctrl.SetStringItem(itemIndex, 1, board.getBoardTypeStr(), 0)
+        ctrl.SetItemPyData(itemIndex, board)
+        return
+
+    def appendBoardListView(self, board):
+        ctrl = self.viewCtrl
+        boardCnt = ctrl.GetItemCount()
+
+        if boardCnt == 0:
+            index = ctrl.InsertStringItem(sys.maxint, board.getBoardIdStr(), 0)
+        else:
+            index = ctrl.InsertStringItem(boardCnt, board.getBoardIdStr(), 0)
+
+        ctrl.SetStringItem(index, 1, board.getBoardTypeStr(), 0)
+        ctrl.SetItemPyData(index, board)
+        ctrl.Select(index)
+
+    def updateBoardList(self, canStation, isOnLoad):
+        self.viewCtrl.DeleteAllItems()
 
         if canStation is None:
             return
@@ -269,6 +370,9 @@ class IoBoardViewControl():
 
         for ioBoard in canStation.OutputBoardList:
             self.listInsertIoBoard(-1, ioBoard)
+
+        if isOnLoad:
+            self.setDefaultSelect()
 
         return
 
@@ -298,109 +402,105 @@ class IoBoardViewControl():
         if station is None:
             print "Error: --> onAddNewIoBoard"
 
-        frame = wx.Frame(None, size=(350, 400))
-        Panel_EditIoBoard(frame, self.canStationEditor, targetStation=station)
-        frame.CenterOnScreen()
-        frame.Show()
+        window = MyPopupWindow(size=(600,400), title=WINDOW_TITLE_ADD_BOARD)
+        Panel_EditIoBoard(window, self, targetStation=station)
+        window.windowPopup()
 
-    def onDeleteIoBoard(self):
-        actionList = self.canStationEditor.action_list
-        index = actionList.GetFocusedItem()
-        actionList.DeleteItem(index)
+    def onEditBoard(self):
+        station = self.canStationEditor.canStationViewCtrl.getCurrentCanStation()
+        if station is None:
+            print "Error: --> onEditBoard"
 
-        self.onEditActionUpdate()
-        actionCount = actionList.GetItemCount()
-        if actionCount:
-            if index == actionCount:
-                actionList.Select(index-1,1)
+        board = self.getCurrentBoardObj()
+
+        window = MyPopupWindow(size=(600, 400), title=WINDOW_TITLE_EDIT_BOARD)
+        Panel_EditIoBoard(window, self, self.viewCtrl.GetFirstSelected(), targetStation=station, boardIn=board)
+        window.windowPopup()
+
+    def onDelBoard(self):
+        tree = self.viewCtrl
+        itemIndex = tree.GetFirstSelected()
+        board = self.getCurrentBoardObj()
+
+        dlg = MainBase.ConfirmDIALOG(self.canStationEditor.frame)
+        dlg.SetTitle(WINDOW_TITLE_DEL_BOARD)
+        dlg.alert_msg_txt.SetLabel(DIALOG_ALERT_DEL_BOARD)
+
+        if dlg.ShowModal() == wx.ID_OK:
+            if board:
+                self.removeBoardObj(board)
+        dlg.Destroy()
+
+        self.onBoardDelUpdate(itemIndex)
+
+    def getCurrentCanStation(self):
+        return self.canStationEditor.canStationViewCtrl.getCurrentCanStation()
+
+    def onBoardDelUpdate(self, delIndex):
+        station = self.getCurrentCanStation()
+        self.updateIoBoardView(station, False)
+
+        tree = self.viewCtrl
+        listCnt = tree.GetItemCount()
+
+        if listCnt > 0:
+            if delIndex > 0:
+                tree.Select(delIndex - 1)
             else:
-                actionList.Select(index,1)
-        return
+                tree.Select(0)
+        # else:
+        #     self.canStationEditor.ioBoardViewCtrl.updateIoBoardView(None)
 
-    def onIoBoardMoveUp(self):
-        actionList = self.canStationEditor.action_list
-        index = actionList.GetFocusedItem()
-        if index == -1:
-            return
 
-        action = actionList.GetItemData(index)
-        actionList.DeleteItem(index)
-        if index < 2:
-            self.listInsertNewAction(0, action)
-            index = 0
-        else:
-            self.listInsertNewAction(index-1, action)
-            index = index-1
 
-        self.onEditActionUpdate()
-        actionList.Select(index,1)
-        return
 
-    def onIoBoardMoveDown(self):
-        actionList = self.canStationEditor.action_list
-        index = actionList.GetFocusedItem()
-        if index == -1:
-            return
 
-        actionCount = actionList.GetItemCount()
-        action = actionList.GetItemData(index)
-        if actionCount > 1 and index != actionCount-1:
-            self.listInsertNewAction(index+2, action)
-            actionList.DeleteItem(index)
-        else:
-            return
-
-        self.onEditActionUpdate()
-        actionList.Select(index+1,1)
-        return
 
     def onIoBoardToolClicked(self, event):
         eventId = event.GetId()
         ret = {
             MainBase.ioBoard_new:  lambda: self.onAddNewIoBoard(),
-            MainBase.ioBoard_del:  lambda: self.onDeleteIoBoard(),
-            MainBase.ioBoard_up:   lambda: self.onIoBoardMoveUp(),
-            MainBase.ioBoard_down: lambda: self.onIoBoardMoveDown(),
+            MainBase.ioBoard_del:  lambda: self.onDelBoard(),
+            MainBase.ioBoard_edit:  lambda: self.onEditBoard(),
+            # MainBase.ioBoard_up:   lambda: self.onIoBoardMoveUp(),
+            # MainBase.ioBoard_down: lambda: self.onIoBoardMoveDown(),
             }[eventId]()
 
         print ret
 
-    def updateIoBoardView(self, station):
-        if station is None:
-            self.canStationEditor.ioBoard_toolbar.EnableTool(MainBase.ioBoard_new, 0)
+    def updateIoBoardView(self, station, isOnLoad):
+        self.canStationEditor.ioBoardViewCtrl.updateAddNewToolStatus(0)
+
+        if station is not None:
+            self.canStationEditor.ioBoardViewCtrl.updateAddNewToolStatus(1)
+
+        self.updateBoardList(station, isOnLoad)
+
+    def onIoBoardListItemSelected(self, event):
+        board = self.getCurrentBoardObj()
+        if board is not None:
+            self.updateToolStatus(1)
         else:
-            self.canStationEditor.ioBoard_toolbar.EnableTool(MainBase.ioBoard_new, 1)
+            self.updateToolStatus(0)
 
-        self.refreshIoBoardList(station)
+        return
 
 
-class Panel_CanStation(MainBase.Panel_Edit_Can_Station_Base):
-    def __init__( self, frame , device=None):
-        MainBase.Panel_Edit_Can_Station_Base.__init__( self, frame )
-        print "Panel_EditIOStation  1111"
+class Panel_Manage_Can_Station(MainBase.Panel_Manage_Can_Station_Base):
+    def __init__(self, frame, device=None):
+        MainBase.Panel_Manage_Can_Station_Base.__init__(self, frame)
 
         self.frame = frame
         self.canStationViewCtrl = CanStationViewControl(self)
         self.ioBoardViewCtrl = IoBoardViewControl(self)
         self.onLoadUpdate()
 
-        # self.deviceInfoPanelSetup()
-        #
-        #
-        # self.moduleIoViewCtrl = ModuleIoListControl(self)
-        # self.attrCtrl = AttributeViewControl(self)
-        # self.actionListCtrl = ActionViewControl(self)
-        # self.actGrpCtrl = ActionGroupViewControl(self)
-        # self.onLoadUpdate()
-
     def onIoBoardToolClicked(self, event):
         self.ioBoardViewCtrl.onIoBoardToolClicked(event)
 
     def onLoadUpdate(self):
-        self.canStationViewCtrl.onCanStationUpdate()
+        self.canStationViewCtrl.onCanStationUpdate(True)
         self.canStationViewCtrl.setDefaultSelection()
-
-
         return
 
     def onEditUpdate(self, targetObj=None):
@@ -431,14 +531,17 @@ class Panel_CanStation(MainBase.Panel_Edit_Can_Station_Base):
     def onCancel(self, event):
         print "my onCancel"
 
+    def getBoardViewCtrl(self):
+        return self.ioBoard_list
+
     def getCanStationViewTree(self):
-        return self.canStationTree
+        return self.canStationList
 
     def onCanStationToolClicked(self, event):
         self.canStationViewCtrl.onCanStationToolClicked(event)
 
-    def onCanStationItemSelChanged(self, event):
-        self.canStationViewCtrl.onCanStationItemSelChanged(event)
+    def onCanStationItemSelected(self, event):
+        self.canStationViewCtrl.onCanStationItemSelected(event)
 
     def onCanStationItemBeginEdit(self, event):
         self.canStationViewCtrl.onCanStationItemBeginEdit(event)
@@ -449,18 +552,92 @@ class Panel_CanStation(MainBase.Panel_Edit_Can_Station_Base):
     def onCanStationItemDelete(self, event):
         self.canStationViewCtrl.onCanStationItemDelete(event)
 
+    def onIoBoardListItemSelected(self, event):
+        self.ioBoardViewCtrl.onIoBoardListItemSelected(event)
     ######################################################
     ######################################################
+
+
+class Panel_Edit_Can_Station(MainBase.Panel_Edit_Can_Station_Base):
+
+    def __init__(self, window, canStationViewCtrlIn, editListItemIn=-1, editStationIn=None):
+        MainBase.Panel_Edit_Can_Station_Base.__init__(self, window.frame)
+        self.canStationViewCtrl = canStationViewCtrlIn
+        self.editListItem = editListItemIn
+        self.editStation = editStationIn
+        self.window = window
+        self.onLoadUpdate()
+
+        return
+
+    def onLoadUpdate(self):
+
+        if self.editStation is not None:
+            stationName = self.editStation.name
+            stationIdStr = str(self.editStation.stationId)
+            stationDesc = self.editStation.info
+        else:
+            stationName = CAN_STATION_DEFAULT_NAME
+            stationIdStr = "0"
+            stationDesc = CAN_STATION_DEFAULT_DESC
+
+        self.stationName_input.SetValue(stationName)
+        self.stationDesc_input.SetValue(stationDesc)
+        self.stationId_input.SetValue(stationIdStr)
+
+        return
+
+    def onApply(self, evt):
+        stationName = self.stationName_input.GetValue()
+        stationId = self.stationId_input.GetValue()
+        stationDesc = self.stationDesc_input.GetValue()
+
+        if self.editStation is None:
+            station = DeviceCanStation()
+            station.stationId = int(stationId)
+            station.name = stationName
+            station.info = stationDesc
+            self.canStationViewCtrl.appendCanStationList(station)
+            self.canStationViewCtrl.appendCanStationListView(station)
+        else:
+            station = self.editStation
+            station.stationId = int(stationId)
+            station.name = stationName
+            station.info = stationDesc
+            self.canStationViewCtrl.updateCanStationItem(self.editListItem, station)
+
+
+        #self.canStationViewCtrl.onCanStationUpdate()
+        self.window.closeWindow()
+        return
+
+
+    def onCancel(self, evt):
+        self.window.closeWindow()
+        return
 
 
 class Panel_EditIoBoard(MainBase.Panel_IoBoard_Base):
 
-    def __init__(self, frame, canStationEditor, targetStation=None):
-        MainBase.Panel_IoBoard_Base.__init__(self, frame)
-        self.canStationEditor = canStationEditor
+    def __init__(self, window, viewCtrlIn, editListItemIn=-1, targetStation=None, boardIn=None):
+        MainBase.Panel_IoBoard_Base.__init__(self, window.frame)
+        self.viewCtrl = viewCtrlIn
         self.targetStation = targetStation
-        self.frame = frame
+        self.onEditBoard = boardIn
+        self.editListItem = editListItemIn
+        self.window = window
         self.buildBoardTypeChoice()
+        self.onLoadUpdate()
+
+    def onLoadUpdate(self):
+
+        if self.onEditBoard:
+            boardId = self.onEditBoard.boardId
+            boardType = self.onEditBoard.boardType
+            self.boardId_text.SetValue(str(boardId))
+            for index in range(self.boardType_choice.GetCount()):
+                if boardType == self.boardType_choice.GetClientData(index):
+                    self.boardType_choice.SetSelection(index)
 
     def buildBoardTypeChoice(self):
         self.boardType_choice.Clear()
@@ -472,29 +649,6 @@ class Panel_EditIoBoard(MainBase.Panel_IoBoard_Base):
         index = DeviceIoBoard.BOARD_TYPE_OUTPUT
         self.boardType_choice.Insert(DeviceIoBoard.board_type_choices[index], 1, index)
 
-    def selectActionType(self, boardType):
-        self.boardType = boardType
-
-    def getPrevSelected(self, choiceObj):
-        sel = choiceObj.GetSelection()
-        if sel == wx.NOT_FOUND:
-            return None
-
-        return choiceObj.GetClientData(sel)
-
-    def buildChoiceList(self, itemList, choiceObj):
-        """select the previous selected item after update"""
-        index = 0
-
-        prevItem = self.getPrevSelected(choiceObj)
-        choiceObj.Clear()
-
-        for item in itemList:
-            choiceObj.Append(item.name, item)
-            if item is prevItem:
-                choiceObj.Select(index)
-            index += 1
-
     def createIoBoard(self, boardType, boardId):
         board = DeviceIoBoard()
         board.boardId = boardId
@@ -502,68 +656,30 @@ class Panel_EditIoBoard(MainBase.Panel_IoBoard_Base):
 
         return board
 
-    def onEditUpdate(self, targetObj=None):
-        print "Panel_NewAction -> onEditUpdate"
-        self.buildOutputChoiceList()
-        self.buildFeedbackChoiceList()
-
-        print "targetObj.GetCount()", targetObj.GetCount()
-        targetObj.SetSelection(targetObj.GetCount()-1)
-        self.deviceEditor.onEditUpdate()
-
     def onIoBoardTypeChoice(self, event):
 
         print "onIoBoardTypeChoice"
         self.boardType = event.GetInt()
 
-    def onAddModuleIO(self, event):
-        print "onAddModuleIO"
-
-        if self.addOutputBtn is event.GetEventObject():
-            targetChoice = self.choice_output
-        else:
-            targetChoice = self.choice_feedback
-
-        #frame1 = wx.Frame(parent=self.parent, size=(800,400))
-        frame1 = wx.Frame(parent=None, size=(800,400))
-
-        Panel_EditModuleIO(frame1, self, self.deviceEditor, targetObj=targetChoice)
-        frame1.CenterOnScreen()
-        frame1.Show()
-
-    def refreshDisplay(self):
-        if self.attribute:
-            txt = self.attribute.genAttributeDisplayName()
-            self.txt_attribute.SetValue(txt)
-            self.setApplyBtnEnabled(1)
-
-    # def callbackGetAttributeSelect(self, attr):
-    #     print "callbackGetAttributeSelect"
-    #     print attr
-    #     self.attribute = attr
-    #     self.refreshDisplay()
-    #     return
-    #
-    # def onSelectAttributeBind( self, event ):
-    #     print "onSelectOperationOn"
-    #     window = MyPopupWindow(size=(600,400), title="setting")
-    #     Panel_AttributeSelect(window.frame, self, self.callbackGetAttributeSelect)
-    #     window.windowPopup()
-
-    def closeWindow(self):
-        self.frame.Close()
-
     def onApply(self, evt):
-        boardId = self.boardId_text.GetValue()
+        boardId = int(self.boardId_text.GetValue())
         selIndex = self.boardType_choice.GetSelection()
-        boardType = self.boardType_choice.GetClientData(selIndex)
-        newBoard = self.createIoBoard(boardType, boardId)
+        boardType = int(self.boardType_choice.GetClientData(selIndex))
 
-        self.targetStation.addNewIoBoard(newBoard)
-        self.canStationEditor.ioBoardViewCtrl.refreshIoBoardList(self.targetStation)
-        self.closeWindow()
+        if self.onEditBoard is not None:
+            self.onEditBoard.boardId = boardId
+            self.onEditBoard.boardType = boardType
+
+            self.viewCtrl.updateBoardListView(self.editListItem, self.onEditBoard)
+        else:
+            newBoard = self.createIoBoard(boardType, boardId)
+            self.targetStation.addNewIoBoard(newBoard)
+            self.viewCtrl.appendBoardListView(newBoard)
+
+        #self.viewCtrl.updateBoardList(self.targetStation, False)
+        self.window.closeWindow()
         return
 
     def onCancel(self, evt):
-        self.closeWindow()
+        self.window.closeWindow()
         return

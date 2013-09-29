@@ -41,7 +41,7 @@ class MyFrame(MainBase.FrameBase):
         print "add device"
 
         frame1 = wx.Frame(parent=self.parent, size=(800,400))
-        Panel_CanStation(frame1)
+        Panel_Manage_Can_Station(frame1)
         frame1.CenterOnScreen()
         frame1.Show()
         return
