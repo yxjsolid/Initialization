@@ -36,8 +36,8 @@ class DeviceCanStation():
         self.daemon = None
 
     def getStationInfo(self):
-        infoFormat = "%s:%s  %s:%s"
-        stationInfoStr = infoFormat % (LABEL_CAN_STATION_ID, str(self.stationId), LABEL_CAN_STATION_NAME, self.name)
+        infoFormat = "%s:[%s]  %s:[%d]"
+        stationInfoStr = infoFormat % (LABEL_CAN_STATION_NAME, self.name, LABEL_CAN_STATION_ID, self.stationId)
 
         return stationInfoStr
 
@@ -111,13 +111,21 @@ class DeviceCanStation():
 
         return
 
-    def doStatusCheck(self, interval):
-
+    def doStationInit(self):
         for board in self.InputBoardList:
-            board.doStatusCheck(interval)
+            board.doBoardInit()
 
         for board in self.OutputBoardList:
-            board.doStatusCheck(interval)
+            board.doBoardInit()
+
+
+    def doStationStatusCheck(self, interval):
+
+        for board in self.InputBoardList:
+            board.doBoardStatusCheck(interval)
+
+        for board in self.OutputBoardList:
+            board.doBoardStatusCheck(interval)
 
         return
 
@@ -200,10 +208,11 @@ class DeviceIoBoard():
         self.IoStatus = 0
         self.pendingReq = 0
         self.station = stationIn
-
+        self.statusCheckTaskEvent = None
+        self.setIoEvent = None
         return
 
-    def doDeviceInit(self):
+    def doBoardInit(self):
         self.statusCheckTaskEvent = threading.Event()
         self.setIoEvent = threading.Event()
 
@@ -217,6 +226,11 @@ class DeviceIoBoard():
 
     def clearPendingRequest(self):
         self.pendingReq = 0
+
+    def getBoardInfoStr(self):
+        infoFormat = "%s:[%s]"
+        boardInfoStr = infoFormat % (LABEL_IO_BOARD_COLUM_ID, str(self.boardId))
+        return boardInfoStr
 
     def getBoardIdStr(self):
 
@@ -264,7 +278,7 @@ class DeviceIoBoard():
         #canFrame.dumpCanData()
         return canFrame
 
-    def doStatusCheck(self, interval):
+    def doBoardStatusCheck(self, interval):
         print datetime.datetime.now(),  "doStatusCheck "
 
         frame = self.genStatusCheckData()
@@ -277,7 +291,7 @@ class DeviceIoBoard():
         self.startStatusCheckTimer(interval)
 
     def startStatusCheckTimer(self, interval):
-        t = threading.Timer(interval, self.doStatusCheck, (interval, ))
+        t = threading.Timer(interval, self.doBoardStatusCheck, (interval, ))
         t.start()
 
     def boardHandleCanFrameReply(self, canFrame):

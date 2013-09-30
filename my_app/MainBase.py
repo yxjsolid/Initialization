@@ -880,6 +880,7 @@ class Panel_Edit_IO_Node_Base ( wx.Panel ):
 		self.m_button911.Bind( wx.EVT_BUTTON, self.onDeleteAttribute )
 		self.attribute_list.Bind( wx.EVT_LIST_ITEM_DESELECTED, self.OnItemDeselected )
 		self.attribute_list.Bind( wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected )
+		self.stationChoice.Bind( wx.EVT_CHOICE, self.onStationChoice )
 		self.m_button6.Bind( wx.EVT_BUTTON, self.onApply )
 		self.m_button7.Bind( wx.EVT_BUTTON, self.onCancel )
 	
@@ -901,6 +902,9 @@ class Panel_Edit_IO_Node_Base ( wx.Panel ):
 		event.Skip()
 	
 	def OnItemSelected( self, event ):
+		event.Skip()
+	
+	def onStationChoice( self, event ):
 		event.Skip()
 	
 	def onApply( self, event ):
@@ -1225,6 +1229,7 @@ class Panel_Manage_IO_Node_Base ( wx.Panel ):
 		bSizer33 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_splitter9 = wx.SplitterWindow( self.IoStation_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SP_3D )
+		self.m_splitter9.SetSashGravity( 0 )
 		self.m_splitter9.Bind( wx.EVT_IDLE, self.m_splitter9OnIdle )
 		
 		self.m_panel80 = wx.Panel( self.m_splitter9, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.STATIC_BORDER|wx.TAB_TRAVERSAL )
@@ -1269,7 +1274,7 @@ class Panel_Manage_IO_Node_Base ( wx.Panel ):
 		self.m_panel79.SetSizer( fgSizer341 )
 		self.m_panel79.Layout()
 		fgSizer341.Fit( self.m_panel79 )
-		self.m_splitter9.SplitVertically( self.m_panel80, self.m_panel79, 361 )
+		self.m_splitter9.SplitVertically( self.m_panel80, self.m_panel79, 150 )
 		bSizer33.Add( self.m_splitter9, 1, wx.EXPAND, 5 )
 		
 		
@@ -1334,7 +1339,7 @@ class Panel_Manage_IO_Node_Base ( wx.Panel ):
 		event.Skip()
 	
 	def m_splitter9OnIdle( self, event ):
-		self.m_splitter9.SetSashPosition( 361 )
+		self.m_splitter9.SetSashPosition( 150 )
 		self.m_splitter9.Unbind( wx.EVT_IDLE )
 	
 

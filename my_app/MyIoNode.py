@@ -14,6 +14,21 @@ class IoNode():
         self.offInfo = ""
         self.onInfo = ""
 
+        self.category = None
+        self.station = None
+        self.board = None
+        self.port = 0
+
+    def getIoInfoStr(self):
+        info = ""
+
+        stationInfo = self.station.getStationInfo()
+        boardInfo = self.board.getBoardInfoStr()
+        portInfo = "%s:[%d]" %(LABEL_IO_PORT, self.port)
+        info += stationInfo + " " + boardInfo + " " + portInfo
+        return info
+
+
 
 
 class IoNodeCategory():

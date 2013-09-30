@@ -43,10 +43,11 @@ class CanStationDaemon():
         self.station.stationHandleCanFrameReply(canFrame)
         return
 
-    def doStatusCheck(self, interval):
+    def doStationDeamonStatusCheck(self, interval):
         print datetime.datetime.now(),  "doStatusCheck "
 
-        self.station.doStatusCheck(interval)
+        self.station.doStationInit()
+        self.station.doStationStatusCheck(interval)
     #     frameList = self.station.getStatusCheckData()
     #
     #     for frame in frameList:
@@ -111,6 +112,6 @@ if __name__ == '__main__':
 
     daemonMgmt.addStationDaemon(canStation, daemon)
 
-    daemon.doStatusCheck(1)
+    daemon.doStationDeamonStatusCheck(1)
 
     canStation.setBoardIo(1, 0x0)
