@@ -143,6 +143,11 @@ def globalGetCfg():
     return cfgObj
 
 
+def globalGetRuntime():
+    return wx.GetApp().getRuntime()
+
+
+
 
 
 class MyPopupWindow():

@@ -25,25 +25,26 @@ ID_MENU_EDIT_IO_NODE = 1003
 ID_MENU_ADD_DEVICE = 1004
 ID_MENU_EDIT_DEVICE = 1005
 ID_MENU_DELETE_DEVICE = 1006
-ctrl_new = 1007
-ctrl_del = 1008
-ctrl_up = 1009
-ctrl_down = 1010
-action_new = 1011
-action_del = 1012
-action_up = 1013
-action_down = 1014
-canStation_new = 1015
-canStation_edit = 1016
-canStation_del = 1017
-ioBoard_new = 1018
-ioBoard_edit = 1019
-ioBoard_del = 1020
-IO_NODE_NEW = 1021
-IO_NODE_EDIT = 1022
-IO_NODE_DEL = 1023
-STATUS_ADD = 1024
-STATUS_DEL = 1025
+ID_MENU_RUN = 1007
+ctrl_new = 1008
+ctrl_del = 1009
+ctrl_up = 1010
+ctrl_down = 1011
+action_new = 1012
+action_del = 1013
+action_up = 1014
+action_down = 1015
+canStation_new = 1016
+canStation_edit = 1017
+canStation_del = 1018
+ioBoard_new = 1019
+ioBoard_edit = 1020
+ioBoard_del = 1021
+IO_NODE_NEW = 1022
+IO_NODE_EDIT = 1023
+IO_NODE_DEL = 1024
+STATUS_ADD = 1025
+STATUS_DEL = 1026
 
 ###########################################################################
 ## Class FrameBase
@@ -86,6 +87,10 @@ class FrameBase ( wx.Frame ):
 		
 		self.m_toolBar2.AddLabelTool( ID_MENU_DELETE_DEVICE, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_DELETE, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
 		
+		self.m_toolBar2.AddSeparator()
+		
+		self.m_toolBar2.AddLabelTool( ID_MENU_RUN, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_GO_FORWARD, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
+		
 		self.m_toolBar2.Realize() 
 		
 		
@@ -98,6 +103,8 @@ class FrameBase ( wx.Frame ):
 		self.Bind( wx.EVT_MENU, self.onMenuBtnClicked, id = self.menuEditIoNode.GetId() )
 		self.Bind( wx.EVT_TOOL, self.onMenuBtnClicked, id = ID_MENU_ADD_DEVICE )
 		self.Bind( wx.EVT_TOOL, self.onMenuBtnClicked, id = ID_MENU_EDIT_DEVICE )
+		self.Bind( wx.EVT_TOOL, self.onMenuBtnClicked, id = ID_MENU_DELETE_DEVICE )
+		self.Bind( wx.EVT_TOOL, self.onMenuBtnClicked, id = ID_MENU_RUN )
 	
 	def __del__( self ):
 		pass
@@ -106,6 +113,8 @@ class FrameBase ( wx.Frame ):
 	# Virtual event handlers, overide them in your derived class
 	def onMenuBtnClicked( self, event ):
 		event.Skip()
+	
+	
 	
 	
 	

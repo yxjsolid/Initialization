@@ -9,13 +9,20 @@ from mySerial.canData import *
 from mySerial.mySerial import *
 
 
-class CanStationDaemonMgmt():
-    def __init__(self):
+class CanStationDaemonManagement():
+    def __init__(self, stationCfg):
         self.daemonDict = {}
-
+        self.setupStationDaemon(stationCfg)
+        self.dataProxy = None
         return
 
-    def addStationDaemon(self, station, daemon):
+    def setupStationDaemon(self, stationCfg):
+        for station in stationCfg.getCanStationList():
+            self.addStationDaemon(station)
+        return
+
+    def addStationDaemon(self, station):
+        daemon = CanStationDaemon(self, station)
         self.daemonDict[station.stationId] = [station, daemon]
         return
 
@@ -24,23 +31,90 @@ class CanStationDaemonMgmt():
 
         return self.daemonDict[stationId][1]
 
+    def startStatusCheck(self):
+        for stationId in self.daemonDict:
+            self.getStationDaemon(stationId).daemonDoStatusCheck(1)
+
+    def sendCanFrame(self,frame):
+        self.dataProxy.sendCanFrame(frame)
+
 
 class CanStationDaemon():
-    def __init__(self, stationIn=None, canProxyIn=None):
+    def __init__(self, daemonMgmt=None, stationIn=None, canProxyIn=None):
         self.station = stationIn
-        self.canProxy = canProxyIn
-
+        self.dataProxy = canProxyIn
         self.station.daemon = self
+        self.boardStatusCheckEventDict = {}
+        self.boardActionEventDict = {}
+        self.daemonMgmt = daemonMgmt
+        self.doInit()
         # self.statusCheckTask = None
         #
         # self.statusCheckTaskEvent = threading.Event()
+        return
+
+    def doInit(self):
+        self.stationInit()
+
+    def boardInit(self, board):
+        self.boardStatusCheckEventDict[board] = threading.Event()
+        self.boardActionEventDict[board] = threading.Event()
+
+    def stationInit(self):
+        for board in self.station.InputBoardList:
+            self.boardInit(board)
+
+        for board in self.station.OutputBoardList:
+            self.boardInit(board)
+
+    def daemonDoStatusCheck(self, interval):
+        dict = self.boardStatusCheckEventDict
+        for board in dict:
+            self.doBoardStatusCheck(board, dict[board], interval)
 
         return
+
+    def doBoardStatusCheck(self, board, event, interval):
+        print datetime.datetime.now(),  "doStatusCheck "
+
+        frame = board.genStatusCheckData()
+        self.daemonMgmt.sendCanFrame(frame)
+        #self.setPendingRequest()
+        event.wait(3)
+        if not event.isSet():
+            print board.getBoardTypeStr(), " id: [%d] ", board.boardId, " timeout"
+
+        self.startStatusCheckTimer(board, event, interval)
+
+    def startStatusCheckTimer(self, board, event, interval):
+        t = threading.Timer(interval, self.doBoardStatusCheck, (board, event, interval ))
+        t.start()
+
+    def getBoardStatusCheckEvent(self, board):
+        dict = self.boardStatusCheckEventDict
+        event = dict[board]
+        return event
 
     def daemonHandleCanFrameReceived(self, canFrame):
         print "CanStationDaemon --> daemonHandleCanFrameReceived"
 
-        self.station.stationHandleCanFrameReply(canFrame)
+        boardType = canFrame.getCMDBoardType()
+        boardId = canFrame.getCMDBoardID()
+        board = self.station.getBoard(boardType, boardId)
+
+        event = self.getBoardStatusCheckEvent(board)
+        event.set()
+
+        board.boardStatus = canFrame.getCMDBoardStatus()
+        board.IoStatus = canFrame.getCmdData()
+
+        if board.boardStatus == DeviceIoBoard.Board_status_Disconnected:
+            print board.getBoardTypeStr(), " id: [%r] " % board.boardId, "disconnected"
+        else:
+            print board.getBoardTypeStr(), " id: [%d] ", board.boardId, " get reply"
+            print "self.IoStatus = %x " % board.IoStatus
+
+        #self.station.stationHandleCanFrameReply(canFrame)
         return
 
     def doStationDeamonStatusCheck(self, interval):
@@ -93,7 +167,7 @@ def buildCanStationTest(idIn):
 
 
 if __name__ == '__main__':
-    daemonMgmt = CanStationDaemonMgmt()
+    daemonMgmt = CanStationDaemonManagement()
 
     rt = SerialHandler(Port=3)
 

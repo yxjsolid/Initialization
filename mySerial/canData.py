@@ -466,19 +466,24 @@ class CAN_FRAME(Structure):
 
 
 class CanProxy():
-    def __init__(self, CanData=None, SerialHandler=None, daemonMgmtIn=None):
+    def __init__(self, SerialHandler=None, stationDaemonMgmt=None):
 
         self.serialHandler = SerialHandler
-        self.canData = CanData
-        self.daemonMgmt = daemonMgmtIn
+        self.stationDaemonMgmt = stationDaemonMgmt
         self.receivedData = ""
         #self.receivedRawDataList = []
+        if self.serialHandler:
+            self.serialHandler.dataProxy = self
+
+        if self.stationDaemonMgmt:
+            self.stationDaemonMgmt.dataProxy = self
+
         return
 
-    def handleCanFrameReceived(self, canFrame):
+    def proxyHandleCanFrameReceived(self, canFrame):
         print "handleCanFrameReceived"
         stationId = canFrame.getCanStationId()
-        self.daemonMgmt.getStationDaemon(stationId).daemonHandleCanFrameReceived(canFrame)
+        self.stationDaemonMgmt.getStationDaemon(stationId).daemonHandleCanFrameReceived(canFrame)
         
         return
 
@@ -489,8 +494,8 @@ class CanProxy():
         if self.serialHandler:
             self.serialHandler.SendData(dataToSend.dumpDataToSend())
 
-    def receiveCanFrame(self, rawData):
-        print "receiveCanFrame"
+    def proxyReceiveCanFrame(self, rawData):
+        print "proxyReceiveCanFrame"
 
         if len(rawData) != sizeof(USB2CAN_DATA):
             print "receiveFrame -> error data len not match"
@@ -502,7 +507,7 @@ class CanProxy():
         canFrame = usb2canData.convertToCanFrame()
         canFrame.dumpCanData()
 
-        self.handleCanFrameReceived(canFrame)
+        self.proxyHandleCanFrameReceived(canFrame)
         return 1
 
     def receiveSerialRawData(self, data):
@@ -521,7 +526,7 @@ class CanProxy():
             #print "##################"
             #print "received:",index, elem
             #self.receivedRawDataList.append(elem)
-            self.receiveCanFrame(elem)
+            self.proxyReceiveCanFrame(elem)
             #print "receiveSerialRawData"
             #print self.printHex(data)
 

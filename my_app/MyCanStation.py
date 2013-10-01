@@ -7,7 +7,7 @@ import datetime
 from mySerial.canData import *
 
 
-class StationManagement():
+class StationConfiguration():
     def __init__(self):
 
         self.stationList = []
@@ -81,13 +81,13 @@ class DeviceCanStation():
     def clearPendingStatusCheck(self):
         self.pendingStatusCheck = 0
 
-    def stationHandleCanFrameReply(self, canFrame):
-        boardType = canFrame.getCMDBoardType()
-        boardId = canFrame.getCMDBoardID()
-        board = self.getBoard(boardType, boardId)
-        board.boardHandleCanFrameReply(canFrame)
-
-        return
+    # def stationHandleCanFrameReply(self, canFrame):
+    #     boardType = canFrame.getCMDBoardType()
+    #     boardId = canFrame.getCMDBoardID()
+    #     board = self.getBoard(boardType, boardId)
+    #     board.boardHandleCanFrameReply(canFrame)
+    #
+    #     return
 
     def handleStatusCheckReply(self, canFrame):
         inBoardCnt = canFrame.getInputBoardCnt()

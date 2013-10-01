@@ -61,6 +61,12 @@ class MyFrame(MainBase.FrameBase):
         # frame1.Show()
         return
 
+
+    def doRun(self):
+        wx.GetApp().getRuntime().doRun()
+        return
+
+
     def addDevice(self):
         print "add device"
 
@@ -121,6 +127,8 @@ class MyFrame(MainBase.FrameBase):
         MainBase.ID_MENU_ADD_DEVICE:    lambda: self.addDevice(),
         MainBase.ID_MENU_EDIT_DEVICE:   lambda: self.editDevice(),
         MainBase.ID_MENU_DELETE_DEVICE: lambda: self.addDevice(),
+        MainBase.ID_MENU_RUN:           lambda: self.doRun(),
+
         }[eventId]()
         return
 

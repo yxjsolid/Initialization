@@ -108,7 +108,7 @@ class CanStationViewControl():
         self.onCanStationDelUpdate(itemIndex)
 
     def getCanStationCfg(self):
-        self.canStationList = wx.GetApp().getStationMgmt().getCanStationList()[:]
+        self.canStationList = wx.GetApp().getStationConfiguration().getCanStationList()[:]
 
     def onCanStationDelUpdate(self, delIndex):
         self.updateToolStatus(0)
@@ -498,7 +498,7 @@ class Panel_Manage_Can_Station(MainBase.Panel_Manage_Can_Station_Base):
 
     def onApply(self, event):
         canStationList = self.canStationViewCtrl.getCanStationList()
-        wx.GetApp().getStationMgmt().setCanStationList(canStationList)
+        wx.GetApp().getStationConfiguration().setCanStationList(canStationList)
         self.closeWindow()
 
     def onCancel(self, event):

@@ -6,12 +6,12 @@ import socket
 from canData import *
 
 class SerialHandler:
-    def __init__(self, Port=0, DataHandler=None):
+    def __init__(self, Port=0, DataProxy=None):
         self.l_serial = None
         self.alive = False
         self.waitEnd = None
         self.port = Port
-        self.dataHandler = DataHandler
+        self.dataProxy = DataProxy
 
         self.serialLock = threading.Lock()
 
@@ -106,7 +106,7 @@ class SerialHandler:
 
                 data += dataNew
 
-               # print "FirstReader 111 ", data
+                print "FirstReader 111 ", data
 
                 #print "\n\n######################\n"
                 #print n,"data", "new",dataNew

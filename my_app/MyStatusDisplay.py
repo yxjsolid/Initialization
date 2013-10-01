@@ -9,6 +9,18 @@ from MiddleWare_Edit_IO import *
 from MyWidgetLibrary import *
 from MyDraggablePanel import *
 
+
+class StatusDisplayMgmt():
+    def __init__(self):
+
+        self.statusDisplay = []
+
+        return
+
+    def appendStatusDisplayList(self, panel):
+        self.statusDisplay.append(panel)
+
+
 class statusDisplayView():
     def __init__(self, viewCtrl, colSetting):
         self.viewCtrl = viewCtrl
@@ -122,9 +134,7 @@ class Panel_Status_Display(MainBase.Panel_Status_Display_Base):
         self.onLoadUpdate()
         self.Show()
 
-
     def getDisplaySize(self):
-
         return self.viewCtrl.getDisplaySize()
 
     def onLoadUpdate(self):
@@ -170,8 +180,10 @@ class Panel_Edit_Status_Display(MainBase.Panel_Edit_Status_Display_Base):
         d = MyDraggable(self.onEditPanel, self.popupPos, (2000, 2000))
 
         colSetting = self.viewCtrl.getColumnSetting()
-
         subP = Panel_Status_Display(d, self.nodeList, colSetting)
+
+        runtime = globalGetRuntime()
+        runtime.statusDisplayMgmt.appendStatusDisplayList(subP)
 
 
         d.AdjustToChild(subP)

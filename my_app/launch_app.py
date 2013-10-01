@@ -4,14 +4,14 @@ import wx
 import sys
 import MyGlobal as gl
 from  MyMiddleWare import *
-
+from MyRuntime import *
 
 
 from MyDevice import *
 
 class CfgContainer():
     def __init__(self):
-        self.stationManagement = StationManagement()
+        self.stationCfg = StationConfiguration()
         self.deviceController = None
         self.IoNodeMgmt = IoNodeMgmt()
 
@@ -23,15 +23,19 @@ class MyApp(wx.App):
         print "App __init__"
         wx.App.__init__(self, redirect, filename)
         self.cfgContainer = CfgContainer()
+        self.runtime = RuntimeManagement()
 
     def getDeviceCtrl(self):
         return self.getConfigure().deviceController
 
-    def getStationMgmt(self):
-        return self.getConfigure().stationManagement
+    def getStationConfiguration(self):
+        return self.getConfigure().stationCfg
 
     def getConfigure(self):
         return self.cfgContainer
+
+    def getRuntime(self):
+        return self.runtime
 
     def setConfigure(self, cfg):
         self.cfgContainer = cfg
