@@ -139,17 +139,7 @@ class SplitterPanelBase ( wx.Panel ):
 		self.m_splitter6.Bind( wx.EVT_IDLE, self.m_splitter6OnIdle )
 		self.m_splitter6.SetMinimumPaneSize( 100 )
 		
-		self.m_scrolledWindow3 = wx.ScrolledWindow( self.m_splitter6, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.HSCROLL|wx.VSCROLL )
-		self.m_scrolledWindow3.SetScrollRate( 5, 5 )
-		bSizer36 = wx.BoxSizer( wx.VERTICAL )
-		
-		self.viewPanel = wx.Panel( self.m_scrolledWindow3, wx.ID_ANY, wx.DefaultPosition, wx.Size( 2000,1000 ), wx.TAB_TRAVERSAL )
-		bSizer36.Add( self.viewPanel, 1, wx.EXPAND |wx.ALL, 5 )
-		
-		
-		self.m_scrolledWindow3.SetSizer( bSizer36 )
-		self.m_scrolledWindow3.Layout()
-		bSizer36.Fit( self.m_scrolledWindow3 )
+		self.viewPanel = wx.Panel( self.m_splitter6, wx.ID_ANY, wx.DefaultPosition, wx.Size( 2000,1000 ), wx.TAB_TRAVERSAL )
 		self.detailPanel = wx.Panel( self.m_splitter6, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		sbSizer17 = wx.StaticBoxSizer( wx.StaticBox( self.detailPanel, wx.ID_ANY, _(u"label") ), wx.VERTICAL )
 		
@@ -160,14 +150,14 @@ class SplitterPanelBase ( wx.Panel ):
 		self.detailPanel.SetSizer( sbSizer17 )
 		self.detailPanel.Layout()
 		sbSizer17.Fit( self.detailPanel )
-		self.m_splitter6.SplitHorizontally( self.m_scrolledWindow3, self.detailPanel, 350 )
+		self.m_splitter6.SplitHorizontally( self.viewPanel, self.detailPanel, 350 )
 		bSizer12.Add( self.m_splitter6, 1, wx.EXPAND, 5 )
 		
 		
 		self.viewContainPanel.SetSizer( bSizer12 )
 		self.viewContainPanel.Layout()
 		bSizer12.Fit( self.viewContainPanel )
-		self.m_splitter4.SplitVertically( self.viewSelectPanel, self.viewContainPanel, 171 )
+		self.m_splitter4.SplitVertically( self.viewSelectPanel, self.viewContainPanel, 100 )
 		bSizer6.Add( self.m_splitter4, 1, wx.EXPAND, 5 )
 		
 		
@@ -178,7 +168,7 @@ class SplitterPanelBase ( wx.Panel ):
 		pass
 	
 	def m_splitter4OnIdle( self, event ):
-		self.m_splitter4.SetSashPosition( 171 )
+		self.m_splitter4.SetSashPosition( 100 )
 		self.m_splitter4.Unbind( wx.EVT_IDLE )
 	
 	def m_splitter6OnIdle( self, event ):
@@ -1237,9 +1227,8 @@ class Panel_Manage_IO_Node_Base ( wx.Panel ):
 		self.m_splitter9.Bind( wx.EVT_IDLE, self.m_splitter9OnIdle )
 		
 		self.m_panel80 = wx.Panel( self.m_splitter9, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.STATIC_BORDER|wx.TAB_TRAVERSAL )
-		fgSizer34 = wx.FlexGridSizer( 1, 1, 0, 0 )
+		fgSizer34 = wx.FlexGridSizer( 0, 0, 0, 0 )
 		fgSizer34.AddGrowableCol( 0 )
-		fgSizer34.AddGrowableCol( 1 )
 		fgSizer34.AddGrowableRow( 0 )
 		fgSizer34.SetFlexibleDirection( wx.BOTH )
 		fgSizer34.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -1254,6 +1243,7 @@ class Panel_Manage_IO_Node_Base ( wx.Panel ):
 		self.m_panel79 = wx.Panel( self.m_splitter9, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		fgSizer341 = wx.FlexGridSizer( 2, 0, 0, 0 )
 		fgSizer341.AddGrowableCol( 0 )
+		fgSizer341.AddGrowableCol( 1 )
 		fgSizer341.AddGrowableRow( 1 )
 		fgSizer341.SetFlexibleDirection( wx.BOTH )
 		fgSizer341.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
