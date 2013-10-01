@@ -13,6 +13,7 @@ from wx.lib.agw.customtreectrl import CustomTreeCtrl
 import wx
 import wx.xrc
 import wx.richtext
+import wx.grid
 
 import gettext
 _ = gettext.gettext
@@ -41,6 +42,8 @@ ioBoard_del = 1020
 IO_NODE_NEW = 1021
 IO_NODE_EDIT = 1022
 IO_NODE_DEL = 1023
+STATUS_ADD = 1024
+STATUS_DEL = 1025
 
 ###########################################################################
 ## Class FrameBase
@@ -136,9 +139,17 @@ class SplitterPanelBase ( wx.Panel ):
 		self.m_splitter6.Bind( wx.EVT_IDLE, self.m_splitter6OnIdle )
 		self.m_splitter6.SetMinimumPaneSize( 100 )
 		
-		self.viewPanel = wx.Panel( self.m_splitter6, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-		self.viewPanel.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_GRAYTEXT ) )
+		self.m_scrolledWindow3 = wx.ScrolledWindow( self.m_splitter6, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.HSCROLL|wx.VSCROLL )
+		self.m_scrolledWindow3.SetScrollRate( 5, 5 )
+		bSizer36 = wx.BoxSizer( wx.VERTICAL )
 		
+		self.viewPanel = wx.Panel( self.m_scrolledWindow3, wx.ID_ANY, wx.DefaultPosition, wx.Size( 2000,1000 ), wx.TAB_TRAVERSAL )
+		bSizer36.Add( self.viewPanel, 1, wx.EXPAND |wx.ALL, 5 )
+		
+		
+		self.m_scrolledWindow3.SetSizer( bSizer36 )
+		self.m_scrolledWindow3.Layout()
+		bSizer36.Fit( self.m_scrolledWindow3 )
 		self.detailPanel = wx.Panel( self.m_splitter6, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		sbSizer17 = wx.StaticBoxSizer( wx.StaticBox( self.detailPanel, wx.ID_ANY, _(u"label") ), wx.VERTICAL )
 		
@@ -149,14 +160,14 @@ class SplitterPanelBase ( wx.Panel ):
 		self.detailPanel.SetSizer( sbSizer17 )
 		self.detailPanel.Layout()
 		sbSizer17.Fit( self.detailPanel )
-		self.m_splitter6.SplitHorizontally( self.viewPanel, self.detailPanel, 350 )
+		self.m_splitter6.SplitHorizontally( self.m_scrolledWindow3, self.detailPanel, 350 )
 		bSizer12.Add( self.m_splitter6, 1, wx.EXPAND, 5 )
 		
 		
 		self.viewContainPanel.SetSizer( bSizer12 )
 		self.viewContainPanel.Layout()
 		bSizer12.Fit( self.viewContainPanel )
-		self.m_splitter4.SplitVertically( self.viewSelectPanel, self.viewContainPanel, 150 )
+		self.m_splitter4.SplitVertically( self.viewSelectPanel, self.viewContainPanel, 171 )
 		bSizer6.Add( self.m_splitter4, 1, wx.EXPAND, 5 )
 		
 		
@@ -167,7 +178,7 @@ class SplitterPanelBase ( wx.Panel ):
 		pass
 	
 	def m_splitter4OnIdle( self, event ):
-		self.m_splitter4.SetSashPosition( 150 )
+		self.m_splitter4.SetSashPosition( 171 )
 		self.m_splitter4.Unbind( wx.EVT_IDLE )
 	
 	def m_splitter6OnIdle( self, event ):
@@ -264,7 +275,6 @@ class Panel_AddDevice_Base ( wx.Panel ):
 		
 		fgSizer4 = wx.FlexGridSizer( 2, 1, 0, 0 )
 		fgSizer4.AddGrowableCol( 0 )
-		fgSizer4.AddGrowableCol( 1 )
 		fgSizer4.AddGrowableRow( 0 )
 		fgSizer4.SetFlexibleDirection( wx.BOTH )
 		fgSizer4.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -324,7 +334,6 @@ class Panel_AddDevice_Base ( wx.Panel ):
 		self.attribute_panel = wx.Panel( self.m_notebook4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		fgSizer511 = wx.FlexGridSizer( 2, 1, 0, 0 )
 		fgSizer511.AddGrowableCol( 0 )
-		fgSizer511.AddGrowableCol( 1 )
 		fgSizer511.AddGrowableRow( 1 )
 		fgSizer511.SetFlexibleDirection( wx.BOTH )
 		fgSizer511.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -360,7 +369,6 @@ class Panel_AddDevice_Base ( wx.Panel ):
 		
 		fgSizer51 = wx.FlexGridSizer( 2, 1, 0, 0 )
 		fgSizer51.AddGrowableCol( 0 )
-		fgSizer51.AddGrowableCol( 1 )
 		fgSizer51.AddGrowableRow( 1 )
 		fgSizer51.SetFlexibleDirection( wx.BOTH )
 		fgSizer51.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -397,7 +405,6 @@ class Panel_AddDevice_Base ( wx.Panel ):
 		self.m_panel80 = wx.Panel( self.m_splitter9, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		fgSizer34 = wx.FlexGridSizer( 2, 0, 0, 0 )
 		fgSizer34.AddGrowableCol( 0 )
-		fgSizer34.AddGrowableCol( 1 )
 		fgSizer34.AddGrowableRow( 1 )
 		fgSizer34.SetFlexibleDirection( wx.BOTH )
 		fgSizer34.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -427,7 +434,6 @@ class Panel_AddDevice_Base ( wx.Panel ):
 		self.m_panel79 = wx.Panel( self.m_splitter9, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		fgSizer341 = wx.FlexGridSizer( 2, 0, 0, 0 )
 		fgSizer341.AddGrowableCol( 0 )
-		fgSizer341.AddGrowableCol( 1 )
 		fgSizer341.AddGrowableRow( 1 )
 		fgSizer341.SetFlexibleDirection( wx.BOTH )
 		fgSizer341.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -688,7 +694,6 @@ class Panel_Edit_IO_Node_Base ( wx.Panel ):
 		
 		fgSizer4 = wx.FlexGridSizer( 2, 1, 0, 0 )
 		fgSizer4.AddGrowableCol( 0 )
-		fgSizer4.AddGrowableCol( 1 )
 		fgSizer4.AddGrowableRow( 0 )
 		fgSizer4.SetFlexibleDirection( wx.BOTH )
 		fgSizer4.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -767,7 +772,6 @@ class Panel_Edit_IO_Node_Base ( wx.Panel ):
 		self.attribute_panel = wx.Panel( self.m_notebook4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		fgSizer511 = wx.FlexGridSizer( 2, 1, 0, 0 )
 		fgSizer511.AddGrowableCol( 0 )
-		fgSizer511.AddGrowableCol( 1 )
 		fgSizer511.AddGrowableRow( 1 )
 		fgSizer511.SetFlexibleDirection( wx.BOTH )
 		fgSizer511.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -1071,10 +1075,10 @@ class Panel_Manage_Can_Station_Base ( wx.Panel ):
 	
 
 ###########################################################################
-## Class Panel_Manage_IO_Node_Base2
+## Class Panel_Manage_IO_Node_Base1
 ###########################################################################
 
-class Panel_Manage_IO_Node_Base2 ( wx.Panel ):
+class Panel_Manage_IO_Node_Base1 ( wx.Panel ):
 	
 	def __init__( self, parent ):
 		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 698,429 ), style = wx.TAB_TRAVERSAL )
@@ -1233,8 +1237,9 @@ class Panel_Manage_IO_Node_Base ( wx.Panel ):
 		self.m_splitter9.Bind( wx.EVT_IDLE, self.m_splitter9OnIdle )
 		
 		self.m_panel80 = wx.Panel( self.m_splitter9, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.STATIC_BORDER|wx.TAB_TRAVERSAL )
-		fgSizer34 = wx.FlexGridSizer( 0, 0, 0, 0 )
+		fgSizer34 = wx.FlexGridSizer( 1, 1, 0, 0 )
 		fgSizer34.AddGrowableCol( 0 )
+		fgSizer34.AddGrowableCol( 1 )
 		fgSizer34.AddGrowableRow( 0 )
 		fgSizer34.SetFlexibleDirection( wx.BOTH )
 		fgSizer34.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -1249,7 +1254,6 @@ class Panel_Manage_IO_Node_Base ( wx.Panel ):
 		self.m_panel79 = wx.Panel( self.m_splitter9, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		fgSizer341 = wx.FlexGridSizer( 2, 0, 0, 0 )
 		fgSizer341.AddGrowableCol( 0 )
-		fgSizer341.AddGrowableCol( 1 )
 		fgSizer341.AddGrowableRow( 1 )
 		fgSizer341.SetFlexibleDirection( wx.BOTH )
 		fgSizer341.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -2339,6 +2343,289 @@ class ConfirmDIALOG ( wx.Dialog ):
 	
 	
 	# Virtual event handlers, overide them in your derived class
+	def onApply( self, event ):
+		event.Skip()
+	
+	def onCancel( self, event ):
+		event.Skip()
+	
+
+###########################################################################
+## Class Panel_Status_Display_Base
+###########################################################################
+
+class Panel_Status_Display_Base ( wx.Panel ):
+	
+	def __init__( self, parent ):
+		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( -1,-1 ), style = wx.STATIC_BORDER )
+		
+		fgSizer61 = wx.FlexGridSizer( 0, 0, 0, 0 )
+		fgSizer61.AddGrowableCol( 0 )
+		fgSizer61.AddGrowableRow( 0 )
+		fgSizer61.SetFlexibleDirection( wx.BOTH )
+		fgSizer61.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.statusDispGrid = wx.grid.Grid( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
+		
+		# Grid
+		self.statusDispGrid.CreateGrid( 0, 2 )
+		self.statusDispGrid.EnableEditing( False )
+		self.statusDispGrid.EnableGridLines( True )
+		self.statusDispGrid.EnableDragGridSize( False )
+		self.statusDispGrid.SetMargins( 0, 0 )
+		
+		# Columns
+		self.statusDispGrid.SetColSize( 0, 100 )
+		self.statusDispGrid.SetColSize( 1, 100 )
+		self.statusDispGrid.EnableDragColMove( False )
+		self.statusDispGrid.EnableDragColSize( True )
+		self.statusDispGrid.SetColLabelSize( 30 )
+		self.statusDispGrid.SetColLabelAlignment( wx.ALIGN_CENTRE, wx.ALIGN_CENTRE )
+		
+		# Rows
+		self.statusDispGrid.EnableDragRowSize( False )
+		self.statusDispGrid.SetRowLabelSize( 30 )
+		self.statusDispGrid.SetRowLabelAlignment( wx.ALIGN_CENTRE, wx.ALIGN_CENTRE )
+		
+		# Label Appearance
+		self.statusDispGrid.SetLabelFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 70, 90, 91, False, wx.EmptyString ) )
+		
+		# Cell Defaults
+		self.statusDispGrid.SetDefaultCellFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 70, 90, 92, False, wx.EmptyString ) )
+		self.statusDispGrid.SetDefaultCellAlignment( wx.ALIGN_LEFT, wx.ALIGN_CENTRE )
+		fgSizer61.Add( self.statusDispGrid, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		self.SetSizer( fgSizer61 )
+		self.Layout()
+		fgSizer61.Fit( self )
+	
+	def __del__( self ):
+		pass
+	
+
+###########################################################################
+## Class Panel_Status_Display_Base1
+###########################################################################
+
+class Panel_Status_Display_Base1 ( wx.Panel ):
+	
+	def __init__( self, parent ):
+		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.STATIC_BORDER )
+		
+		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_HIGHLIGHT ) )
+		
+		fgSizer61 = wx.FlexGridSizer( 0, 0, 0, 0 )
+		fgSizer61.AddGrowableCol( 0 )
+		fgSizer61.AddGrowableRow( 0 )
+		fgSizer61.SetFlexibleDirection( wx.BOTH )
+		fgSizer61.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.statusNodeList = UlcListCtrl( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT )
+		fgSizer61.Add( self.statusNodeList, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		self.SetSizer( fgSizer61 )
+		self.Layout()
+		
+		# Connect Events
+		self.statusNodeList.Bind( wx.EVT_LIST_ITEM_SELECTED, self.onIoNodeListItemSelected )
+	
+	def __del__( self ):
+		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def onIoNodeListItemSelected( self, event ):
+		event.Skip()
+	
+
+###########################################################################
+## Class Panel_Edit_Status_Display_Base_List
+###########################################################################
+
+class Panel_Edit_Status_Display_Base_List ( wx.Panel ):
+	
+	def __init__( self, parent ):
+		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL )
+		
+		fgSizer4 = wx.FlexGridSizer( 2, 1, 0, 0 )
+		fgSizer4.AddGrowableCol( 0 )
+		fgSizer4.AddGrowableCol( 1 )
+		fgSizer4.AddGrowableRow( 0 )
+		fgSizer4.SetFlexibleDirection( wx.BOTH )
+		fgSizer4.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		fgSizer341 = wx.FlexGridSizer( 2, 0, 0, 0 )
+		fgSizer341.AddGrowableCol( 0 )
+		fgSizer341.AddGrowableCol( 1 )
+		fgSizer341.AddGrowableRow( 1 )
+		fgSizer341.SetFlexibleDirection( wx.BOTH )
+		fgSizer341.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.edit_status_disp_toolbar = wx.ToolBar( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TB_HORIZONTAL ) 
+		self.edit_status_disp_toolbar.AddLabelTool( STATUS_ADD, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_NEW, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
+		
+		self.edit_status_disp_toolbar.AddLabelTool( STATUS_DEL, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_DELETE, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
+		
+		self.edit_status_disp_toolbar.AddSeparator()
+		
+		self.edit_status_disp_toolbar.Realize() 
+		
+		fgSizer341.Add( self.edit_status_disp_toolbar, 0, wx.EXPAND, 5 )
+		
+		self.status_disp_list = UlcListCtrl( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT )
+		fgSizer341.Add( self.status_disp_list, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		fgSizer4.Add( fgSizer341, 1, wx.EXPAND, 5 )
+		
+		self.m_panel27 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		gSizer3 = wx.GridSizer( 0, 2, 0, 0 )
+		
+		self.m_button6 = wx.Button( self.m_panel27, wx.ID_ANY, _(u"Apply"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		gSizer3.Add( self.m_button6, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
+		
+		self.m_button7 = wx.Button( self.m_panel27, wx.ID_ANY, _(u"Cancel"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		gSizer3.Add( self.m_button7, 0, wx.ALIGN_LEFT|wx.ALL, 5 )
+		
+		
+		self.m_panel27.SetSizer( gSizer3 )
+		self.m_panel27.Layout()
+		gSizer3.Fit( self.m_panel27 )
+		fgSizer4.Add( self.m_panel27, 1, wx.EXPAND |wx.ALL, 5 )
+		
+		
+		self.SetSizer( fgSizer4 )
+		self.Layout()
+		
+		# Connect Events
+		self.Bind( wx.EVT_TOOL, self.onStatusDispToolClicked, id = STATUS_ADD )
+		self.Bind( wx.EVT_TOOL, self.onStatusDispToolClicked, id = STATUS_DEL )
+		self.status_disp_list.Bind( wx.EVT_LIST_ITEM_SELECTED, self.onIoNodeListItemSelected )
+		self.m_button6.Bind( wx.EVT_BUTTON, self.onApply )
+		self.m_button7.Bind( wx.EVT_BUTTON, self.onCancel )
+	
+	def __del__( self ):
+		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def onStatusDispToolClicked( self, event ):
+		event.Skip()
+	
+	
+	def onIoNodeListItemSelected( self, event ):
+		event.Skip()
+	
+	def onApply( self, event ):
+		event.Skip()
+	
+	def onCancel( self, event ):
+		event.Skip()
+	
+
+###########################################################################
+## Class Panel_Edit_Status_Display_Base
+###########################################################################
+
+class Panel_Edit_Status_Display_Base ( wx.Panel ):
+	
+	def __init__( self, parent ):
+		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 464,296 ), style = wx.TAB_TRAVERSAL )
+		
+		fgSizer4 = wx.FlexGridSizer( 2, 1, 0, 0 )
+		fgSizer4.AddGrowableCol( 0 )
+		fgSizer4.AddGrowableCol( 1 )
+		fgSizer4.AddGrowableRow( 0 )
+		fgSizer4.SetFlexibleDirection( wx.BOTH )
+		fgSizer4.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		fgSizer341 = wx.FlexGridSizer( 2, 0, 0, 0 )
+		fgSizer341.AddGrowableCol( 0 )
+		fgSizer341.AddGrowableCol( 1 )
+		fgSizer341.AddGrowableRow( 1 )
+		fgSizer341.SetFlexibleDirection( wx.BOTH )
+		fgSizer341.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.edit_status_disp_toolbar = wx.ToolBar( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TB_HORIZONTAL ) 
+		self.edit_status_disp_toolbar.AddLabelTool( STATUS_ADD, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_NEW, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
+		
+		self.edit_status_disp_toolbar.AddLabelTool( STATUS_DEL, _(u"tool"), wx.ArtProvider.GetBitmap( wx.ART_DELETE, wx.ART_TOOLBAR ), wx.NullBitmap, wx.ITEM_NORMAL, wx.EmptyString, wx.EmptyString, None ) 
+		
+		self.edit_status_disp_toolbar.AddSeparator()
+		
+		self.edit_status_disp_toolbar.Realize() 
+		
+		fgSizer341.Add( self.edit_status_disp_toolbar, 0, wx.EXPAND, 5 )
+		
+		self.status_disp_grid = wx.grid.Grid( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
+		
+		# Grid
+		self.status_disp_grid.CreateGrid( 0, 2 )
+		self.status_disp_grid.EnableEditing( False )
+		self.status_disp_grid.EnableGridLines( True )
+		self.status_disp_grid.EnableDragGridSize( False )
+		self.status_disp_grid.SetMargins( 0, 0 )
+		
+		# Columns
+		self.status_disp_grid.SetColSize( 0, 200 )
+		self.status_disp_grid.SetColSize( 1, 200 )
+		self.status_disp_grid.EnableDragColMove( False )
+		self.status_disp_grid.EnableDragColSize( True )
+		self.status_disp_grid.SetColLabelSize( 30 )
+		self.status_disp_grid.SetColLabelValue( 0, _(u"aaa") )
+		self.status_disp_grid.SetColLabelValue( 1, _(u"bbb") )
+		self.status_disp_grid.SetColLabelAlignment( wx.ALIGN_CENTRE, wx.ALIGN_CENTRE )
+		
+		# Rows
+		self.status_disp_grid.EnableDragRowSize( False )
+		self.status_disp_grid.SetRowLabelSize( 30 )
+		self.status_disp_grid.SetRowLabelAlignment( wx.ALIGN_CENTRE, wx.ALIGN_CENTRE )
+		
+		# Label Appearance
+		
+		# Cell Defaults
+		self.status_disp_grid.SetDefaultCellAlignment( wx.ALIGN_LEFT, wx.ALIGN_CENTRE )
+		fgSizer341.Add( self.status_disp_grid, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		fgSizer4.Add( fgSizer341, 1, wx.EXPAND, 5 )
+		
+		self.m_panel27 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		gSizer3 = wx.GridSizer( 0, 2, 0, 0 )
+		
+		self.m_button6 = wx.Button( self.m_panel27, wx.ID_ANY, _(u"Apply"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		gSizer3.Add( self.m_button6, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
+		
+		self.m_button7 = wx.Button( self.m_panel27, wx.ID_ANY, _(u"Cancel"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		gSizer3.Add( self.m_button7, 0, wx.ALIGN_LEFT|wx.ALL, 5 )
+		
+		
+		self.m_panel27.SetSizer( gSizer3 )
+		self.m_panel27.Layout()
+		gSizer3.Fit( self.m_panel27 )
+		fgSizer4.Add( self.m_panel27, 1, wx.EXPAND |wx.ALL, 5 )
+		
+		
+		self.SetSizer( fgSizer4 )
+		self.Layout()
+		
+		# Connect Events
+		self.Bind( wx.EVT_TOOL, self.onStatusDispToolClicked, id = STATUS_ADD )
+		self.Bind( wx.EVT_TOOL, self.onStatusDispToolClicked, id = STATUS_DEL )
+		self.m_button6.Bind( wx.EVT_BUTTON, self.onApply )
+		self.m_button7.Bind( wx.EVT_BUTTON, self.onCancel )
+	
+	def __del__( self ):
+		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def onStatusDispToolClicked( self, event ):
+		event.Skip()
+	
+	
 	def onApply( self, event ):
 		event.Skip()
 	

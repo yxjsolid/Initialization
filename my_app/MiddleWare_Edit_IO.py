@@ -241,7 +241,7 @@ class IoNodeViewControl():
         window.windowPopup()
         return
 
-    def getCurrentEditObj(self):
+    def getCurrentSelectedObj(self):
         editItem = self.listView.GetFirstSelected()
         categoryObj = self.listView.GetItemPyData(editItem)[0]
         nodeObj = self.listView.GetItemPyData(editItem)[1]
@@ -254,7 +254,7 @@ class IoNodeViewControl():
         # categoryObj = self.listView.GetItemPyData(editItem)[0]
         # nodeObj = self.listView.GetItemPyData(editItem)[1]
 
-        categoryObj, nodeObj = self.getCurrentEditObj()
+        categoryObj, nodeObj = self.getCurrentSelectedObj()
 
         window = MyPopupWindow(size=(600, 400), title=IO_NODE_EDIT)
         Panel_Edit_IO_Node(window, self, self.listView.GetFirstSelected(), categoryObj, nodeObj)
@@ -265,7 +265,7 @@ class IoNodeViewControl():
     def onIoNodeDelUpdate(self, delIndex):
         #station = self.getCurrentCanStation()
         self.updateToolStatus(0)
-        categoryObj, nodeObj = self.getCurrentEditObj()
+        categoryObj, nodeObj = self.getCurrentSelectedObj()
         self.updateIoNodeView([categoryObj], False)
 
         ctrl = self.listView
@@ -282,7 +282,7 @@ class IoNodeViewControl():
         # itemIndex = tree.GetFirstSelected()
         delIndex = self.listView.GetFirstSelected()
 
-        categoryObj, nodeObj = self.getCurrentEditObj()
+        categoryObj, nodeObj = self.getCurrentSelectedObj()
 
         dlg = MainBase.ConfirmDIALOG(self.ioNodeEditor.frame)
         dlg.SetTitle(WINDOW_TITLE_DEL_IO_NODE)
@@ -382,13 +382,23 @@ class IoNodeViewControl():
 
 
 class Panel_Manage_IO_Node(MainBase.Panel_Manage_IO_Node_Base):
-    def __init__(self, frame):
-        MainBase.Panel_Manage_IO_Node_Base.__init__(self, frame)
-        self.frame = frame
+
+    MODE_MANAGE, MODE_SELECT = range(2)
+    def __init__(self, window, onEditParent=None, mode=MODE_MANAGE):
+        MainBase.Panel_Manage_IO_Node_Base.__init__(self, window.frame)
         self.categoryCtrl = IoCategoryViewControl(self)
         self.ioNodeCtrl = IoNodeViewControl(self)
+        self.mode = mode
+        self.onEditParent = onEditParent
+        self.window = window
 
         return
+
+    def disableToolBar(self):
+        self.ioNode_toolbar.Disable()
+
+    def getSelectedIoNode(self):
+        return self.ioNodeCtrl.getCurrentSelectedObj()
 
     def onCategoryItemSelChanged(self, event):
         self.categoryCtrl.onCategoryItemSelChanged(event)
@@ -412,16 +422,21 @@ class Panel_Manage_IO_Node(MainBase.Panel_Manage_IO_Node_Base):
         return self.ioNodeCtrl.onIoNodeListItemSelected()
 
     def closeWindow(self):
-        self.frame.Close()
+        self.window.closeWindow()
 
     def onApply(self, event):
-        cfg = globalGetCfg()
 
-        inList = self.getInputIoCategoryList()
-        outList = self.getOutputIoCategoryList()
+        if self.mode == Panel_Manage_IO_Node.MODE_MANAGE:
+            cfg = globalGetCfg()
+            inList = self.getInputIoCategoryList()
+            outList = self.getOutputIoCategoryList()
 
-        cfg.IoNodeMgmt.setInputIoCategoryList(inList)
-        cfg.IoNodeMgmt.setOutputIoCategoryList(outList)
+            cfg.IoNodeMgmt.setInputIoCategoryList(inList)
+            cfg.IoNodeMgmt.setOutputIoCategoryList(outList)
+
+        elif self.mode == Panel_Manage_IO_Node.MODE_SELECT:
+            categoryObj, nodeObj = self.getSelectedIoNode()
+            self.onEditParent.onAddStatusUpdate(nodeObj)
 
         self.closeWindow()
         return

@@ -49,10 +49,16 @@ class MyFrame(MainBase.FrameBase):
     def editIONode(self):
         print "add device"
 
-        frame1 = wx.Frame(parent=self.parent, size=(800,400))
-        Panel_Manage_IO_Node(frame1)
-        frame1.CenterOnScreen()
-        frame1.Show()
+        window = MyPopupWindow(size=(600, 400), title=IO_NODE_ADD_NEW)
+
+        Panel_Manage_IO_Node(window)
+        window.windowPopup()
+
+
+        # frame1 = wx.Frame(parent=self.parent, size=(800,400))
+        # Panel_Manage_IO_Node(frame1)
+        # frame1.CenterOnScreen()
+        # frame1.Show()
         return
 
     def addDevice(self):

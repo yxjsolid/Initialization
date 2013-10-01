@@ -1081,7 +1081,7 @@ class ButtonSprite(DragSprite):
             self.status = 0
             self.index = 0
 
-            self.initPos = (initPos[0],initPos[1])
+            self.initPos = (initPos[0], initPos[1])
             self.width = width
             self.height = height
             self.rectOrig = pygame.Rect(initPos, (width, height))
@@ -1091,7 +1091,6 @@ class ButtonSprite(DragSprite):
             self.operationOff = None
 
             self.operationDic = {"on":self.getOperationOnItem, "off":self.getOperationOffItem}
-
 
             for dic in dicts:
                 self.loadImgResource(dic)

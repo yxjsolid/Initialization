@@ -7,30 +7,31 @@ from MyGlobal import *
 import wx.lib.resizewidget as rw
 from MySprite import *
 from MyButton import *
+from MyStatusDisplay import *
+from MyHmiPanel import *
 
+class MyWidgetLibraryPanel (wx.Panel):
 
-class MyWidgetLibraryPanel ( wx.Panel ):
+    def __init__(self, parent):
+        wx.Panel.__init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.Size(518, 300), style=wx.TAB_TRAVERSAL )
 
-    def __init__( self, parent ):
-        wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 518,300 ), style = wx.TAB_TRAVERSAL )
+        mainWinSizer = wx.BoxSizer(wx.VERTICAL)
 
-        mainWinSizer = wx.BoxSizer( wx.VERTICAL )
-
-        self.scrolledWindow = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.HSCROLL|wx.VSCROLL )
-        self.scrolledWindow.SetScrollRate( 5, 5 )
+        self.scrolledWindow = wx.ScrolledWindow(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.HSCROLL|wx.VSCROLL )
+        self.scrolledWindow.SetScrollRate(5, 5)
         # boxSizer = wx.StaticBoxSizer( wx.StaticBox( self.scrolledWindow, wx.ID_ANY, _(u"label") ), wx.VERTICAL )
-        boxSizer = wx.StaticBoxSizer( wx.StaticBox( self.scrolledWindow, wx.ID_ANY, u"label" ), wx.VERTICAL )
+        boxSizer = wx.StaticBoxSizer(wx.StaticBox(self.scrolledWindow, wx.ID_ANY, u"label"), wx.VERTICAL)
 
-        libSizer = wx.FlexGridSizer( 10, 5, 0, 0 )
-        libSizer.SetFlexibleDirection( wx.BOTH )
-        libSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+        libSizer = wx.FlexGridSizer(10, 5, 0, 0)
+        libSizer.SetFlexibleDirection(wx.BOTH)
+        libSizer.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
 
-        boxSizer.Add( libSizer, 1, wx.EXPAND, 5 )
-        self.scrolledWindow.SetSizer( boxSizer )
+        boxSizer.Add(libSizer, 1, wx.EXPAND, 5)
+        self.scrolledWindow.SetSizer(boxSizer)
         self.scrolledWindow.Layout()
-        boxSizer.Fit( self.scrolledWindow )
-        mainWinSizer.Add( self.scrolledWindow, 1, wx.EXPAND |wx.ALL, 5 )
-        self.SetSizer( mainWinSizer )
+        boxSizer.Fit(self.scrolledWindow)
+        mainWinSizer.Add(self.scrolledWindow, 1, wx.EXPAND |wx.ALL, 5)
+        self.SetSizer(mainWinSizer)
 
         self.boxSizer = boxSizer
         self.libSizer = libSizer
@@ -57,32 +58,25 @@ class MyWidgetLibraryPanel ( wx.Panel ):
         btn.widget = widget
         self.libSizer.Add( btn, 0, wx.ALL, 5 )
 
-    def addWidgetToPanel11(self, event):
-
-        print "addWidgetToPanel"
-        testBtn1 =  MyGenBitmapToggleButton(self.targetPanel, -1,  pos = (100,100), style =  wx.BORDER_NONE|wx.TRANSPARENT_WINDOW)
-        testBtn1.loadImageLabel(btn_on)
-        testBtn1.loadImageSelected(btn_off)
-        testBtn1.setSizeFitImage()
 
     def addWidgetToPanel(self, event):
         print "addWidgetToPanel"
         #m_button16 = wx.Button( self.targetPanel, wx.ID_ANY, u"MyButton", pos = (100,100), (100,100), 0)
-        m_button16 = btn1( self.targetPanel, wx.ID_ANY, u"MyButton", (100,200), (100,100), wx.TRANSPARENT_WINDOW )
+        m_button16 = btn1(self.targetPanel, wx.ID_ANY, u"MyButton", (100, 200), (100, 100), wx.TRANSPARENT_WINDOW)
 
-        btnuu = wx.BitmapButton( self.targetPanel, wx.ID_ANY, wx.ArtProvider.GetBitmap( wx.ART_ADD_BOOKMARK, wx.ART_BUTTON ), (250,300), (100,100), wx.TRANSPARENT_WINDOW )
+        btnuu = wx.BitmapButton(self.targetPanel, wx.ID_ANY, wx.ArtProvider.GetBitmap(wx.ART_ADD_BOOKMARK, wx.ART_BUTTON), (250, 300), (100, 100), wx.TRANSPARENT_WINDOW)
 
-        self.testBtn1 =  MyGenBitmapToggleButton(self.targetPanel, -1,  pos = (100,250), style =  wx.BORDER_NONE |  wx.TRANSPARENT_WINDOW )
+        self.testBtn1 = MyGenBitmapToggleButton(self.targetPanel, -1,  pos=(100, 250), style = wx.BORDER_NONE | wx.TRANSPARENT_WINDOW )
         self.testBtn1.Raise()
         self.testBtn1.SetDoubleBuffered(0)
 
         self.testBtn1.loadImageLabel(circle_btn_on)
         self.testBtn1.loadImageSelected(circle_btn_off)
 
-        self.targetPanel.testBtn =   self.testBtn1
+        self.targetPanel.testBtn = self.testBtn1
 
     def addSpriteWidgetToPanel(self, event):
-        btn =  event.GetEventObject()
+        btn = event.GetEventObject()
         widget = btn.widget
         sprite = widget.createNewSprite()
         self.targetPanel.addSpriteToPanel(sprite)
@@ -109,27 +103,12 @@ class MyWidgetObj():
 
     def __init__(self, type):
 
-        self.dict = {"Button":self.createNewBtnSprite, "Transporter":self.createNewTranspotrSprite}
+        self.dict = {"Button": self.createNewBtnSprite, "Transporter": self.createNewTranspotrSprite}
         self.type = type
         self.Sprite = None
 
         if not self.dict.has_key(type):
             raise "error"
-
-    # def getIconBmp(self, size):
-    #     from PIL import Image
-    #     print "self.btnOn,", self.btnOn
-    #     print "size", size
-    #
-    #     im = Image.open(self.btnOn)
-    #     #im.thumbnail(size, Image.ANTIALIAS)
-    #     #im.save(r".\image\tttt", "JPEG")
-    #     #s = im.tostring()
-    #     img = ImageOps.fit(im, size, Image.ANTIALIAS)
-    #     img.save(r".\image\tttt", "JPEG")
-    #     #img = wx.ImageFromData(size[0], size[1], s)  # Load this string into a wx image
-    #
-    #     return img.ConvertToBitmap()
 
     def getIconBmp(self, size):
         # getIconFn = self.dict[self.type]
@@ -246,6 +225,11 @@ class MyDefaultLibrary():
         self.widgetList.append(obj)
 
 
+
+
+
+
+
 def popupAddHmiWindow(targetPanel):
     frame1 = wx.Frame(parent=None, size=(800,400))
     panel = MyWidgetLibraryPanel(frame1)
@@ -253,6 +237,21 @@ def popupAddHmiWindow(targetPanel):
 
     frame1.CenterOnScreen()
     frame1.Show()
+
+def popupAddStatusDisplay(targetPanel, pos):
+    window = MyPopupWindow(size=(600, 400), title=IO_NODE_ADD_NEW)
+
+    print "popupAddStatusDisplay pos= ", pos
+    Panel_Edit_Status_Display(window, targetPanel, pos)
+    window.windowPopup()
+
+    print "popupAddStatusDisplay"
+    #Panel_Status_Display(targetPanel)
+
+    # d = MyDraggable(targetPanel, (100, 200), (500, 500))
+    # subP = Panel_Status_Display(d)
+    # d.AdjustToChild(subP)
+    # subP.Disable()
 
 
 if __name__ == '__main__':

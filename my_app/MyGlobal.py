@@ -99,7 +99,14 @@ LABEL_IO_BOARD_INPUT = u"信号量输入"
 
 MENU_ITEM_BUTTON_SETTING = u"动作属性"
 
+
 DEVICE_ITEM_SETTING = u"属性设置"
+HMI_POPUP_MENU_ADD_OBJ = u"添加控件"
+HMI_POPUP_MENU_ADD_STATUS_DISP = u"添加状态表"
+
+
+STATUS_DISPLAY_NAME = u"数据点"
+STATUS_DISPLAY_STATUS = u"状态"
 
 rescoure_dir = r".\image\\"
 
