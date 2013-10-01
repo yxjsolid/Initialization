@@ -106,15 +106,15 @@ class SerialHandler:
 
                 data += dataNew
 
-                print "FirstReader 111 ", data
+                #print "FirstReader 111 ", data
 
                 #print "\n\n######################\n"
                 #print n,"data", "new",dataNew
                 #print binascii.b2a_hex(dataNew)
                 #print binascii.b2a_hex(data)
 
-                if self.dataHandler is not None:
-                    self.dataHandler.receiveSerialRawData(data)
+                if self.dataProxy is not None:
+                    self.dataProxy.receiveSerialRawData(data)
 
             #except Exception, ex:
                 #print "FirstReader:",ex
