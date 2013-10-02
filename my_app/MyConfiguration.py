@@ -6,6 +6,22 @@ def globalGetCfg():
     return cfgObj
 
 
+class ActionGroupConfiguration():
+    def __init__(self):
+        self.actionGrpList = []
+        return
+
+    def addActionGroup(self, actionGrp):
+        self.actionGrpList.append(actionGrp)
+        return
+
+    def getActionGroupList(self):
+        return self.actionGrpList
+
+    def setActionGroupList(self, actGrpList):
+        self.actionGrpList = actGrpList
+
+
 class StationConfiguration():
     def __init__(self):
         self.stationList = []
@@ -68,9 +84,13 @@ class CfgContainer():
     def __init__(self):
         self.stationCfg = StationConfiguration()
         self.guiCfg = GuiLayoutConfiguration()
+        self.actionGroupCfg = ActionGroupConfiguration()
 
         self.deviceController = None
         self.IoNodeCfg = IoNodeConfiguration()
+
+    def getActionGroupCfgList(self):
+        return self.actionGroupCfg.getActionGroupList()
 
     def testDump(self, pickle, file):
         print "test guiCfg"
@@ -90,3 +110,6 @@ class CfgContainer():
 
     def getStatusDisplayCfg(self):
         return self.guiCfg.getStatusDisplayCfg()
+
+    def setActionGroupCfg(self, actionGroupList):
+        self.actionGroupCfg.setActionGroupList(actionGroupList)

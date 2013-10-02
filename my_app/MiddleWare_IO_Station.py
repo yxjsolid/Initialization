@@ -12,6 +12,7 @@ from MyCanStation import *
 from ViewSelectPanel import *
 import pickle
 
+
 class CanStationViewControl():
     def __init__(self, canStationEditor):
         self.canStationEditor = canStationEditor

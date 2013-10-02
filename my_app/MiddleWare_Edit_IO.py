@@ -437,7 +437,7 @@ class Panel_Manage_IO_Node(MainBase.Panel_Manage_IO_Node_Base):
 
         elif self.mode == Panel_Manage_IO_Node.MODE_SELECT:
             categoryObj, nodeObj = self.getSelectedIoNode()
-            self.onEditParent.onAddStatusUpdate(nodeObj)
+            self.onEditParent.onSelectIoNodeUpdate(nodeObj)
 
         self.closeWindow()
         return
@@ -464,16 +464,12 @@ class Panel_Edit_IO_Node(MainBase.Panel_Edit_IO_Node_Base):
 
         sel = self.stationChoice.GetCurrentSelection()
         station = self.stationChoice.GetClientData(sel)
-        print station
 
         sel = self.boardChoice.GetCurrentSelection()
         board = self.boardChoice.GetClientData(sel)
 
         sel = self.portChoice.GetCurrentSelection()
         port = self.portChoice.GetClientData(sel)
-
-
-
 
         if self.onEditNode is not None:
             self.onEditNode.name = name
@@ -486,7 +482,6 @@ class Panel_Edit_IO_Node(MainBase.Panel_Edit_IO_Node_Base):
 
             self.viewCtrl.editUpdateIoNodeItem(self.onEditListItem, self.categoryObj, self.onEditNode)
             #self.viewCtrl.updateBoardListView(self.editListItem, self.onEditBoard)
-            newIoNode = self.onEditNode
         else:
             newIoNode = IoNode()
             newIoNode.name = name
@@ -496,10 +491,10 @@ class Panel_Edit_IO_Node(MainBase.Panel_Edit_IO_Node_Base):
             newIoNode.station = station
             newIoNode.board = board
             newIoNode.port = port
+            newIoNode.category = self.categoryObj
 
             self.viewCtrl.appendIoNodeListView(newIoNode)
 
-        #self.viewCtrl.updateIoNodeView([self.categoryObj], False)
         self.window.closeWindow()
 
     def onLoadUpdate(self):
@@ -511,6 +506,7 @@ class Panel_Edit_IO_Node(MainBase.Panel_Edit_IO_Node_Base):
             self.onEditUpdate()
 
         return
+
 
     def setSelectObj(self, choiceObj, clientData):
         for i in range(choiceObj.GetCount()):

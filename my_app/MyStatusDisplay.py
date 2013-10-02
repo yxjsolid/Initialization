@@ -200,6 +200,9 @@ class Panel_Edit_Status_Display(MainBase.Panel_Edit_Status_Display_Base):
         self.nodeList = []
         self.Show()
 
+    def onSelectIoNodeUpdate(self, nodeObj):
+        self.onAddStatusUpdate(nodeObj)
+
     def onAddStatusUpdate(self, nodeObj):
         self.nodeList.append(nodeObj)
         self.viewCtrl.gridInsertStatusIoNode(-1, nodeObj)

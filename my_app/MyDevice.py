@@ -113,51 +113,6 @@ class DeviceAttribute():
         self.actionYell(value)
         self.value = value
 
-class DeviceAction():
-    def __init__(self):
 
-        return
-
-class DeviceActionIO(DeviceAction):
-    def __init__(self):
-        DeviceAction.__init__(self)
-        self.moduleOutput = None
-        self.outputValue = 0
-
-        self.moduleFeedback = None
-        self.feedbackTimeout = 0
-
-        self.moduleDelay = None
-        return
-
-class DeviceActionAttrSet(DeviceAction):
-    def __init__(self):
-        DeviceAction.__init__(self)
-        self.attribute = None
-        self.valueToSet = 0
-        return
-
-    def getName(self):
-        if self.attribute:
-            return self.attribute.name
-        else:
-            return "N/A"
-
-    def doAction(self):
-        if self.attribute:
-            self.attribute.setAttrValue(self.valueToSet)
-
-
-class DeviceActionDelay(DeviceAction):
-    def __init__(self):
-        DeviceAction.__init__(self)
-        self.moduleOutput = None
-        self.outputValue = 0
-
-        self.moduleFeedback = None
-        self.feedbackTimeout = 0
-
-        self.moduleDelay = None
-        return
 
 

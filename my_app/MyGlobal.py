@@ -108,6 +108,36 @@ HMI_POPUP_MENU_ADD_STATUS_DISP = u"添加状态表"
 STATUS_DISPLAY_NAME = u"数据点"
 STATUS_DISPLAY_STATUS = u"状态"
 
+
+LABEl_ACTION_TYPE = u"动作类型"
+LABEl_ACTION_DESC = u"动作描述"
+
+
+
+
+ACTION_GRP_DEFAULT_NAME = u"未命名"
+ACTION_GRP_DEFAULT_DESC = u"未定义"
+
+
+WINDOW_TITLE_ADD_ACTION = u"添加动作"
+WINDOW_TITLE_EDIT_ACTION = u"编辑动作"
+WINDOW_TITLE_DEL_ACTION = u"删除动作"
+DIALOG_ALERT_DEL_ACTION = u"确定删除动作？"
+
+WINDOW_TITLE_ADD_ACTION_GROUP = u"添加动作脚本"
+WINDOW_TITLE_EDIT_ACTION_GROUP = u"编辑动作脚本"
+WINDOW_TITLE_DEL_ACTION_GROUP = u"删除动作脚本"
+LABEL_ACTION_GROUP_NAME = u"动作脚本"
+LABEL_ACTION_GROUP_DESC = u"描述"
+
+DIALOG_ALERT_DEL_ACTION_GROUP = u"确定删除动作脚本及其所有动作？"
+
+
+ACTION_TYPE_OUTPUT_NAME = u"开关量输出"
+ACTION_TYPE_DELAY_NAME = u"延时等待"
+ACTION_TYPE_SET_INTERNAL_NAME = u"内部变量设置"
+ACTION_DETAIL_STR_FORMAT = u"%s   输出:[%s]"
+
 rescoure_dir = r".\image\\"
 
 btn_red_up = rescoure_dir + r"red_up.png"
@@ -124,36 +154,27 @@ circle_btn_off = rescoure_dir + "circle_btn_off.png"
 
 image_fish = rescoure_dir + "fugu.png"
 
-"""
- def addDevice(self):
-        print "add device"
-#            self.pane.
-# wx.GetApp().GetAppViewSelectPane().AddDeviceNode("tool bar create")
-
-        frame1 = wx.Frame(parent=self.parent, size=(800,400))
-        Panel_AddDevice(frame1)
-        frame1.CenterOnScreen()
-        frame1.Show()
-
-"""
-
-
-
-
-
-
-
-
 
 def globalGetRuntime():
     return wx.GetApp().getRuntime()
+
 
 class MyPopupWindow():
     def __init__(self, parent=None, size=(800, 600), title=None):
         #wx.DEFAULT_FRAME_STYLE
         #self.frame = wx.MiniFrame(parent=None, size=size, style = wx.CAPTION | wx.RESIZE_BORDER)
-        self.frame = wx.Frame(parent=None, size=size, title=title)
+        self.frame = wx.Frame(parent=parent, size=size, title=title)
+
+        #self.frame = wx.Dialog(parent=parent, size=size, title=title)
+
+        # if parent:
+        #     parent.Enable(False)
+        #     parent.Enable(False)
+
         self.frame.EnableCloseButton(1)
+        self.frame.ToggleWindowStyle(wx.STAY_ON_TOP)
+        #self.frame.ToggleWindowStyle(wx.FRAME_FLOAT_ON_PARENT)
+
 
     def windowPopup(self):
         self.frame.CenterOnScreen()

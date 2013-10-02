@@ -12,6 +12,7 @@ from ViewSelectPanel import *
 import pickle
 from MiddleWare_IO_Station import *
 from MiddleWare_Edit_IO import *
+from MiddleWare_Action import *
 
 mydata = wxPythonInAction.Chapter_15.data.tree
 
@@ -49,6 +50,11 @@ class MyFrame(MainBase.FrameBase):
         Panel_Manage_IO_Node(window)
         window.windowPopup()
         return
+
+    def editAction(self):
+        window = MyPopupWindow(size=(600, 400), title=IO_NODE_ADD_NEW)
+        Panel_Manage_Action(window)
+        window.windowPopup()
 
     def doRun(self):
         wx.GetApp().getRuntime().doRun()
@@ -117,6 +123,8 @@ class MyFrame(MainBase.FrameBase):
         MainBase.ID_MENU_LOAD:          lambda: self.onLoad(),
         MainBase.ID_MENU_EDIT_STATION:  lambda: self.editIOStation(),
         MainBase.ID_MENU_EDIT_IO_NODE:  lambda: self.editIONode(),
+        MainBase.ID_MENU_EDIT_ACTION:  lambda: self.editAction(),
+
         MainBase.ID_MENU_ADD_DEVICE:    lambda: self.addDevice(),
         MainBase.ID_MENU_EDIT_DEVICE:   lambda: self.editDevice(),
         MainBase.ID_MENU_DELETE_DEVICE: lambda: self.addDevice(),
@@ -741,194 +749,7 @@ class ActionViewControl():
         print ret
 
 
-class Panel_EditAction(MainBase.Panel_EditAction_Base):
-    #0: IO , 1:delay, 2:attr
 
-    ACTION_TYPE_IO, ACTION_TYPE_DELAY, ACTION_TYPE_ATTR = range(3)
-    def __init__(self, frame, deviceEditor, targetObj=None):
-        MainBase.Panel_EditAction_Base.__init__(self, frame)
-        self.deviceEditor = deviceEditor
-        self.targetObj = targetObj
-        self.frame = frame
-        self.selectActionType(0)
-        self.buildOutputChoiceList()
-        self.buildFeedbackChoiceList()
-        self.buildAttrChoiceList()
-
-        print "Panel_EditAction.ACTION_TYPE_IO", Panel_EditAction.ACTION_TYPE_IO
-
-    def selectActionType(self, type):
-        self.actionType = type
-        #0: IO , 1:delay, 2:attr
-
-        self.mainSizer.Hide(self.SizerIO)
-        self.mainSizer.Hide(self.sizeTimeDelay)
-        self.mainSizer.Hide(self.SizerAttr)
-
-        if type == Panel_EditAction.ACTION_TYPE_IO:
-            self.mainSizer.Show(self.SizerIO)
-        elif type == Panel_EditAction.ACTION_TYPE_DELAY:
-            self.mainSizer.Show(self.sizeTimeDelay)
-        elif type == Panel_EditAction.ACTION_TYPE_ATTR:
-            self.mainSizer.Show(self.SizerAttr)
-
-        self.mainSizer.Layout()
-
-   # def editActionUpdate(self):
-        #self.buildChoiceList()
-
-    def getPrevSelected(self, choiceObj):
-        sel = choiceObj.GetSelection()
-        if sel == wx.NOT_FOUND:
-            return None
-
-        return choiceObj.GetClientData(sel)
-
-
-    def buildChoiceList(self, itemList, choiceObj):
-        """select the previous selected item after update"""
-        index = 0
-        
-        prevItem = self.getPrevSelected(choiceObj)
-        choiceObj.Clear()
-
-        #wx.Choice(
-        for item in itemList:
-            print "\n",item.name, sys.getrefcount(item)
-            choiceObj.Append(item.name, item)
-
-            if item is prevItem:
-                choiceObj.Select(index)
-            index += 1
-            print item.name, sys.getrefcount(item)
-
-    def buildFeedbackChoiceList(self):
-        io_modules = self.deviceEditor.getModuleIoViewControl().getIoModules()
-        self.buildChoiceList(io_modules, self.choice_feedback)
-    
-    def buildOutputChoiceList(self):
-        io_modules = self.deviceEditor.getModuleIoViewControl().getIoModules()
-        self.buildChoiceList(io_modules, self.choice_output)
-
-    def buildAttrChoiceList(self):
-        attrList = self.deviceEditor.thisDevice.getAttrList()
-        self.buildChoiceList(attrList, self.choice_attr)
-
-    def createIoAction(self):
-        newActionObj = DeviceActionIO()
-        outObj = None
-        feedbackObj = None
-
-        sel = self.choice_output.GetSelection()
-        if sel != wx.NOT_FOUND:
-            outObj = self.choice_output.GetClientData(sel)
-
-        outputValue = self.text_output.GetValue()
-
-        sel = self.choice_feedback.GetSelection()
-        if sel != wx.NOT_FOUND:
-            feedbackObj = self.choice_feedback.GetClientData(sel)
-
-        timeout = self.text_timeout.GetValue()
-        newActionObj.moduleOutput = outObj
-        newActionObj.outputValue = outputValue
-        newActionObj.moduleFeedback = feedbackObj
-        newActionObj.feedbackTimeout = timeout
-
-        return newActionObj
-
-    def createAttrSetAction(self):
-        newActionObj = DeviceActionAttrSet()
-
-        sel = self.choice_attr.GetSelection()
-        if sel != wx.NOT_FOUND:
-            attrObj = self.choice_attr.GetClientData(sel)
-        else:
-            attrObj = None
-
-        newActionObj.attribute = attrObj
-        newActionObj.valueToSet = int(self.text_valuSet.GetValue())
-
-        return newActionObj
-
-    def createDelayAction(self):
-        newActionObj = DeviceActionDelay()
-
-
-        return newActionObj
-
-    def createNewAction(self, actionType):
-        obj = None
-        if actionType == Panel_EditAction.ACTION_TYPE_IO:
-            obj = self.createIoAction()
-        elif actionType == Panel_EditAction.ACTION_TYPE_DELAY:
-            obj = self.createDelayAction()
-        elif actionType == Panel_EditAction.ACTION_TYPE_ATTR:
-            obj = self.createAttrSetAction()
-
-        return obj
-  
-    def onEditUpdate(self, targetObj=None):
-        print "Panel_NewAction -> onEditUpdate"
-        self.buildOutputChoiceList()
-        self.buildFeedbackChoiceList()
-
-        print "targetObj.GetCount()", targetObj.GetCount()
-        targetObj.SetSelection(targetObj.GetCount()-1)
-        self.deviceEditor.onEditUpdate()
-
-    def onChoice(self, event):
-        print "onChoice"
-        type = event.GetInt()
-        self.selectActionType(type)
-    
-    def onAddModuleIO(self, event):
-        print "onAddModuleIO"
-
-        if self.addOutputBtn is event.GetEventObject():
-            targetChoice = self.choice_output
-        else:
-            targetChoice = self.choice_feedback
-
-        #frame1 = wx.Frame(parent=self.parent, size=(800,400))
-        frame1 = wx.Frame(parent=None, size=(800,400))
-
-        Panel_EditModuleIO(frame1, self, self.deviceEditor, targetObj=targetChoice)
-        frame1.CenterOnScreen()
-        frame1.Show()
-
-    def refreshDisplay(self):
-        if self.attribute:
-            txt = self.attribute.genAttributeDisplayName()
-            self.txt_attribute.SetValue(txt)
-            self.setApplyBtnEnabled(1)
-
-    # def callbackGetAttributeSelect(self, attr):
-    #     print "callbackGetAttributeSelect"
-    #     print attr
-    #     self.attribute = attr
-    #     self.refreshDisplay()
-    #     return
-    #
-    # def onSelectAttributeBind( self, event ):
-    #     print "onSelectOperationOn"
-    #     window = MyPopupWindow(size=(600,400), title="setting")
-    #     Panel_AttributeSelect(window.frame, self, self.callbackGetAttributeSelect)
-    #     window.windowPopup()
-
-    def closeWindow(self):
-        self.frame.Close()
-
-    def onApply(self, evt):
-        newAction = self.createNewAction(self.actionType)
-        self.targetObj.addNewAction(newAction)
-        self.deviceEditor.actionListCtrl.listInsertNewAction(-1, newAction)
-        self.closeWindow()
-        return
-
-    def onCancel(self, evt):
-        self.closeWindow()
-        return
 
 
 class AttributeViewControl():
