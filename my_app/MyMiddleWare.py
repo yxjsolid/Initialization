@@ -117,6 +117,13 @@ class MyFrame(MainBase.FrameBase):
 
         self.viewPanel_sub.onEditUpdate()
 
+        self.onCfgLoadUpdate()
+
+    def onCfgLoadUpdate(self):
+        self.viewPanel_sub.onCfgLoadUpdate()
+
+
+
     def onMenuBtnClicked(self, event):
         eventId = event.GetId()
         ret = {

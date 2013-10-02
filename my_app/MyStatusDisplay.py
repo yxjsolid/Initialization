@@ -10,15 +10,42 @@ from MyWidgetLibrary import *
 from MyDraggablePanel import *
 
 
-class StatusDisplayMgmt():
+class StatusDisplayManagement():
     def __init__(self):
-
-        self.statusDisplay = []
-
+        self.statusDisplayPanel = []
         return
 
     def appendStatusDisplayList(self, panel):
-        self.statusDisplay.append(panel)
+        self.statusDisplayPanel.append(panel)
+
+    def addNewStatusDisplayPanel(self, targetPanel, cfg):
+        d = MyDraggable(targetPanel, cfg.pos, (200, 200))
+        subP = Panel_Status_Display(d, cfg.nodeList, cfg.colSetting, cfg)
+        d.AdjustToChild(subP)
+        subP.Refresh()
+        d.Refresh()
+        subP.Disable()
+        self.appendStatusDisplayList(subP)
+
+    def onCfgLoadUpdate(self, targetPanel, cfgList):
+        for cfg in cfgList:
+            self.addNewStatusDisplayPanel(targetPanel, cfg)
+
+        self.displayUpdateCheck(1)
+        return
+
+    def displayUpdateCheck(self, interval):
+        for p in self.statusDisplayPanel:
+            p.doStatusUpdate()
+
+        self.displayUpdateTimer(interval)
+
+    def displayUpdateTimer(self, interval):
+        t = threading.Timer(interval, self.displayUpdateCheck, (interval, ))
+        t.start()
+
+
+    #def onCfgLoadUpdate(self, targetPanel):
 
 
 class statusDisplayView():
@@ -30,6 +57,13 @@ class statusDisplayView():
 
         return
 
+    def doUpdateStatus(self, index, nodeObj):
+        isOn = nodeObj.board.isPortOn(nodeObj.port)
+        if isOn > 0:
+            statusInfo = nodeObj.onInfo
+        else:
+            statusInfo = nodeObj.offInfo
+        self.viewCtrl.SetCellValue(index, 1, statusInfo)
 
     def getDisplaySize(self):
         rowCnt = self.viewCtrl.GetNumberRows()
@@ -127,10 +161,11 @@ class statusDisplayView():
 
 
 class Panel_Status_Display(MainBase.Panel_Status_Display_Base):
-    def __init__(self, parent, nodeObjList, colSetting):
+    def __init__(self, parent, nodeObjList, colSetting, panelCfg):
         MainBase.Panel_Status_Display_Base.__init__(self, parent)
         self.nodeObjList = nodeObjList
         self.viewCtrl = statusDisplayView(self.statusDispGrid, colSetting)
+        self.panelCfg = panelCfg
         self.onLoadUpdate()
         self.Show()
 
@@ -143,6 +178,13 @@ class Panel_Status_Display(MainBase.Panel_Status_Display_Base):
 
         for node in self.nodeObjList:
             self.viewCtrl.gridInsertStatusIoNode(-1, node)
+
+        return
+
+    def doStatusUpdate(self):
+        print "doStatusUpdate"
+        for i, nodeObj in enumerate(self.nodeObjList):
+            self.viewCtrl.doUpdateStatus(i, nodeObj)
 
         return
 
@@ -163,7 +205,6 @@ class Panel_Edit_Status_Display(MainBase.Panel_Edit_Status_Display_Base):
         self.viewCtrl.gridInsertStatusIoNode(-1, nodeObj)
         return
 
-
     def onAddNewStatus(self):
         window = MyPopupWindow(size=(600, 400), title=IO_NODE_ADD_NEW)
         panel = Panel_Manage_IO_Node(window, self, Panel_Manage_IO_Node.MODE_SELECT)
@@ -177,24 +218,13 @@ class Panel_Edit_Status_Display(MainBase.Panel_Edit_Status_Display_Base):
         return
 
     def onApply(self, event):
-        d = MyDraggable(self.onEditPanel, self.popupPos, (2000, 2000))
-
         colSetting = self.viewCtrl.getColumnSetting()
-        subP = Panel_Status_Display(d, self.nodeList, colSetting)
+        panelCfg = GuiStatusDisplayCfg(self.popupPos, colSetting, self.nodeList)
+        cfg = globalGetCfg()
+        cfg.appendStatusDisplayCfg(panelCfg)
 
         runtime = globalGetRuntime()
-        runtime.statusDisplayMgmt.appendStatusDisplayList(subP)
-
-
-        d.AdjustToChild(subP)
-        subP.Refresh()
-        d.Refresh()
-
-        subP.Disable()
-
-        #self.onEditPanel.Refresh()
-
-
+        runtime.statusDisplayMgmt.addNewStatusDisplayPanel(self.onEditPanel, panelCfg)
         self.window.closeWindow()
 
         return

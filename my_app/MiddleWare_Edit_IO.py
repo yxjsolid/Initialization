@@ -5,6 +5,7 @@ import wx
 import MainBase
 from MyGlobal import *
 from MyIoNode import *
+from MyConfiguration import *
 
 
 class IoCategoryViewControl():
@@ -28,8 +29,8 @@ class IoCategoryViewControl():
 
     def onLoadUpdate(self):
         cfg = globalGetCfg()
-        inList = cfg.IoNodeMgmt.getInputIoCategoryList()
-        outList = cfg.IoNodeMgmt.getOutputIoCategoryList()
+        inList = cfg.IoNodeCfg.getInputIoCategoryList()
+        outList = cfg.IoNodeCfg.getOutputIoCategoryList()
 
         for cate in inList:
             self.addNewCategory(self.viewTree, self.inputRoot, cate)
@@ -431,8 +432,8 @@ class Panel_Manage_IO_Node(MainBase.Panel_Manage_IO_Node_Base):
             inList = self.getInputIoCategoryList()
             outList = self.getOutputIoCategoryList()
 
-            cfg.IoNodeMgmt.setInputIoCategoryList(inList)
-            cfg.IoNodeMgmt.setOutputIoCategoryList(outList)
+            cfg.IoNodeCfg.setInputIoCategoryList(inList)
+            cfg.IoNodeCfg.setOutputIoCategoryList(outList)
 
         elif self.mode == Panel_Manage_IO_Node.MODE_SELECT:
             categoryObj, nodeObj = self.getSelectedIoNode()
@@ -503,8 +504,8 @@ class Panel_Edit_IO_Node(MainBase.Panel_Edit_IO_Node_Base):
 
     def onLoadUpdate(self):
         cfgObj = wx.GetApp().getConfigure()
-        stationMgmt = cfgObj.stationManagement
-        self.buildChoice(stationMgmt)
+        stationCfg = cfgObj.stationCfg
+        self.buildChoice(stationCfg)
 
         if self.onEditListItem != -1:
             self.onEditUpdate()

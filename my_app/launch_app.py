@@ -5,15 +5,9 @@ import sys
 import MyGlobal as gl
 from  MyMiddleWare import *
 from MyRuntime import *
-
+from MyConfiguration import *
 
 from MyDevice import *
-
-class CfgContainer():
-    def __init__(self):
-        self.stationCfg = StationConfiguration()
-        self.deviceController = None
-        self.IoNodeMgmt = IoNodeMgmt()
 
 
 class MyApp(wx.App):

@@ -138,17 +138,15 @@ image_fish = rescoure_dir + "fugu.png"
 """
 
 
-def globalGetCfg():
-    cfgObj = wx.GetApp().getConfigure()
-    return cfgObj
+
+
+
+
+
 
 
 def globalGetRuntime():
     return wx.GetApp().getRuntime()
-
-
-
-
 
 class MyPopupWindow():
     def __init__(self, parent=None, size=(800, 600), title=None):

@@ -4,11 +4,12 @@
 from MyStatusDisplay import *
 from mySerial.mySerial import *
 from MyCanStationDaemon import *
+from MyConfiguration import *
 
 
 class RuntimeManagement():
     def __init__(self):
-        self.statusDisplayMgmt = StatusDisplayMgmt()
+        self.statusDisplayMgmt = StatusDisplayManagement()
         self.serialHandle = None
         self.stationDaemonMgmt = None
         self.canProxy = None
@@ -35,13 +36,4 @@ class RuntimeManagement():
 
     def openCanProxy(self):
         self.canProxy = CanProxy(SerialHandler=self.serialHandle, stationDaemonMgmt=self.stationDaemonMgmt)
-
-
-        # canProxy = CanProxy(SerialHandler=rt, daemonMgmtIn=daemonMgmt)
-    # rt.dataHandler = canProxy
-    # canStation = buildCanStationTest(5)
-
-    #
-    # daemon.doStationDeamonStatusCheck(1)
-    #
-    # canStation.setBoardIo(1, 0x0)
+        return

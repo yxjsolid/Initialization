@@ -210,17 +210,27 @@ class ViewSelectPanel(wx.Panel):
 
         self.dispanel = wx.Notebook( container, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
 
-        pygamePanel = PygameDisplay(self.dispanel, -1)
+        self.pygamePanel = PygameDisplay(self.dispanel, -1)
 
-        myHMIPanel = MyHmiPanel(self.dispanel, -1)
+        self.myHMIPanel = MyHmiPanel(self.dispanel, -1)
 
-        self.dispanel.AddPage( myHMIPanel, (u"HMI"), False )
-        self.dispanel.AddPage( pygamePanel, (u"pygame"), False )
+        self.dispanel.AddPage(self.myHMIPanel, (u"HMI"), False )
+        self.dispanel.AddPage(self.pygamePanel, (u"pygame"), False )
 
-        sizer.Add( self.dispanel, 1, wx.EXPAND |wx.ALL, 5 )
+        sizer.Add(self.dispanel, 1, wx.EXPAND | wx.ALL, 5)
 
         container.SetSizer(sizer)
         container.Layout()
+
+
+    def onCfgLoadUpdate(self):
+        statusCfgList = globalGetCfg().getStatusDisplayCfg()
+        statusDisplayMgmt = globalGetRuntime().statusDisplayMgmt
+        statusDisplayMgmt.onCfgLoadUpdate(self.myHMIPanel, statusCfgList)
+
+
+        pass
+
 
     def onEditUpdate(self):
         self.clearDeviceNode()
