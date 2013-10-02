@@ -38,8 +38,6 @@ class MyFrame(MainBase.FrameBase):
         return
 
     def editIOStation(self):
-        print "add device"
-
         frame1 = wx.Frame(parent=self.parent, size=(800,400))
         Panel_Manage_Can_Station(frame1)
         frame1.CenterOnScreen()
@@ -47,30 +45,17 @@ class MyFrame(MainBase.FrameBase):
         return
 
     def editIONode(self):
-        print "add device"
-
         window = MyPopupWindow(size=(600, 400), title=IO_NODE_ADD_NEW)
-
         Panel_Manage_IO_Node(window)
         window.windowPopup()
-
-
-        # frame1 = wx.Frame(parent=self.parent, size=(800,400))
-        # Panel_Manage_IO_Node(frame1)
-        # frame1.CenterOnScreen()
-        # frame1.Show()
         return
-
 
     def doRun(self):
         wx.GetApp().getRuntime().doRun()
         return
 
-
     def addDevice(self):
-        print "add device"
-
-        frame1 = wx.Frame(parent=self.parent, size=(800,400))
+        frame1 = wx.Frame(parent=self.parent, size=(800, 400))
         Panel_AddDevice(frame1)
         frame1.CenterOnScreen()
         frame1.Show()
@@ -94,7 +79,7 @@ class MyFrame(MainBase.FrameBase):
         else:
             print "not device"
 
-        frame1 = wx.Frame(parent=self.parent, size=(800,400))
+        frame1 = wx.Frame(parent=self.parent, size=(800, 400))
         Panel_AddDevice(frame1, obj)
         frame1.CenterOnScreen()
         frame1.Show()
@@ -105,6 +90,9 @@ class MyFrame(MainBase.FrameBase):
         saveFile = open(self.saveFileName, "w")
 
         cfgObj = wx.GetApp().getConfigure()
+
+        #cfgObj.testDump(pickle, saveFile)
+
         pickle.dump(cfgObj, saveFile)
         saveFile.close()
         return
@@ -122,8 +110,6 @@ class MyFrame(MainBase.FrameBase):
     def onCfgLoadUpdate(self):
         self.viewPanel_sub.onCfgLoadUpdate()
 
-
-
     def onMenuBtnClicked(self, event):
         eventId = event.GetId()
         ret = {
@@ -140,9 +126,9 @@ class MyFrame(MainBase.FrameBase):
         return
 
 
-class testMySplitterPanel( MainBase.SplitterPanelBase ):
+class testMySplitterPanel(MainBase.SplitterPanelBase):
     def __init__(self, parent):
-        MainBase.SplitterPanelBase.__init__( self, parent )
+        MainBase.SplitterPanelBase.__init__(self, parent)
         self.parent = parent
         self.buildViewSelectPanel()
         self.viewPanel_sub = self.viewPanel_sub
@@ -156,38 +142,20 @@ class testMySplitterPanel( MainBase.SplitterPanelBase ):
 #        sizer.Add( self.viewPanel_sub, 1, wx.EXPAND |wx.ALL, 5 )
         
         self.viewPanel_sub = ViewSelectPanel(self, container, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        sizer.Add( self.viewPanel_sub, 1, wx.EXPAND |wx.ALL, 5 )
+        sizer.Add(self.viewPanel_sub, 1, wx.EXPAND  |wx.ALL, 5)
         self.viewPanel_sub.SetBackgroundColour("sky blue")
-        container.SetSizer( sizer )
+        container.SetSizer(sizer)
         container.Layout()
         sizer.Fit(container)
         return
     
     def GetViewPanel(self):
         return self.viewPanel
-"""
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""
 class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
-    def __init__( self, frame , device=None):
-        MainBase.Panel_AddDevice_Base.__init__( self, frame )
-
-
-        print "Panel_AddDevice  1111"
+    def __init__(self, frame, device=None):
+        MainBase.Panel_AddDevice_Base.__init__(self, frame)
 
         if device is None:
             self.thisDevice = Device_Transport()
@@ -195,7 +163,6 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
             self.thisDevice = device
         self.frame = frame
         self.deviceInfoPanelSetup()
-
 
         self.moduleIoViewCtrl = ModuleIoListControl(self)
         self.attrCtrl = AttributeViewControl(self)
@@ -253,6 +220,7 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
     """
     def closeWindow(self):
         self.frame.Close()
+
     def onApply(self, event):
         print "my onApply"
 
@@ -316,8 +284,10 @@ class Panel_AddDevice(MainBase.Panel_AddDevice_Base):
 
     def getModuleIoViewList(self):
         return self.moudleIo_list
+
     def getModuleIoViewControl(self):
         return self.moduleIoViewCtrl
+
 
 class ModuleIoListControl():
     def __init__(self, parent):
@@ -361,7 +331,7 @@ class ModuleIoListControl():
     def deleteIoModule(self):
         modules = []
         key = 0
-        for item in  self.parent.thisDevice.getIoModules():
+        for item in self.parent.thisDevice.getIoModules():
             if key not in self.viewList.checkList:
                 modules.append(item)
             key += 1
@@ -389,7 +359,7 @@ class ModuleIoListControl():
 
 class Panel_EditModuleIO(MainBase.Panel_EditModuleIO_Base):
     def __init__(self, frame, opener, deviceEditor, targetObj=None):
-        MainBase.Panel_EditModuleIO_Base.__init__( self, frame )
+        MainBase.Panel_EditModuleIO_Base.__init__(self, frame)
         self.moduleTypeChoiceSetup(self.choice)
         self.deviceEditor = deviceEditor
         self.frame = frame
@@ -405,8 +375,8 @@ class Panel_EditModuleIO(MainBase.Panel_EditModuleIO_Base):
         choice.Select(0)
 
     def createNewModule(self):
-        name =  self.text_name.GetValue()
-        ioStr =  self.text_io.GetValue()
+        name = self.text_name.GetValue()
+        ioStr = self.text_io.GetValue()
         type = self.getChoiceData()
         module = DeviceModule(nm=name, io=ioStr, tp=type)
         return module
@@ -419,7 +389,6 @@ class Panel_EditModuleIO(MainBase.Panel_EditModuleIO_Base):
         index = choice.GetSelection()
         return choice.GetClientData(index)
 
-    
     def onChoice(self, event):
 
         print "onChoice"
@@ -455,7 +424,7 @@ class ActionGroupViewControl():
         tree.AddColumn(OPERATION_LIST_LABEL_NAME)
         tree.AddColumn(OPERATION_LIST_LABEL_DESC)
 
-        tree.SetMainColumn(0) # the one with the tree in it...
+        tree.SetMainColumn(0)# the one with the tree in it...
         tree.SetColumnWidth(0, 150)
 
         tree.SetColumnEditable(0, True)
@@ -464,14 +433,14 @@ class ActionGroupViewControl():
 
     def addNewActGrp(self):
         tree = self.viewTree
-        name = OPERATION_NAME_DEFAULT + str(tree.GetCount()+1)
+        name = OPERATION_NAME_DEFAULT + str(tree.GetCount() + 1)
         ctrl = DeviceOperation(self.deviceEditor.thisDevice, name)
         self.appendActGrp(ctrl)
 
     def appendActGrp(self, ctrl):
         tree = self.viewTree
         child = tree.AppendItem(tree.root, ctrl.name)
-        tree.SetItemText(child, ctrl.info,1)
+        tree.SetItemText(child, ctrl.info, 1)
         tree.SetItemPyData(child, ctrl)
 
     def onActGrpUpdate(self):
@@ -509,7 +478,7 @@ class ActionGroupViewControl():
                 break
         return ActGrps
 
-    def setActGrp(self, ctrl,index, txtIn):
+    def setActGrp(self, ctrl, index, txtIn):
         if index is 0:
             ctrl.name = txtIn
         elif index is 1:
@@ -704,7 +673,7 @@ class ActionViewControl():
         if ctrlModule is None:
             print "Error: --> addNewAction"
 
-        frame = wx.Frame(None, size=(350,400))
+        frame = wx.Frame(None, size=(350, 400))
         Panel_EditAction(frame, self.deviceEditor, targetObj=ctrlModule)
         frame.CenterOnScreen()
         frame.Show()
@@ -718,9 +687,9 @@ class ActionViewControl():
         actionCount = actionList.GetItemCount()
         if actionCount:
             if index == actionCount:
-                actionList.Select(index-1,1)
+                actionList.Select(index - 1, 1)
             else:
-                actionList.Select(index,1)
+                actionList.Select(index, 1)
         return
 
     def onActionMoveUp(self):
@@ -735,11 +704,11 @@ class ActionViewControl():
             self.listInsertNewAction(0, action)
             index = 0
         else:
-            self.listInsertNewAction(index-1, action)
-            index = index-1
+            self.listInsertNewAction(index - 1, action)
+            index -= 1
 
         self.onEditActionUpdate()
-        actionList.Select(index,1)
+        actionList.Select(index, 1)
         return
 
     def onActionMoveDown(self):
@@ -750,8 +719,8 @@ class ActionViewControl():
 
         actionCount = actionList.GetItemCount()
         action = actionList.GetItemData(index)
-        if actionCount > 1 and index != actionCount-1:
-            self.listInsertNewAction(index+2, action)
+        if actionCount > 1 and index != actionCount - 1:
+            self.listInsertNewAction(index + 2, action)
             actionList.DeleteItem(index)
         else:
             return
@@ -994,7 +963,7 @@ class AttributeViewControl():
         # if ctrlModule is None:
         #     print "Error: --> addNewAction"
 
-        frame = wx.Frame(None, size=(350,400))
+        frame = wx.Frame(None, size=(350, 400))
         Panel_EditAttribute(frame, self, target=self)
         frame.CenterOnScreen()
         frame.Show()
@@ -1050,6 +1019,7 @@ class AttributeViewControl():
 
         return
 
+
 class Panel_EditAttribute(MainBase.Panel_EditAttribute_Base):
     def __init__(self, frame, deviceEditor, target=None):
         MainBase.Panel_EditAttribute_Base.__init__(self, frame)
@@ -1080,6 +1050,7 @@ class Panel_EditAttribute(MainBase.Panel_EditAttribute_Base):
         attrObj.name = name
         attrObj.desc = desc
         return attrObj
+
 
 class Panel_ButtonSetting(MainBase.Panel_ButtonSetting_Base):
     def __init__(self, frame, opener, callbackFn):
@@ -1127,31 +1098,32 @@ class Panel_ButtonSetting(MainBase.Panel_ButtonSetting_Base):
         self.refreshDisplay()
         return
 
-    def onSelectOperationOn( self, event ):
+    def onSelectOperationOn(self, event):
         print "onSelectOperationOn"
-        window = MyPopupWindow(size=(600,400), title="setting")
+        window = MyPopupWindow(size=(600, 400), title="setting")
         Panel_OperationSelect(window.frame, self, self.getOperationOnSelect)
         window.windowPopup()
 
-    def onSelectOperationOff( self, event ):
+    def onSelectOperationOff(self, event):
         print "onSelectOperationOff"
-        window = MyPopupWindow(size=(600,400), title="setting")
+        window = MyPopupWindow(size=(600, 400), title="setting")
         Panel_OperationSelect(window.frame, self, self.getOperationOffSelect)
         window.windowPopup()
 
     def closeWindow(self):
         self.frame.Close()
 
-    def onApply( self, event ):
+    def onApply(self, event):
         #callback: onButtonSettingDone
         self.callbackFn(self.operationOn, self.operationOff)
         self.closeWindow()
         return
 
-    def onCancel( self, event ):
+    def onCancel(self, event):
         print "onCancel"
         self.closeWindow()
         return
+
 
 class Panel_OperationSelect(MainBase.Panel_OperationSelect_Base):
     def __init__(self, frame, opener, callbackFn):
@@ -1244,17 +1216,17 @@ class Panel_OperationSelect(MainBase.Panel_OperationSelect_Base):
 
         """ ref SetStringItem """
         itemCount = listCtrl.GetItemCount()
-        if index > itemCount+1:
+        if index > itemCount + 1:
             raise "error"
             return
 
         if index == -1:
             if itemCount == 0:
-                index = listCtrl.InsertStringItem(sys.maxint, str(itemCount+1),0)
+                index = listCtrl.InsertStringItem(sys.maxint, str(itemCount + 1), 0)
             else:
-                index = listCtrl.InsertStringItem(itemCount, str(itemCount+1),0)
+                index = listCtrl.InsertStringItem(itemCount, str(itemCount + 1), 0)
         else:
-            index = listCtrl.InsertStringItem(index, str(itemCount+1),0)
+            index = listCtrl.InsertStringItem(index, str(itemCount + 1), 0)
 
         listCtrl.SetStringItem(index, 1, operationItem.name, 0)
         listCtrl.SetStringItem(index, 2, operationItem.info, 0)
@@ -1356,15 +1328,16 @@ class Panel_DeviceAnimationSetting(MainBase.Panel_DeviceAnimationSetting_Base):
     def closeWindow(self):
         self.frame.Close()
 
-    def onApply( self, event ):
+    def onApply(self, event):
         self.callbackFn(self.attribute, self.getCondition())
         self.closeWindow()
         return
 
-    def onCancel( self, event ):
+    def onCancel(self, event):
         print "onCancel"
         self.closeWindow()
         return
+
 
 class Panel_AttributeSelect(MainBase.Panel_OperationSelect_Base):
     def __init__(self, frame, opener, callbackFn):
@@ -1435,22 +1408,21 @@ class Panel_AttributeSelect(MainBase.Panel_OperationSelect_Base):
 
         """ ref SetStringItem """
         itemCount = listCtrl.GetItemCount()
-        if index > itemCount+1:
+        if index > itemCount + 1:
             raise "error"
             return
 
         if index == -1:
             if itemCount == 0:
-                index = listCtrl.InsertStringItem(sys.maxint, str(itemCount+1),0)
+                index = listCtrl.InsertStringItem(sys.maxint, str(itemCount + 1), 0)
             else:
-                index = listCtrl.InsertStringItem(itemCount, str(itemCount+1),0)
+                index = listCtrl.InsertStringItem(itemCount, str(itemCount + 1), 0)
         else:
-            index = listCtrl.InsertStringItem(index, str(itemCount+1),0)
+            index = listCtrl.InsertStringItem(index, str(itemCount + 1), 0)
 
         listCtrl.SetStringItem(index, 1, device.name, 0)
         listCtrl.SetStringItem(index, 2, device.info, 0)
         listCtrl.SetItemData(index, device)
-
 
     def listInsertOperationNode(self, index, operationItem):
         listCtrl = self.getOperationListCtrl()
@@ -1478,7 +1450,7 @@ class Panel_AttributeSelect(MainBase.Panel_OperationSelect_Base):
         listCtrl.DeleteAllItems()
 
     def onDeviceItemSelected(self, event):
-        deviceItem =  event.GetItem().GetData()
+        deviceItem = event.GetItem().GetData()
         self.refreshOperetionListCtrl()
 
         for operationItem in deviceItem.attrList:
@@ -1510,7 +1482,7 @@ class Panel_AttributeSelect(MainBase.Panel_OperationSelect_Base):
         self.closeWindow()
         return
 
-    def onCancel( self, event ):
+    def onCancel(self, event):
         self.closeWindow()
         return
 

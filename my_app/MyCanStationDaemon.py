@@ -10,13 +10,16 @@ from mySerial.mySerial import *
 
 
 class CanStationDaemonManagement():
-    def __init__(self, stationCfg):
+    def __init__(self, stationCfg=None):
         self.daemonDict = {}
         self.setupStationDaemon(stationCfg)
         self.dataProxy = None
         return
 
     def setupStationDaemon(self, stationCfg):
+        if stationCfg is None:
+            return
+
         for station in stationCfg.getCanStationList():
             self.addStationDaemon(station)
         return
@@ -40,10 +43,8 @@ class CanStationDaemonManagement():
 
 
 class CanStationDaemon():
-    def __init__(self, daemonMgmt=None, stationIn=None, canProxyIn=None):
+    def __init__(self, daemonMgmt=None, stationIn=None):
         self.station = stationIn
-        self.dataProxy = canProxyIn
-        self.station.daemon = self
         self.boardStatusCheckEventDict = {}
         self.boardActionEventDict = {}
         self.daemonMgmt = daemonMgmt
@@ -176,16 +177,14 @@ if __name__ == '__main__':
     except Exception, se:
         print str(se)
 
-    canProxy = CanProxy(SerialHandler=rt, daemonMgmtIn=daemonMgmt)
+    canProxy = CanProxy(SerialHandler=rt, stationDaemonMgmt=daemonMgmt)
 
     rt.dataHandler = canProxy
 
     canStation = buildCanStationTest(5)
 
-    daemon = CanStationDaemon(canStation, canProxy)
+    daemonMgmt.addStationDaemon(canStation)
 
-    daemonMgmt.addStationDaemon(canStation, daemon)
+    daemonMgmt.startStatusCheck()
 
-    daemon.doStationDeamonStatusCheck(1)
-
-    canStation.setBoardIo(1, 0x0)
+    #canStation.setBoardIo(1, 0x0)

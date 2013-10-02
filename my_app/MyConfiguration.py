@@ -72,6 +72,16 @@ class CfgContainer():
         self.deviceController = None
         self.IoNodeCfg = IoNodeConfiguration()
 
+    def testDump(self, pickle, file):
+        print "test guiCfg"
+        pickle.dump(self.guiCfg, file)
+
+        print "test IoNodeCfg"
+        pickle.dump(self.IoNodeCfg, file)
+
+        print "test stationCfg"
+        pickle.dump(self.stationCfg, file)
+
     def getGuiLayoutCfg(self):
         return self.guiCfg
 

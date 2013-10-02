@@ -18,7 +18,6 @@ class DeviceCanStation():
         self.InputBoardList = []
         self.OutputBoardList = []
         self.pendingStatusCheck = 0
-        self.daemon = None
 
     def getStationInfo(self):
         infoFormat = "%s:[%s]  %s:[%d]"
@@ -91,13 +90,7 @@ class DeviceIoBoard():
         self.IoStatus = 0
         self.pendingReq = 0
         self.station = stationIn
-        self.statusCheckTaskEvent = None
-        self.setIoEvent = None
         return
-
-    def doBoardInit(self):
-        self.statusCheckTaskEvent = threading.Event()
-        self.setIoEvent = threading.Event()
 
     def updateBoardStatus(self, boardId, status):
         self.clearPendingRequest()

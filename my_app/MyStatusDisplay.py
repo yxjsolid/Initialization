@@ -31,7 +31,7 @@ class StatusDisplayManagement():
         for cfg in cfgList:
             self.addNewStatusDisplayPanel(targetPanel, cfg)
 
-        self.displayUpdateCheck(1)
+        #self.displayUpdateCheck(1)
         return
 
     def displayUpdateCheck(self, interval):
