@@ -25,7 +25,7 @@ class ActionGroup():
         self.actions = actions
 
     def genOperationDisplayName(self):
-        txt = self.parent.name + "\\" + self.name
+        txt = self.name
         return txt
 
     def processOperation(self):

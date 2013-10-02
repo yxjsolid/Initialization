@@ -2360,6 +2360,87 @@ class Panel_OperationSelect_Base ( wx.Panel ):
 	
 
 ###########################################################################
+## Class Panel_Action_Group_Select_Base
+###########################################################################
+
+class Panel_Action_Group_Select_Base ( wx.Panel ):
+	
+	def __init__( self, parent ):
+		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 400,400 ), style = wx.TAB_TRAVERSAL )
+		
+		fgSizer33 = wx.FlexGridSizer( 2, 1, 0, 0 )
+		fgSizer33.AddGrowableCol( 0 )
+		fgSizer33.AddGrowableRow( 0 )
+		fgSizer33.SetFlexibleDirection( wx.BOTH )
+		fgSizer33.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		bSizer36 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_panel26 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		bSizer38 = wx.BoxSizer( wx.VERTICAL )
+		
+		sbSizer40 = wx.StaticBoxSizer( wx.StaticBox( self.m_panel26, wx.ID_ANY, _(u"动作脚本") ), wx.VERTICAL )
+		
+		fgSizer62 = wx.FlexGridSizer( 0, 0, 0, 0 )
+		fgSizer62.AddGrowableCol( 0 )
+		fgSizer62.AddGrowableRow( 0 )
+		fgSizer62.SetFlexibleDirection( wx.BOTH )
+		fgSizer62.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		self.actionGrpListView = UlcListCtrl( self.m_panel26, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT|wx.LC_SINGLE_SEL )
+		fgSizer62.Add( self.actionGrpListView, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		sbSizer40.Add( fgSizer62, 1, wx.EXPAND, 5 )
+		
+		
+		bSizer38.Add( sbSizer40, 1, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		self.m_panel26.SetSizer( bSizer38 )
+		self.m_panel26.Layout()
+		bSizer38.Fit( self.m_panel26 )
+		bSizer36.Add( self.m_panel26, 1, wx.EXPAND |wx.ALL, 5 )
+		
+		
+		fgSizer33.Add( bSizer36, 1, wx.EXPAND, 5 )
+		
+		gSizer15 = wx.GridSizer( 0, 2, 0, 0 )
+		
+		self.applyBtn = wx.Button( self, wx.ID_ANY, _(u"Apply"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		gSizer15.Add( self.applyBtn, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
+		
+		self.m_button41 = wx.Button( self, wx.ID_ANY, _(u"Cancel"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		gSizer15.Add( self.m_button41, 0, wx.ALL, 5 )
+		
+		
+		fgSizer33.Add( gSizer15, 1, wx.BOTTOM|wx.EXPAND, 5 )
+		
+		
+		self.SetSizer( fgSizer33 )
+		self.Layout()
+		
+		# Connect Events
+		self.actionGrpListView.Bind( wx.EVT_LIST_ITEM_SELECTED, self.onDeviceItemSelected )
+		self.applyBtn.Bind( wx.EVT_BUTTON, self.onApply )
+		self.m_button41.Bind( wx.EVT_BUTTON, self.onCancel )
+	
+	def __del__( self ):
+		pass
+	
+	
+	# Virtual event handlers, overide them in your derived class
+	def onDeviceItemSelected( self, event ):
+		event.Skip()
+	
+	def onApply( self, event ):
+		event.Skip()
+	
+	def onCancel( self, event ):
+		event.Skip()
+	
+
+###########################################################################
 ## Class testPanel
 ###########################################################################
 

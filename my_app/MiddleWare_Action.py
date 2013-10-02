@@ -690,7 +690,6 @@ class Panel_EditAction(MainBase.Panel_EditAction_Base):
         panel.disableToolBar()
         window.windowPopup()
 
-
     def refreshDisplay(self):
         if self.attribute:
             txt = self.attribute.genAttributeDisplayName()
@@ -721,4 +720,84 @@ class Panel_EditAction(MainBase.Panel_EditAction_Base):
 
     def onCancel(self, evt):
         self.closeWindow()
+        return
+
+
+class Panel_Action_Group_Select(MainBase.Panel_Action_Group_Select_Base):
+    def __init__(self, window, opener, callbackFn):
+        MainBase.Panel_Action_Group_Select_Base.__init__(self, window.frame)
+        self.opener = opener
+        self.callbackFn = callbackFn
+        self.actionGrpCfgList = None
+        self.window = window
+        self.getActionGroupCfg()
+        self.setupActionGroupTreeView()
+        self.onActionGroupUpdate(True)
+
+        return
+
+
+    def setupActionGroupTreeView(self):
+        viewCtrl = self.actionGrpListView
+
+        #viewCtrl.SetSingleStyle(wx.LC_EDIT_LABELS, True)
+        viewCtrl.InsertColumn(0, "#", wx.LIST_FORMAT_LEFT)
+        viewCtrl.InsertColumn(1, LABEL_ACTION_GROUP_NAME)
+        viewCtrl.InsertColumn(2, LABEL_ACTION_GROUP_DESC)
+
+        viewCtrl.SetColumnWidth(0, wx.LIST_AUTOSIZE)
+        viewCtrl.SetColumnWidth(1, 100)
+        viewCtrl.SetColumnWidth(2, 100)
+
+
+    def getActionGroupCfg(self):
+        self.actionGrpCfgList = globalGetCfg().getActionGroupCfgList()
+
+    def onActionGroupUpdate(self, isOnLoad):
+        actGrpList = self.actionGrpCfgList
+        # self.clearAllItem()
+        for actGrp in actGrpList:
+            if actGrp:
+                self.appendActionGroupListView(actGrp)
+
+        if isOnLoad:
+            self.setDefaultSelect()
+        return
+
+    def appendActionGroupListView(self, actionGrp):
+        tree = self.actionGrpListView
+        listCnt = tree.GetItemCount()
+
+        if listCnt == 0:
+            index = tree.InsertStringItem(sys.maxint, str(listCnt + 1))
+        else:
+            index = tree.InsertStringItem(listCnt, str(listCnt + 1))
+
+        tree.SetStringItem(index, 1, actionGrp.name)
+        tree.SetStringItem(index, 2, actionGrp.info)
+        tree.SetItemPyData(index, actionGrp)
+
+        tree.Select(index)
+
+    def setDefaultSelect(self):
+        tree = self.actionGrpListView
+        listCnt = tree.GetItemCount()
+
+        if listCnt > 0:
+            tree.Select(0)
+
+    def getCurrentSelectedObj(self):
+        tree = self.actionGrpListView
+        item = tree.GetFirstSelected()
+        if item != -1:
+            return tree.GetItemPyData(item)
+        return None
+
+    def onApply(self, event):
+        opItem = self.getCurrentSelectedObj()
+        if opItem is None:
+            raise "Panel_OperationSelect error onApply"
+
+        self.callbackFn(opItem)
+        self.window.closeWindow()
         return

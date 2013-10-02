@@ -52,7 +52,7 @@ class MyFrame(MainBase.FrameBase):
         return
 
     def editAction(self):
-        window = MyPopupWindow(size=(600, 400), title=IO_NODE_ADD_NEW)
+        window = MyPopupWindow(size=(600, 400), title=WINDOW_TITLE_ACTION_GROUP)
         Panel_Manage_Action(window)
         window.windowPopup()
 
@@ -922,13 +922,13 @@ class Panel_ButtonSetting(MainBase.Panel_ButtonSetting_Base):
     def onSelectOperationOn(self, event):
         print "onSelectOperationOn"
         window = MyPopupWindow(size=(600, 400), title="setting")
-        Panel_OperationSelect(window.frame, self, self.getOperationOnSelect)
+        Panel_Action_Group_Select(window, self, self.getOperationOnSelect)
         window.windowPopup()
 
     def onSelectOperationOff(self, event):
         print "onSelectOperationOff"
         window = MyPopupWindow(size=(600, 400), title="setting")
-        Panel_OperationSelect(window.frame, self, self.getOperationOffSelect)
+        Panel_Action_Group_Select(window, self, self.getOperationOffSelect)
         window.windowPopup()
 
     def closeWindow(self):
