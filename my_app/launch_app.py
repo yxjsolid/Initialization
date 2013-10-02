@@ -17,7 +17,7 @@ class MyApp(wx.App):
         print "App __init__"
         wx.App.__init__(self, redirect, filename)
         self.cfgContainer = CfgContainer()
-        self.runtime = RuntimeManagement()
+        self.initRuntime()
 
     def getDeviceCtrl(self):
         return self.getConfigure().deviceController
@@ -30,6 +30,9 @@ class MyApp(wx.App):
 
     def getRuntime(self):
         return self.runtime
+
+    def initRuntime(self):
+        self.runtime = RuntimeManagement()
 
     def setConfigure(self, cfg):
         self.cfgContainer = cfg

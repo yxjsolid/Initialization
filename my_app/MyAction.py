@@ -30,14 +30,13 @@ class ActionGroup():
 
     def processOperation(self):
         txt = u"操作:"
-
         txt += " " + self.genOperationDisplayName()
         print "processOperation:", txt
         # LogWriter.writeLog(txt)
         #
         #
-        # for act in self.actions:
-        #     act.doAction()
+        for act in self.actions:
+            act.doAction()
 
 
 class ActionBase():
@@ -74,6 +73,11 @@ class ActionOutput(ActionBase):
         nameStr = self.outputObj.getNodeNameWithCategory()
 
         return  actionDetailFormat % (nameStr, str(self.outputValue))
+
+    def doAction(self):
+        self.outputObj.doOutputAction(self.outputValue)
+
+        return
 
 
 class ActionInternalSet(ActionBase):

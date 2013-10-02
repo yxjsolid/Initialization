@@ -90,6 +90,8 @@ class DeviceIoBoard():
         self.IoStatus = 0
         self.pendingReq = 0
         self.station = stationIn
+        self.outputStatus = 0xff
+
         return
 
     def updateBoardStatus(self, boardId, status):
@@ -120,7 +122,7 @@ class DeviceIoBoard():
         canFrame.setCanStationId(self.station.stationId)
         return canFrame
 
-    def genSetIoCmdData(self, IO_DATA):
+    def genSetIoCmdData(self):
         canFrame = self.prepareNewCanFrame()
         canFrame.setCanFrameLen(5)
 
@@ -128,7 +130,7 @@ class DeviceIoBoard():
         canFrame.setCMDBoardType(self.boardType)
         canFrame.setCMDBoardID(self.boardId)
         canFrame.setCMDBoardStatus(self.boardStatus)
-        canFrame.setCmdData(IO_DATA)
+        canFrame.setCmdData(self.outputStatus)
 
         return canFrame
 
@@ -154,3 +156,11 @@ class DeviceIoBoard():
     def isPortOn(self, port):
         flag = (~self.IoStatus) & (0x1 << (port - 1))
         return flag
+
+
+    def setPortStatus(self, port, onOffFlag):
+        if onOffFlag == 1:
+            self.outputStatus &= ~(0x1 << port)
+        elif onOffFlag == 0:
+            self.outputStatus |= (0x1 << port)
+

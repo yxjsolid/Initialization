@@ -41,11 +41,22 @@ class CanStationDaemonManagement():
     def sendCanFrame(self, frame):
         self.dataProxy.sendCanFrame(frame)
 
+    def doIoNodeOutput(self, outputNode):
+        station = outputNode.station
+        board = outputNode.board
+        board.setPortStatus(outputNode.port, outputNode.onOffFlag)
+
+        self.getStationDaemon(station.stationId).doSetStationBoardIo(board)
+
+        return
+
+
 
 class CanStationDaemon():
     def __init__(self, daemonMgmt=None, stationIn=None):
         self.station = stationIn
         self.boardStatusCheckEventDict = {}
+        self.boardSetCmdEventDict = {}
         self.boardActionEventDict = {}
         self.daemonMgmt = daemonMgmt
         self.doInit()
@@ -118,28 +129,27 @@ class CanStationDaemon():
         #self.station.stationHandleCanFrameReply(canFrame)
         return
 
-    def doStationDeamonStatusCheck(self, interval):
-        print datetime.datetime.now(),  "doStatusCheck "
+    def doSetStationBoardIo(self, board):
+        print datetime.datetime.now(),  "doSetStationBoardIo "
+        _dict = self.boardSetCmdEventDict
+        canFrame = board.genSetIoCmdData()
+        self.daemonMgmt.sendCanFrame(canFrame)
 
-        self.station.doStationInit()
-        self.station.doStationStatusCheck(interval)
-    #     frameList = self.station.getStatusCheckData()
-    #
-    #     for frame in frameList:
-    #         frame.structureToByteArray()
-    #         self.canProxy.sendCanFrame(frame)
-    #         self.station.setPendingStatusCheck()
-    #
-    #         self.statusCheckTaskEvent.wait(1)
-    #         print "doStatusCheck -> ",  self.statusCheckTaskEvent.isSet()
-    #
-    #         #if not self.statusCheckTaskEvent.isSet():
-    #
-    #     self.startStatusCheckTimer(interval)
-    #
-    # def startStatusCheckTimer(self, interval):
-    #     t = threading.Timer(interval, self.doStatusCheck, (interval, ))
-    #     t.start()
+        _dict[board] = threading.Event()
+        _dict[board].wait(2)
+        if not _dict[board].isSet():
+            print " board[%d] setCmd" % board.boardId, " timeout"
+
+        return
+
+
+    def doSetIoCmd(self, IO_DATA):
+        frame = self.genSetIoCmdData(IO_DATA)
+        self.station.daemon.canProxy.sendCanFrame(frame)
+        self.setIoEvent.wait(1)
+        if not self.setIoEvent.isSet():
+            print self.getBoardTypeStr(), " id: [%d] setCmd", self.boardId, " timeout"
+
 
 
 def buildTestIoBoard(idIn, typeIn):
@@ -187,4 +197,4 @@ if __name__ == '__main__':
 
     daemonMgmt.startStatusCheck()
 
-    #canStation.setBoardIo(1, 0x0)
+    canStation.setBoardIo(1, 0x0)

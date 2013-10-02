@@ -18,6 +18,7 @@ class IoNode():
         self.station = None
         self.board = None
         self.port = 0
+        self.onOffFlag = 0
 
     def getIoInfoStr(self):
         info = ""
@@ -32,10 +33,18 @@ class IoNode():
         info = self.category.name + "\\" + self.name
         return info
 
+    def doOutputAction(self, flag):
+        self.onOffFlag = flag
+        stationDaemonMgmt = globalGetRuntime().stationDaemonMgmt
+        stationDaemonMgmt.doIoNodeOutput(self)
+
+        return
+
 
 
 class IoNodeCategory():
     def __init__(self):
+        self.type = None
         self.name = EDIT_IO_NODE_LABEL_GROUP_DEFAULT
         self.ioNodeList = []
         return

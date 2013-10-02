@@ -108,6 +108,8 @@ class MyFrame(MainBase.FrameBase):
         saveFile = open(self.saveFileName, "r")
         cfgObj = pickle.load(saveFile)
         wx.GetApp().setConfigure(cfgObj)
+        wx.GetApp().initRuntime()
+
 
         self.viewPanel_sub.onEditUpdate()
 

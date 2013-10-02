@@ -33,16 +33,22 @@ class IoCategoryViewControl():
         outList = cfg.IoNodeCfg.getOutputIoCategoryList()
 
         for cate in inList:
+            cate.type = DeviceIoBoard.BOARD_TYPE_INPUT
             self.addNewCategory(self.viewTree, self.inputRoot, cate)
 
         for cate in outList:
+            cate.type = DeviceIoBoard.BOARD_TYPE_OUTPUT
             self.addNewCategory(self.viewTree, self.outputRoot, cate)
 
         if not self.viewTree.ItemHasChildren(self.inputRoot):
-            self.addNewCategory(self.viewTree, self.inputRoot, IoNodeCategory())
+            cate = IoNodeCategory()
+            cate.type = DeviceIoBoard.BOARD_TYPE_INPUT
+            self.addNewCategory(self.viewTree, self.inputRoot, cate)
 
         if not self.viewTree.ItemHasChildren(self.outputRoot):
-            self.addNewCategory(self.viewTree, self.outputRoot, IoNodeCategory())
+            cate = IoNodeCategory()
+            cate.type = DeviceIoBoard.BOARD_TYPE_OUTPUT
+            self.addNewCategory(self.viewTree, self.outputRoot, cate)
 
         return
 
@@ -150,6 +156,8 @@ class IoCategoryViewControl():
         elif selItem == self.outputRoot:
             categoryList = self.getChildrenItem(self.viewTree, selItem)
         else:
+            catObj = self.getSelectedCategoryObj()
+
             categoryList = [self.getSelectedCategoryObj()]
             self.ioNodeEditor.ioNodeCtrl.updateAddNewToolStatus(1)
 
@@ -164,6 +172,11 @@ class IoCategoryViewControl():
             newName = dlg.GetValue()
             newCategory = IoNodeCategory()
             newCategory.name = newName
+
+            if self.item is self.inputRoot:
+                newCategory.type = DeviceIoBoard.BOARD_TYPE_INPUT
+            elif self.item is self.outputRoot:
+                newCategory.type = DeviceIoBoard.BOARD_TYPE_OUTPUT
 
             self.addNewCategory(self.viewTree, self.item, newCategory)
 
@@ -552,7 +565,10 @@ class Panel_Edit_IO_Node(MainBase.Panel_Edit_IO_Node_Base):
         choiceObj = self.boardChoice
         choiceObj.Clear()
 
-        boardList = station.InputBoardList
+        if self.categoryObj.type == DeviceIoBoard.BOARD_TYPE_OUTPUT:
+            boardList = station.OutputBoardList
+        elif self.categoryObj.type == DeviceIoBoard.BOARD_TYPE_INPUT:
+            boardList = station.InputBoardList
 
         for board in boardList:
             choiceObj.Append(str(board.boardId), board)

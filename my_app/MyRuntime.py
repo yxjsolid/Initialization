@@ -13,13 +13,14 @@ class RuntimeManagement():
         self.serialHandle = None
         self.stationDaemonMgmt = None
         self.canProxy = None
+        self.buildCanStationManagement()
 
     def doRun(self):
         print "runtime run"
-        self.buildCanStationManagement()
 
         self.openSerial()
         self.openCanProxy()
+
         self.stationDaemonMgmt.startStatusCheck()
         self.statusDisplayMgmt.displayUpdateCheck(1)
 
