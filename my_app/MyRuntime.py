@@ -16,13 +16,13 @@ class RuntimeManagement():
         self.buildCanStationManagement()
 
     def doRun(self):
-        print "runtime run"
+        print "RuntimeManagement run"
 
         self.openSerial()
         self.openCanProxy()
 
         self.stationDaemonMgmt.startStatusCheck()
-        self.statusDisplayMgmt.displayUpdateCheck(1)
+        self.statusDisplayMgmt.displayUpdateCheck(0.2)
 
     def openSerial(self):
         self.serialHandle = SerialHandler(Port=3)

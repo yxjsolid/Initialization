@@ -52,7 +52,7 @@ class USB2CAN_DATA(Structure):
                 byteArray[index] = checkSum.value
                 self.checkSum = checkSum.value
 
-        print "can data raw:[%r]" % byteArray
+        #print "can data raw:[%r]" % byteArray
         return byteArray
 
     def convertFromUsbRawData(self, rawData):
@@ -188,7 +188,7 @@ class USB2CANParser():
         arrayToSend.append(self.m_FrameHead)
         arrayToSend.append(self.m_FrameHead)
 
-        for index,dataByte in enumerate(dataIn):
+        for index, dataByte in enumerate(dataIn):
             if dataByte in self.m_FrameSpecial:
                 arrayToSend.append(self.m_FrameCtrl)
             arrayToSend.append(dataByte)
@@ -196,7 +196,7 @@ class USB2CANParser():
         arrayToSend.append(self.m_FrameTail)
         arrayToSend.append(self.m_FrameTail)
 
-        print "byteArray %r" % arrayToSend
+        #print "byteArray %r" % arrayToSend
         return arrayToSend
 
     def getFrameFromRawData(self, rawFrame):
@@ -438,7 +438,7 @@ class CAN_FRAME(Structure):
     def getCanStationId(self):
         stationId = (self.sig[3] >> 3) & 0x1f
         stationId |= (self.sig[2] & 0x7) << 5
-        print "getCanStationid = ", stationId
+        #print "getCanStationid = ", stationId
 
         return stationId
 
@@ -481,10 +481,8 @@ class CanProxy():
         return
 
     def proxyHandleCanFrameReceived(self, canFrame):
-        print "handleCanFrameReceived"
-        stationId = canFrame.getCanStationId()
-        self.stationDaemonMgmt.getStationDaemon(stationId).daemonHandleCanFrameReceived(canFrame)
-        
+        #print "handleCanFrameReceived"
+        self.stationDaemonMgmt.daemonHandleCanFrameReceived(canFrame)
         return
 
     def sendCanFrame(self, frame):
@@ -495,7 +493,7 @@ class CanProxy():
             self.serialHandler.SendData(dataToSend.dumpDataToSend())
 
     def proxyReceiveCanFrame(self, rawData):
-        print "proxyReceiveCanFrame"
+        #print "proxyReceiveCanFrame"
 
         if len(rawData) != sizeof(USB2CAN_DATA):
             print "receiveFrame -> error data len not match"

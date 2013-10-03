@@ -34,12 +34,14 @@ class IoNode():
         return info
 
     def doOutputAction(self, flag):
+
+        print self.getNodeNameWithCategory(), "set port ", self.port, "%r" % flag
+
         self.onOffFlag = flag
         stationDaemonMgmt = globalGetRuntime().stationDaemonMgmt
         stationDaemonMgmt.doIoNodeOutput(self)
 
         return
-
 
 
 class IoNodeCategory():

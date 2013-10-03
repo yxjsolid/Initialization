@@ -514,13 +514,16 @@ class Panel_EditAction(MainBase.Panel_EditAction_Base):
         self.onLoadUpdate()
 
     def updateActionOutPutView(self, actObj):
+        self.outputObj = actObj.outputObj
+        self.feedbackObj = actObj.feedbackObj
+
         self.output_txt.SetValue(actObj.outputObj.getNodeNameWithCategory())
         self.outVal_txt.SetValue(str(actObj.outputValue))
 
         if actObj.needFeedback:
             self.needFeedback_cb.SetValue(1)
             self.feedback_txt.SetValue(actObj.feedbackObj.getNodeNameWithCategory())
-            self.feedbackTimeout_txt.SetValue(actObj.feedbackTimeout)
+            self.feedbackTimeout_txt.SetValue(str(actObj.feedbackTimeout))
 
         return
 

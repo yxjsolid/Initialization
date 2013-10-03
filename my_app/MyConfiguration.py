@@ -36,6 +36,14 @@ class StationConfiguration():
     def getCanStationList(self):
         return self.stationList
 
+    def dumpStationCfg(self):
+        for station in self.stationList:
+            station.dumpInfo()
+
+    def onLoadInit(self):
+        for station in self.stationList:
+            station.onLoadInit()
+
 
 class GuiStatusDisplayCfg():
     def __init__(self, pos, colSetting, nodeList):

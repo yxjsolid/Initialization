@@ -86,7 +86,7 @@ class SerialHandler:
             self.l_serial.write(i_msg)
             self.doSerialRelease()
 
-        print "serial send done"
+        #print "serial send done"
         return
     def FirstReader(self):
 

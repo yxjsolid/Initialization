@@ -7,9 +7,6 @@ import datetime
 from mySerial.canData import *
 
 
-
-
-
 class DeviceCanStation():
     def __init__(self, name=CAN_STATION_DEFAULT_NAME, info=CAN_STATION_DEFAULT_DESC):
         self.name = name
@@ -67,6 +64,21 @@ class DeviceCanStation():
         board = self.getOutputBoard(boardId)
         board.doSetIoCmd(IO_DATA)
 
+    def onLoadInit(self):
+        for board in self.InputBoardList:
+            board.onLoadInit()
+
+        for board in self.OutputBoardList:
+            board.onLoadInit()
+
+    def dumpInfo(self):
+        print self.name, " id:", self.stationId
+        for board in self.InputBoardList:
+            board.dumpInfo()
+
+        for board in self.OutputBoardList:
+            board.dumpInfo()
+
 
 class DeviceIoBoard():
 
@@ -87,9 +99,11 @@ class DeviceIoBoard():
         self.boardId = 0
         self.isOk = 0
         self.boardStatus = 0
-        self.IoStatus = 0
+
         self.pendingReq = 0
         self.station = stationIn
+
+        self.IoStatus = 0xff
         self.outputStatus = 0xff
 
         return
@@ -130,6 +144,8 @@ class DeviceIoBoard():
         canFrame.setCMDBoardType(self.boardType)
         canFrame.setCMDBoardID(self.boardId)
         canFrame.setCMDBoardStatus(self.boardStatus)
+
+       # print "outputstatus %x" % self.outputStatus
         canFrame.setCmdData(self.outputStatus)
 
         return canFrame
@@ -154,13 +170,19 @@ class DeviceIoBoard():
         return canFrame
 
     def isPortOn(self, port):
+        #print "iostatus = %x" % self.IoStatus
         flag = (~self.IoStatus) & (0x1 << (port - 1))
         return flag
 
-
     def setPortStatus(self, port, onOffFlag):
         if onOffFlag == 1:
-            self.outputStatus &= ~(0x1 << port)
+            self.outputStatus &= ~(0x1 << (port - 1))
         elif onOffFlag == 0:
-            self.outputStatus |= (0x1 << port)
+            self.outputStatus |= (0x1 << (port - 1))
 
+    def onLoadInit(self):
+        self.IoStatus = 0xff
+        self.outputStatus = 0xff
+
+    def dumpInfo(self):
+        print self.getBoardTypeStr(), " id:",self.boardId, "status:%x" % self.outputStatus, "IO:%x" % self.IoStatus

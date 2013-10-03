@@ -19,8 +19,11 @@ class StatusDisplayManagement():
         self.statusDisplayPanel.append(panel)
 
     def addNewStatusDisplayPanel(self, targetPanel, cfg):
-        d = MyDraggable(targetPanel, cfg.pos, (200, 200))
+        d = MyDraggable(targetPanel, cfg.pos, (1000, 1000))
         subP = Panel_Status_Display(d, cfg.nodeList, cfg.colSetting, cfg)
+
+        d.addChildPanel(subP)
+
         d.AdjustToChild(subP)
         subP.Refresh()
         d.Refresh()
@@ -59,6 +62,9 @@ class statusDisplayView():
 
     def doUpdateStatus(self, index, nodeObj):
         isOn = nodeObj.board.isPortOn(nodeObj.port)
+
+        print datetime.datetime.now(), "status update", nodeObj.board.getBoardTypeStr(), "isOn:", isOn
+
         if isOn > 0:
             statusInfo = nodeObj.onInfo
         else:
@@ -67,8 +73,8 @@ class statusDisplayView():
 
     def getDisplaySize(self):
         rowCnt = self.viewCtrl.GetNumberRows()
-        height = 47 + rowCnt * 30
-        width = 47 + self.colSetting[0] + self.colSetting[1]
+        height = 51 + rowCnt * 30
+        width = 51 + self.colSetting[0] + self.colSetting[1]
 
         return (width, height)
 
@@ -182,7 +188,7 @@ class Panel_Status_Display(MainBase.Panel_Status_Display_Base):
         return
 
     def doStatusUpdate(self):
-        print "doStatusUpdate"
+        #print "doStatusUpdate"
         for i, nodeObj in enumerate(self.nodeObjList):
             self.viewCtrl.doUpdateStatus(i, nodeObj)
 

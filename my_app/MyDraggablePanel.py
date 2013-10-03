@@ -13,6 +13,15 @@ class MyDraggable(wx.Panel):
         self.Bind(wx.EVT_LEFT_UP, self.OnRelease)
         self.Bind(wx.EVT_MOTION, self.OnMouseMove)
 
+    def addChildPanel(self, child):
+        self.SetSizeHintsSz(wx.DefaultSize, wx.DefaultSize)
+        bSizer45 = wx.BoxSizer(wx.VERTICAL)
+        bSizer45.Add(child, 1, wx.EXPAND, 0)
+        self.SetSizer(bSizer45)
+        self.Layout()
+
+        #self.Centre( wx.BOTH )
+
     def OnClick(self, e):
         self.CaptureMouse()
         self.clickDelta = e.GetPositionTuple()
@@ -39,14 +48,27 @@ class MyDraggable(wx.Panel):
             #self.Refresh()
 
     def AdjustToChild(self, child):
-        #self.AdjustToSize(child.GetEffectiveMinSize())
+
+
+
+        # print "child.GetEffectiveMinSize()", child.GetEffectiveMinSize()
+        # print "child.getDisplaySize()", child.getDisplaySize()
+        # print "child.GetAdjustedBestSize",child.GetAdjustedBestSize()
+
         self.child = child
-        x, y = child.getDisplaySize()
-        child.SetSize(wx.Size(x, y))
-        self.AdjustToSize(wx.Size(x, y))
+        self.AdjustToSize(child.GetEffectiveMinSize())
+
+
+        # self.child = child
+        # x, y = child.getDisplaySize()
+        #
+        # child.SetSize(wx.Size(x, y))
+        # self.AdjustToSize(wx.Size(x, y))
 
     def AdjustToSize(self, size):
         size = wx.Size(*size)
         # self._bestSize = size + (RW_THICKNESS, RW_THICKNESS)
         self._bestSize = size
-        self.SetSize(self._bestSize)
+
+        self.SetClientSize(self._bestSize)
+        #self.SetSize(self._bestSize)

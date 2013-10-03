@@ -116,6 +116,12 @@ class MyFrame(MainBase.FrameBase):
         self.onCfgLoadUpdate()
 
     def onCfgLoadUpdate(self):
+        cfg = globalGetCfg()
+
+        stationcfg = cfg.stationCfg
+        stationcfg.onLoadInit()
+        stationcfg.dumpStationCfg()
+
         self.viewPanel_sub.onCfgLoadUpdate()
 
     def onMenuBtnClicked(self, event):
