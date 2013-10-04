@@ -5,7 +5,8 @@ from math import pi
 from PIL import Image
 # from MyMiddleWare import *
 from MyGlobal import *
-import MyMiddleWare
+#import MyMiddleWare
+from MiddleWare_Widget_Setting import *
 
 pygame.font.init()
 try:
@@ -986,10 +987,8 @@ class AnimateTansporterSprite(DragSprite):
         self.parent.PopupMenu(menu)
 
     def onBeginDeviceSetting(self, event):
-        print "onButtonSetting"
-        window = MyPopupWindow(self.parent, size=wx.DefaultSize, title="setting")
-
-        MyMiddleWare.Panel_DeviceAnimationSetting(window.frame, self, self.onDeviceAnimationSettingDone)
+        window = MyPopupWindow(self.parent, size=wx.DefaultSize, title=LABEL_ANIMATION_ACTION_BIND)
+        Panel_AnimationCondition_Setting(window, self, self.onDeviceAnimationSettingDone)
         window.windowPopup()
 
     def onDeviceAnimationSettingDone(self, attribute, attrCondition):
@@ -1202,10 +1201,8 @@ class ButtonSprite(DragSprite):
             self.parent.PopupMenu(menu)
 
         def onBeginButtonSetting(self, event):
-            print "onButtonSetting"
             window = MyPopupWindow(self.parent, size=wx.DefaultSize, title=LABEL_BUTTON_ACTION_BIND)
-
-            MyMiddleWare.Panel_ButtonSetting(window.frame, self, self.onButtonSettingDone)
+            Panel_ButtonSetting(window.frame, self, self.onButtonSettingDone)
             window.windowPopup()
 
         def onButtonSettingDone(self, operOn, operOff):

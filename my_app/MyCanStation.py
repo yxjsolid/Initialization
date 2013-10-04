@@ -128,7 +128,10 @@ class DeviceIoBoard():
         return str(self.boardId)
 
     def getBoardTypeStr(self):
-        return DeviceIoBoard.board_type_choices[self.boardType]
+        return self.getBoardTypeStrByTypeId(self.boardType)
+
+    def getBoardTypeStrByTypeId(self, boardType):
+        return DeviceIoBoard.board_type_choices[boardType]
 
     def prepareNewCanFrame(self):
         canFrame = CAN_FRAME()

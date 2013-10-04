@@ -2441,70 +2441,10 @@ class Panel_Action_Group_Select_Base ( wx.Panel ):
 	
 
 ###########################################################################
-## Class testPanel
+## Class Panel_AnimationCondition_Setting_Base
 ###########################################################################
 
-class testPanel ( wx.Panel ):
-	
-	def __init__( self, parent ):
-		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL )
-		
-		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_CAPTIONTEXT ) )
-		
-		bSizer27 = wx.BoxSizer( wx.VERTICAL )
-		
-		self.m_treeCtrl3 = wx.TreeCtrl( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TR_DEFAULT_STYLE )
-		bSizer27.Add( self.m_treeCtrl3, 0, wx.ALL, 5 )
-		
-		
-		self.SetSizer( bSizer27 )
-		self.Layout()
-	
-	def __del__( self ):
-		pass
-	
-
-###########################################################################
-## Class MyPanel14
-###########################################################################
-
-class MyPanel14 ( wx.Panel ):
-	
-	def __init__( self, parent ):
-		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL )
-		
-		bSizer29 = wx.BoxSizer( wx.VERTICAL )
-		
-		sbSizer13 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, _(u"按钮关闭") ), wx.HORIZONTAL )
-		
-		self.m_staticText37 = wx.StaticText( self, wx.ID_ANY, _(u"MyLabel"), wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText37.Wrap( -1 )
-		sbSizer13.Add( self.m_staticText37, 0, wx.ALL, 5 )
-		
-		self.m_textCtrl19 = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		sbSizer13.Add( self.m_textCtrl19, 0, wx.ALL, 5 )
-		
-		
-		bSizer29.Add( sbSizer13, 1, 0, 5 )
-		
-		sbSizer15 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, _(u"按钮开启") ), wx.VERTICAL )
-		
-		
-		bSizer29.Add( sbSizer15, 1, wx.EXPAND, 5 )
-		
-		
-		self.SetSizer( bSizer29 )
-		self.Layout()
-	
-	def __del__( self ):
-		pass
-	
-
-###########################################################################
-## Class Panel_DeviceAnimationSetting_Base
-###########################################################################
-
-class Panel_DeviceAnimationSetting_Base ( wx.Panel ):
+class Panel_AnimationCondition_Setting_Base ( wx.Panel ):
 	
 	def __init__( self, parent ):
 		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 391,241 ), style = wx.TAB_TRAVERSAL )
@@ -2520,7 +2460,7 @@ class Panel_DeviceAnimationSetting_Base ( wx.Panel ):
 		fgSizer34.SetFlexibleDirection( wx.BOTH )
 		fgSizer34.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		sbSizer13 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, _(u"动画设置") ), wx.VERTICAL )
+		sbSizer13 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, _(u"活动设置") ), wx.VERTICAL )
 		
 		fgSizer35 = wx.FlexGridSizer( 1, 3, 0, 0 )
 		fgSizer35.AddGrowableCol( 1 )
@@ -2529,7 +2469,7 @@ class Panel_DeviceAnimationSetting_Base ( wx.Panel ):
 		
 		bSizer42 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.m_staticText37 = wx.StaticText( self, wx.ID_ANY, _(u"绑定变量"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText37 = wx.StaticText( self, wx.ID_ANY, _(u"绑定数据点"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText37.Wrap( -1 )
 		bSizer42.Add( self.m_staticText37, 0, wx.ALL|wx.EXPAND, 5 )
 		
@@ -2591,7 +2531,7 @@ class Panel_DeviceAnimationSetting_Base ( wx.Panel ):
 		self.Layout()
 		
 		# Connect Events
-		self.m_button27.Bind( wx.EVT_BUTTON, self.onSelectAttributeBind )
+		self.m_button27.Bind( wx.EVT_BUTTON, self.onSelectConditionBind )
 		self.applyBtn.Bind( wx.EVT_BUTTON, self.onApply )
 		self.m_button41.Bind( wx.EVT_BUTTON, self.onCancel )
 	
@@ -2600,7 +2540,7 @@ class Panel_DeviceAnimationSetting_Base ( wx.Panel ):
 	
 	
 	# Virtual event handlers, overide them in your derived class
-	def onSelectAttributeBind( self, event ):
+	def onSelectConditionBind( self, event ):
 		event.Skip()
 	
 	def onApply( self, event ):

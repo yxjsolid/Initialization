@@ -141,8 +141,8 @@ ACTION_TYPE_SET_INTERNAL_NAME = u"内部变量设置"
 ACTION_DETAIL_STR_FORMAT = u"%s   输出:[%s]"
 
 LABEL_BUTTON_ACTION_BIND = u"按钮动作绑定"
-
-
+LABEL_ANIMATION_ACTION_BIND = u"设置活动条件"
+LABEL_CONDITION_SELECT = u"选择数据点"
 
 rescoure_dir = r".\image\\"
 
@@ -164,6 +164,9 @@ image_fish = rescoure_dir + "fugu.png"
 def globalGetRuntime():
     return wx.GetApp().getRuntime()
 
+def globalGetCfg():
+    cfgObj = wx.GetApp().getConfigure()
+    return cfgObj
 
 class MyPopupWindow():
     def __init__(self, parent=None, size=(800, 600), title=None):

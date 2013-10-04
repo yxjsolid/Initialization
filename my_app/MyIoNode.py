@@ -30,7 +30,10 @@ class IoNode():
         return info
 
     def getNodeNameWithCategory(self):
-        info = self.category.name + "\\" + self.name
+        # typeStr = DeviceIoBoard.BOARD_TYPE_INPUT
+        typeStr = DeviceIoBoard().getBoardTypeStrByTypeId(self.category.type)
+
+        info = typeStr + "\\" + self.category.name + "\\" + self.name
         return info
 
     def doOutputAction(self, flag):
@@ -53,4 +56,3 @@ class IoNodeCategory():
 
     def removeIoNode(self, nodeObj):
         self.ioNodeList.remove(nodeObj)
-

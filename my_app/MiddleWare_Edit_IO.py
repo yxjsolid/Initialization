@@ -5,7 +5,7 @@ import wx
 import MainBase
 from MyGlobal import *
 from MyIoNode import *
-from MyConfiguration import *
+#from MyConfiguration import *
 
 
 class IoCategoryViewControl():

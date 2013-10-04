@@ -8,7 +8,7 @@ from MyIoNode import *
 from MiddleWare_Edit_IO import *
 from MyWidgetLibrary import *
 from MyDraggablePanel import *
-
+from MyConfiguration import *
 
 class StatusDisplayManagement():
     def __init__(self):

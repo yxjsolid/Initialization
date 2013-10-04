@@ -2,11 +2,6 @@ import wx
 from MySprite import *
 
 
-def globalGetCfg():
-    cfgObj = wx.GetApp().getConfigure()
-    return cfgObj
-
-
 class ActionGroupConfiguration():
     def __init__(self):
         self.actionGrpList = []
