@@ -4,6 +4,7 @@
 from MyGlobal import *
 import threading
 
+
 class ActionManagement():
     def __init__(self):
 
@@ -14,20 +15,9 @@ class ActionManagement():
             act.doAction()
 
     def processOperation(self, actGrp):
-        # txt = u"操作:"
-        # txt += " " + actGrp.genOperationDisplayName()
-        # print "processOperation:", txt
-        # LogWriter.writeLog(txt)
-        #
-        #
-        # for act in self.actions:
-        #     act.doAction()
-        actionMgmt = globalGetRuntime().actionMgmt
-
         self.actionThread = threading.Thread(target=self.operationProcessTask, args=(actGrp,))
         # self.thread_read.setDaemon(1)
         self.actionThread.start()
-
 
 
 class ActionGroup():
@@ -54,8 +44,6 @@ class ActionGroup():
         txt = self.name
         return txt
 
-
-
     def processOperation(self):
         txt = u"操作:"
         txt += " " + self.genOperationDisplayName()
@@ -67,7 +55,6 @@ class ActionGroup():
         #     act.doAction()
         actionMgmt = globalGetRuntime().actionMgmt
         actionMgmt.processOperation(self)
-
 
 
 class ActionBase():
@@ -82,8 +69,6 @@ class ActionBase():
 
     def getActionTypeStr(self):
         return ActionBase.ACTION_TYPE_STR[self.type]
-
-
 
 
 class ActionOutput(ActionBase):
@@ -132,6 +117,7 @@ class ActionInternalSet(ActionBase):
     def getActionDetail(self):
         return
 
+
 class ActionTimeDelay(ActionBase):
     def __init__(self):
         ActionBase.__init__(self)
@@ -140,5 +126,4 @@ class ActionTimeDelay(ActionBase):
         return
 
     def getActionDetail(self):
-
         return u"等待: [%d]秒" % (self.delayTime)

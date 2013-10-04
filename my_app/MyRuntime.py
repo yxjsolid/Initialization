@@ -17,7 +17,6 @@ class RuntimeManagement():
         self.canProxy = None
         self.buildCanStationManagement()
 
-
     def doRun(self):
         print "RuntimeManagement run"
 

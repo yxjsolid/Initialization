@@ -58,7 +58,7 @@ class statusDisplayView():
         self.viewCtrl = viewCtrl
         # self.SetupStatusDispList()
         self.colSetting = colSetting
-        self.setupStatusDisplayGrid(colSetting)
+        self.setupStatusDisplayGrid()
 
         return
 
@@ -73,7 +73,7 @@ class statusDisplayView():
         width = 51 + self.colSetting[0] + self.colSetting[1]
         return width, height
 
-    def setupStatusDisplayGrid(self, colSetting):
+    def setupStatusDisplayGrid(self):
         self.viewCtrl.SetColLabelValue(0, STATUS_DISPLAY_NAME)
         self.viewCtrl.SetColLabelValue(1, STATUS_DISPLAY_STATUS)
 
