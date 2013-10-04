@@ -689,7 +689,7 @@ class Panel_EditAction(MainBase.Panel_EditAction_Base):
         return
 
     def openIoNodeSelWindow(self):
-        window = MyPopupWindow(parent=self, size=(600, 400), title=IO_NODE_ADD_NEW)
+        window = MyPopupWindow(parent=self, size=(600, 400), title=WINDOW_TITLE_SELECT_IO_NODE)
         panel = Panel_Manage_IO_Node(window, self, Panel_Manage_IO_Node.MODE_SELECT)
         panel.disableToolBar()
         window.windowPopup()

@@ -91,10 +91,10 @@ sg28
 g29
 sS'IoStatus'
 p42
-I127
+I255
 sS'boardStatus'
 p43
-I2
+I0
 sba(iMyCanStation
 DeviceIoBoard
 p44
@@ -112,9 +112,9 @@ I0
 sg28
 g29
 sg42
-I127
+I255
 sg43
-I1
+I0
 sbasg22
 V\u9ed8\u8ba4\u7ad9\u70b9
 p46
@@ -128,7 +128,7 @@ p49
 g37
 I2
 sg38
-I127
+I255
 sg39
 I1
 sg40
@@ -138,9 +138,9 @@ I0
 sg28
 g29
 sg42
-I0
+I255
 sg43
-I2
+I0
 sbasS'pendingStatusCheck'
 p51
 I0

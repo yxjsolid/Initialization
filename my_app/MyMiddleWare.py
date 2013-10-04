@@ -38,23 +38,23 @@ class MyFrame(MainBase.FrameBase):
 
         return
 
-    def editIOStation(self):
-        frame1 = wx.Frame(parent=self.parent, size=(800,400))
-        Panel_Manage_Can_Station(frame1)
-        frame1.CenterOnScreen()
-        frame1.Show()
+    def onEditIOStation(self):
+        window = MyPopupWindow(size=(600, 400), title=WINDOW_TITLE_EDIT_IO_STATION)
+        Panel_Manage_Can_Station(window)
+        window.windowPopup()
         return
 
-    def editIONode(self):
-        window = MyPopupWindow(size=(600, 400), title=IO_NODE_ADD_NEW)
+    def onEditIONode(self):
+        window = MyPopupWindow(size=(600, 400), title=WINDOW_TITLE_EDIT_IO_NODE)
         Panel_Manage_IO_Node(window)
         window.windowPopup()
         return
 
-    def editAction(self):
-        window = MyPopupWindow(size=(600, 400), title=WINDOW_TITLE_ACTION_GROUP)
+    def onEditAction(self):
+        window = MyPopupWindow(size=(600, 400), title=WINDOW_TITLE_ACTION_EDIT_GROUP)
         Panel_Manage_Action(window)
         window.windowPopup()
+        return
 
     def doRun(self):
         wx.GetApp().getRuntime().doRun()
@@ -110,15 +110,10 @@ class MyFrame(MainBase.FrameBase):
         wx.GetApp().setConfigure(cfgObj)
         wx.GetApp().initRuntime()
 
-
         self.viewPanel_sub.onEditUpdate()
         self.onCfgLoadUpdate(cfgObj)
 
     def onCfgLoadUpdate(self, cfgObj):
-        stationcfg = cfgObj.stationCfg
-        stationcfg.onLoadInit()
-        stationcfg.dumpStationCfg()
-
         cfgObj.onCfgLoadUpdate(self.viewPanel_sub.myHMIPanel)
 
         # self.viewPanel_sub.onCfgLoadUpdate()
@@ -128,9 +123,9 @@ class MyFrame(MainBase.FrameBase):
         ret = {
         MainBase.ID_MENU_SAVE:          lambda: self.onSave(),
         MainBase.ID_MENU_LOAD:          lambda: self.onLoad(),
-        MainBase.ID_MENU_EDIT_STATION:  lambda: self.editIOStation(),
-        MainBase.ID_MENU_EDIT_IO_NODE:  lambda: self.editIONode(),
-        MainBase.ID_MENU_EDIT_ACTION:  lambda: self.editAction(),
+        MainBase.ID_MENU_EDIT_STATION:  lambda: self.onEditIOStation(),
+        MainBase.ID_MENU_EDIT_IO_NODE:  lambda: self.onEditIONode(),
+        MainBase.ID_MENU_EDIT_ACTION:  lambda: self.onEditAction(),
 
         MainBase.ID_MENU_ADD_DEVICE:    lambda: self.addDevice(),
         MainBase.ID_MENU_EDIT_DEVICE:   lambda: self.editDevice(),

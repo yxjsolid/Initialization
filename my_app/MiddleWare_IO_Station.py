@@ -478,10 +478,10 @@ class IoBoardViewControl():
 
 
 class Panel_Manage_Can_Station(MainBase.Panel_Manage_Can_Station_Base):
-    def __init__(self, frame):
-        MainBase.Panel_Manage_Can_Station_Base.__init__(self, frame)
+    def __init__(self, window):
+        MainBase.Panel_Manage_Can_Station_Base.__init__(self, window.frame)
 
-        self.frame = frame
+        self.window = window
         self.canStationViewCtrl = CanStationViewControl(self)
         self.ioBoardViewCtrl = IoBoardViewControl(self)
         self.onLoadUpdate()
@@ -495,7 +495,7 @@ class Panel_Manage_Can_Station(MainBase.Panel_Manage_Can_Station_Base):
         return
 
     def closeWindow(self):
-        self.frame.Close()
+        self.window.closeWindow()
 
     def onApply(self, event):
         canStationList = self.canStationViewCtrl.getCanStationList()

@@ -123,7 +123,7 @@ class Panel_AnimationCondition_Setting(MainBase.Panel_AnimationCondition_Setting
         return
 
     def onSelectConditionBind(self, event):
-        window = MyPopupWindow(size=(600, 400), title=LABEL_CONDITION_SELECT)
+        window = MyPopupWindow(size=(600, 400), title=WINDOW_TITLE_SELECT_IO_NODE)
         # Panel_AttributeSelect(window, self, self.callbackGetAttributeSelect)
         Panel_Manage_IO_Node(window, self, Panel_Manage_IO_Node.MODE_SELECT)
         window.windowPopup()

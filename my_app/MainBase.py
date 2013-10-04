@@ -945,8 +945,9 @@ class Panel_Manage_Can_Station_Base ( wx.Panel ):
 		
 		bSizer18 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.m_notebook4 = wx.Notebook( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.IoStation_panel = wx.Panel( self.m_notebook4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		sbSizer25 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, wx.EmptyString ), wx.VERTICAL )
+		
+		self.IoStation_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		bSizer33 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_splitter9 = wx.SplitterWindow( self.IoStation_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SP_3D )
@@ -1013,9 +1014,10 @@ class Panel_Manage_Can_Station_Base ( wx.Panel ):
 		self.IoStation_panel.SetSizer( bSizer33 )
 		self.IoStation_panel.Layout()
 		bSizer33.Fit( self.IoStation_panel )
-		self.m_notebook4.AddPage( self.IoStation_panel, _(u"控制"), True )
+		sbSizer25.Add( self.IoStation_panel, 1, wx.EXPAND |wx.ALL, 5 )
 		
-		bSizer18.Add( self.m_notebook4, 1, wx.ALL|wx.EXPAND, 5 )
+		
+		bSizer18.Add( sbSizer25, 1, wx.ALL|wx.EXPAND, 5 )
 		
 		
 		fgSizer4.Add( bSizer18, 1, wx.EXPAND, 5 )
@@ -1101,6 +1103,8 @@ class Panel_Manage_Action_Base ( wx.Panel ):
 		
 		bSizer18 = wx.BoxSizer( wx.VERTICAL )
 		
+		sbSizer26 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, wx.EmptyString ), wx.VERTICAL )
+		
 		self.IoStation_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		bSizer33 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -1168,7 +1172,10 @@ class Panel_Manage_Action_Base ( wx.Panel ):
 		self.IoStation_panel.SetSizer( bSizer33 )
 		self.IoStation_panel.Layout()
 		bSizer33.Fit( self.IoStation_panel )
-		bSizer18.Add( self.IoStation_panel, 1, wx.EXPAND |wx.ALL, 5 )
+		sbSizer26.Add( self.IoStation_panel, 1, wx.EXPAND |wx.ALL, 5 )
+		
+		
+		bSizer18.Add( sbSizer26, 1, wx.ALL|wx.EXPAND, 5 )
 		
 		
 		fgSizer4.Add( bSizer18, 1, wx.EXPAND, 5 )
@@ -1390,8 +1397,9 @@ class Panel_Manage_IO_Node_Base ( wx.Panel ):
 		
 		bSizer18 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.m_notebook4 = wx.Notebook( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.IoStation_panel = wx.Panel( self.m_notebook4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		sbSizer24 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, wx.EmptyString ), wx.VERTICAL )
+		
+		self.IoStation_panel = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		bSizer33 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_splitter9 = wx.SplitterWindow( self.IoStation_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SP_3D )
@@ -1447,9 +1455,10 @@ class Panel_Manage_IO_Node_Base ( wx.Panel ):
 		self.IoStation_panel.SetSizer( bSizer33 )
 		self.IoStation_panel.Layout()
 		bSizer33.Fit( self.IoStation_panel )
-		self.m_notebook4.AddPage( self.IoStation_panel, _(u"控制"), True )
+		sbSizer24.Add( self.IoStation_panel, 1, wx.EXPAND |wx.ALL, 5 )
 		
-		bSizer18.Add( self.m_notebook4, 1, wx.ALL|wx.EXPAND, 5 )
+		
+		bSizer18.Add( sbSizer24, 1, wx.ALL|wx.EXPAND, 5 )
 		
 		
 		fgSizer4.Add( bSizer18, 1, wx.EXPAND, 5 )
