@@ -87,18 +87,29 @@ class DeviceIoBoard():
     BOARD_TYPE_OUTPUT = 2
     board_type_choices = [LABEL_IO_BOARD_TYPE_UNKNOWN, LABEL_IO_BOARD_INPUT, LABEL_IO_BOARD_OUTPUT]
 
-    Board_status_Init = 0
-    Board_status_Connected = 1
-    Board_status_Disconnected = 2
-    Board_status_Recover = 3
-    Board_status_recover_Reply = 4
-    Board_status_Ok = 5
+    BOARD_STATUS_NONE_RESPONSE = -1
+    BOARD_STATUS_INIT = 0
+    BOARD_STATUS_CONNECTED = 1
+    BOARD_STATUS_DISCONNECTED = 2
+    BOARD_STATUS_RECOVER = 3
+    BOARD_STATUS_RECOVER_REPLY = 4
+    BOARD_STATUS_OK = 5
+
+    board_status_info_dict = {
+        BOARD_STATUS_NONE_RESPONSE : STR_BOARD_STATUS_NONE_RESPONSE,
+        BOARD_STATUS_INIT          : STR_BOARD_STATUS_INIT,
+        BOARD_STATUS_CONNECTED     : STR_BOARD_STATUS_CONNECTED,
+        BOARD_STATUS_DISCONNECTED  : STR_BOARD_STATUS_DISCONNECTED,
+        BOARD_STATUS_RECOVER       : STR_BOARD_STATUS_RECOVER,
+        BOARD_STATUS_RECOVER_REPLY : STR_BOARD_STATUS_RECOVER_REPLY,
+        BOARD_STATUS_OK            : STR_BOARD_STATUS_OK,
+        }
 
     def __init__(self, stationIn=None):
         self.boardType = 0
         self.boardId = 0
         self.isOk = 0
-        self.boardStatus = 0
+        self.boardStatus = DeviceIoBoard.BOARD_STATUS_INIT
 
         self.pendingReq = 0
         self.station = stationIn
@@ -108,10 +119,19 @@ class DeviceIoBoard():
 
         return
 
-    def updateBoardStatus(self, boardId, status):
-        self.clearPendingRequest()
-        self.IoStatus = status
+    def boardResponseTimeout(self):
+        self.updateBoardStatus(DeviceIoBoard.BOARD_STATUS_NONE_RESPONSE)
         return
+
+    def updateBoardStatus(self, newStatus):
+        if newStatus == DeviceIoBoard.BOARD_STATUS_DISCONNECTED:
+            print self.getBoardTypeStr(), " id: [%r] " % self.boardId, "子板无应答"
+
+        self.boardStatus = newStatus
+        return
+
+    def updateIoStatus(self, ioData):
+        self.IoStatus = ioData
 
     def setPendingRequest(self):
         self.pendingReq += 1
@@ -168,14 +188,33 @@ class DeviceIoBoard():
         canFrame.setCMDBoardType(self.boardType)
         canFrame.setCMDBoardID(self.boardId)
         canFrame.setCMDBoardStatus(self.boardStatus)
-
         #canFrame.dumpCanData()
         return canFrame
 
     def isPortOn(self, port):
         #print "iostatus = %x" % self.IoStatus
         flag = (~self.IoStatus) & (0x1 << (port - 1))
-        return flag
+
+        if flag > 0:
+            return True
+        else:
+            return False
+
+    def getBoardStatusInfo(self):
+        return DeviceIoBoard.board_status_info_dict[self.boardStatus]
+
+    def getBoardPortStatus(self, ioNode, port):
+        if self.boardStatus == DeviceIoBoard.BOARD_STATUS_CONNECTED:
+            isOn = self.isPortOn(port)
+            if isOn > 0:
+                statusInfo = ioNode.onInfo
+            else:
+                statusInfo = ioNode.offInfo
+        else:
+            statusInfo = self.getBoardStatusInfo()
+
+        return statusInfo
+
 
     def setPortStatus(self, port, onOffFlag):
         if onOffFlag == 1:

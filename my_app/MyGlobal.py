@@ -144,6 +144,25 @@ LABEL_BUTTON_ACTION_BIND = u"按钮动作绑定"
 LABEL_ANIMATION_ACTION_BIND = u"设置活动条件"
 LABEL_CONDITION_SELECT = u"选择数据点"
 
+
+
+BOARD_STATUS_DEFAULT = u"待检测"
+STR_BOARD_STATUS_NONE_RESPONSE  = u"主站无应答"
+STR_BOARD_STATUS_INIT           = BOARD_STATUS_DEFAULT
+STR_BOARD_STATUS_CONNECTED      = u"正常"
+STR_BOARD_STATUS_DISCONNECTED   = u"子板无应答"
+STR_BOARD_STATUS_RECOVER        = u"子板重置"
+STR_BOARD_STATUS_RECOVER_REPLY  = u"重置恢复"
+STR_BOARD_STATUS_OK             = u"正常"
+
+
+
+
+
+
+
+
+
 rescoure_dir = r".\image\\"
 
 btn_red_off = rescoure_dir + r"red_up.png"

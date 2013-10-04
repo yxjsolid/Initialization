@@ -62,14 +62,7 @@ class statusDisplayView():
         return
 
     def doUpdateStatus(self, index, nodeObj):
-        isOn = nodeObj.board.isPortOn(nodeObj.port)
-
-        print datetime.datetime.now(), "status update", nodeObj.board.getBoardTypeStr(), "isOn:", isOn
-
-        if isOn > 0:
-            statusInfo = nodeObj.onInfo
-        else:
-            statusInfo = nodeObj.offInfo
+        statusInfo = nodeObj.board.getBoardPortStatus(nodeObj, nodeObj.port)
         self.viewCtrl.SetCellValue(index, 1, statusInfo)
 
     def getDisplaySize(self):

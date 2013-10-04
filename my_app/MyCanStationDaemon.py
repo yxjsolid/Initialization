@@ -35,7 +35,7 @@ class CanStationDaemonManagement():
 
     def startStatusCheck(self):
         for stationId in self.daemonDict:
-            self.getStationDaemon(stationId).daemonDoStatusCheck(0.2)
+            self.getStationDaemon(stationId).daemonDoStatusCheck(1)
 
     def sendCanFrame(self, frame):
         self.dataProxy.sendCanFrame(frame)
@@ -60,7 +60,9 @@ class CanStationDaemon():
         self.station = stationIn
         self.boardStatusCheckEventDict = {}
         self.boardSetCmdEventDict = {}
-        self.boardActionEventDict = {}
+        self.stationLock = None
+        self.stationSendFrameEvent = None
+
         self.daemonMgmt = daemonMgmt
         self.doInit()
         # self.statusCheckTask = None
@@ -73,14 +75,24 @@ class CanStationDaemon():
 
     def boardInit(self, board):
         self.boardStatusCheckEventDict[board] = threading.Event()
-        self.boardActionEventDict[board] = threading.Event()
+        self.boardSetCmdEventDict[board] = threading.Event()
 
     def stationInit(self):
+        self.stationLock = threading.Lock()
+        self.stationSendFrameEvent = threading.Event()
+
         for board in self.station.InputBoardList:
             self.boardInit(board)
 
         for board in self.station.OutputBoardList:
             self.boardInit(board)
+
+    def doStationLock(self):
+        return self.stationLock.acquire()
+
+    def doStationRelease(self):
+        self.stationLock.release()
+
 
     def daemonDoStatusCheck(self, interval):
         _dict = self.boardStatusCheckEventDict
@@ -91,6 +103,12 @@ class CanStationDaemon():
 
     def doBoardStatusCheck(self, board, event, interval):
         #print datetime.datetime.now(),  "doStatusCheck "
+        #self.stationSendFrameEvent.wait(1)
+        self.doStationLock()
+        self.stationSendFrameEvent.wait(0.2)
+        #print datetime.datetime.now(),  "station send frame"
+        self.doStationRelease()
+
         frame = board.genStatusCheckData()
         self.daemonMgmt.sendCanFrame(frame)
         #self.setPendingRequest()
@@ -109,27 +127,52 @@ class CanStationDaemon():
         event = _dict[board]
         return event
 
+    def getCmdSetEvent(self, board):
+        _dict = self.boardSetCmdEventDict
+        event = _dict[board]
+        return event
+
+    def getPendingEvent(self, cmdType, board):
+        if cmdType == CAN_FRAME.CAN_FRAME_SET_ACTION:
+            event = self.getCmdSetEvent(board)
+        elif cmdType == CAN_FRAME.CAN_FRAME_STATUS_CHECK:
+            event = self.getBoardStatusCheckEvent(board)
+        else:
+            event = None
+
+        return event
+
     def daemonHandleCanFrameReceived(self, canFrame):
+        #print datetime.datetime.now(),  "station receive frame"
+        #self.stationSendFrameEvent.set()
+
+        # self.doStationRelease()
+
         #print "CanStationDaemon --> daemonHandleCanFrameReceived"
         boardType = canFrame.getCMDBoardType()
         boardId = canFrame.getCMDBoardID()
         board = self.station.getBoard(boardType, boardId)
 
-        event = self.getBoardStatusCheckEvent(board)
+        cmdType = canFrame.getCMDType()
+        event = self.getPendingEvent(cmdType, board)
+
+        if event is None:
+            print "station[%d]" % self.station.stationId, board.getBoardTypeStr(), " id: [%r] " % board.boardId, "received packet with unknown cmd type"
+            return
+
         event.set()
+        board.updateBoardStatus(canFrame.getCMDBoardStatus())
+        board.updateIoStatus(canFrame.getCmdData())
 
-        board.boardStatus = canFrame.getCMDBoardStatus()
-        board.IoStatus = canFrame.getCmdData()
-
-        #print "board.IoStatus = %x" % board.IoStatus
-
-        if board.boardStatus == DeviceIoBoard.Board_status_Disconnected:
-            print board.getBoardTypeStr(), " id: [%r] " % board.boardId, "disconnected"
-        else:
-            #print board.getBoardTypeStr(), " id: [%d] " % board.boardId, " get reply"
-            #print "self.IoStatus = %x " % board.IoStatus
-            pass
-        #self.station.stationHandleCanFrameReply(canFrame)
+        # #print "board.IoStatus = %x" % board.IoStatus
+        #
+        # if board.boardStatus == DeviceIoBoard.BOARD_STATUS_DISCONNECTED:
+        #     print board.getBoardTypeStr(), " id: [%r] " % board.boardId, "disconnected"
+        # else:
+        #     #print board.getBoardTypeStr(), " id: [%d] " % board.boardId, " get reply"
+        #     #print "self.IoStatus = %x " % board.IoStatus
+        #     pass
+        # #self.station.stationHandleCanFrameReply(canFrame)
         return
 
     def doSetStationBoardIo(self, board):
@@ -138,7 +181,7 @@ class CanStationDaemon():
         canFrame = board.genSetIoCmdData()
         self.daemonMgmt.sendCanFrame(canFrame)
 
-        _dict[board] = threading.Event()
+        #_dict[board] = threading.Event()
         _dict[board].wait(2)
         if not _dict[board].isSet():
             print " board[%d] setCmd" % board.boardId, " timeout"
