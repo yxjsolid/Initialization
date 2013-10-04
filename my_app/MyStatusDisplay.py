@@ -69,8 +69,7 @@ class statusDisplayView():
         rowCnt = self.viewCtrl.GetNumberRows()
         height = 51 + rowCnt * 30
         width = 51 + self.colSetting[0] + self.colSetting[1]
-
-        return (width, height)
+        return width, height
 
     def setupStatusDisplayGrid(self, colSetting):
         self.viewCtrl.SetColLabelValue(0, STATUS_DISPLAY_NAME)

@@ -53,20 +53,7 @@ class IoCategoryViewControl():
         return
 
     def setupIoCategoryView(self):
-
-        #self.viewTree.SetAGWWindowStyleFlag(CT.TR_HIDE_ROOT | CT.TR_NO_LINES | CT.TR_ROW_LINES)
-
-        #self.viewTree.SetAGWWindowStyleFlag(CT.TR_NO_LINES)
-
-        #self.viewTree.AddColumn(OPERATION_LIST_LABEL_NAME)
-
-        #import w.lib.agw.customtreectrl as CT
-
-        #CT.CustomTreeCtrl
-        # tree.SetColumnEditable(0, True)
-        # tree.SetColumnEditable(1, True)
-        # tree.root = tree.AddRoot("Root Item")
-        self.root = self.viewTree.AddRoot("myroot")
+        self.root = self.viewTree.AddRoot(IO_NODE_ROOT_NAME)
         self.inputRoot = self.viewTree.AppendItem(self.root, EDIT_IO_NODE_LABEL_INPUT)
         self.outputRoot = self.viewTree.AppendItem(self.root, EDIT_IO_NODE_LABEL_OUTPUT)
 
@@ -396,8 +383,8 @@ class IoNodeViewControl():
 
 
 class Panel_Manage_IO_Node(MainBase.Panel_Manage_IO_Node_Base):
-
     MODE_MANAGE, MODE_SELECT = range(2)
+
     def __init__(self, window, onEditParent=None, mode=MODE_MANAGE):
         MainBase.Panel_Manage_IO_Node_Base.__init__(self, window.frame)
         self.categoryCtrl = IoCategoryViewControl(self)
@@ -519,7 +506,6 @@ class Panel_Edit_IO_Node(MainBase.Panel_Edit_IO_Node_Base):
             self.onEditUpdate()
 
         return
-
 
     def setSelectObj(self, choiceObj, clientData):
         for i in range(choiceObj.GetCount()):

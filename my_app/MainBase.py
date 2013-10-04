@@ -65,25 +65,25 @@ class FrameBase ( wx.Frame ):
 		self.m_statusBar1 = self.CreateStatusBar( 1, wx.ST_SIZEGRIP, wx.ID_ANY )
 		self.m_menubar1 = wx.MenuBar( 0 )
 		self.m_menu1 = wx.Menu()
-		self.menuSave = wx.MenuItem( self.m_menu1, ID_MENU_SAVE, _(u"Save"), wx.EmptyString, wx.ITEM_NORMAL )
+		self.menuSave = wx.MenuItem( self.m_menu1, ID_MENU_SAVE, _(u"保存"), wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu1.AppendItem( self.menuSave )
 		
-		self.menuLoad = wx.MenuItem( self.m_menu1, ID_MENU_LOAD, _(u"Load"), wx.EmptyString, wx.ITEM_NORMAL )
+		self.menuLoad = wx.MenuItem( self.m_menu1, ID_MENU_LOAD, _(u"读取"), wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu1.AppendItem( self.menuLoad )
 		
-		self.m_menubar1.Append( self.m_menu1, _(u"File") ) 
+		self.m_menubar1.Append( self.m_menu1, _(u"文件") ) 
 		
 		self.m_menu2 = wx.Menu()
-		self.menuEditStation = wx.MenuItem( self.m_menu2, ID_MENU_EDIT_STATION, _(u"Edit Station"), wx.EmptyString, wx.ITEM_NORMAL )
+		self.menuEditStation = wx.MenuItem( self.m_menu2, ID_MENU_EDIT_STATION, _(u"编辑I/O站点"), wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu2.AppendItem( self.menuEditStation )
 		
-		self.menuEditIoNode = wx.MenuItem( self.m_menu2, ID_MENU_EDIT_IO_NODE, _(u"Edit IO"), wx.EmptyString, wx.ITEM_NORMAL )
+		self.menuEditIoNode = wx.MenuItem( self.m_menu2, ID_MENU_EDIT_IO_NODE, _(u"编辑数据点"), wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu2.AppendItem( self.menuEditIoNode )
 		
-		self.menuEditAction = wx.MenuItem( self.m_menu2, ID_MENU_EDIT_ACTION, _(u"Edit Action"), wx.EmptyString, wx.ITEM_NORMAL )
+		self.menuEditAction = wx.MenuItem( self.m_menu2, ID_MENU_EDIT_ACTION, _(u"编辑动作"), wx.EmptyString, wx.ITEM_NORMAL )
 		self.m_menu2.AppendItem( self.menuEditAction )
 		
-		self.m_menubar1.Append( self.m_menu2, _(u"Edit") ) 
+		self.m_menubar1.Append( self.m_menu2, _(u"编辑") ) 
 		
 		self.SetMenuBar( self.m_menubar1 )
 		
@@ -1413,7 +1413,7 @@ class Panel_Manage_IO_Node_Base ( wx.Panel ):
 		fgSizer34.SetFlexibleDirection( wx.BOTH )
 		fgSizer34.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		self.io_category_tree = CustomTreeCtrl( self.m_panel80, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TR_DEFAULT_STYLE|wx.TR_LINES_AT_ROOT )
+		self.io_category_tree = CustomTreeCtrl( self.m_panel80, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer34.Add( self.io_category_tree, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		

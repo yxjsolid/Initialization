@@ -24,7 +24,7 @@
         <property name="skip_python_events">1</property>
         <property name="use_enum">0</property>
         <property name="use_microsoft_bom">0</property>
-        <object class="Frame" expanded="0">
+        <object class="Frame" expanded="1">
             <property name="aui_managed">0</property>
             <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
@@ -132,7 +132,7 @@
                 <event name="OnSize"></event>
                 <event name="OnUpdateUI"></event>
             </object>
-            <object class="wxMenuBar" expanded="0">
+            <object class="wxMenuBar" expanded="1">
                 <property name="bg"></property>
                 <property name="context_help"></property>
                 <property name="context_menu">1</property>
@@ -177,8 +177,8 @@
                 <event name="OnSetFocus"></event>
                 <event name="OnSize"></event>
                 <event name="OnUpdateUI"></event>
-                <object class="wxMenu" expanded="0">
-                    <property name="label">File</property>
+                <object class="wxMenu" expanded="1">
+                    <property name="label">文件</property>
                     <property name="name">m_menu1</property>
                     <property name="permission">protected</property>
                     <object class="wxMenuItem" expanded="0">
@@ -188,7 +188,7 @@
                         <property name="help"></property>
                         <property name="id">ID_MENU_SAVE</property>
                         <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">Save</property>
+                        <property name="label">保存</property>
                         <property name="name">menuSave</property>
                         <property name="permission">none</property>
                         <property name="shortcut"></property>
@@ -203,7 +203,7 @@
                         <property name="help"></property>
                         <property name="id">ID_MENU_LOAD</property>
                         <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">Load</property>
+                        <property name="label">读取</property>
                         <property name="name">menuLoad</property>
                         <property name="permission">none</property>
                         <property name="shortcut"></property>
@@ -212,8 +212,8 @@
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>
-                <object class="wxMenu" expanded="0">
-                    <property name="label">Edit</property>
+                <object class="wxMenu" expanded="1">
+                    <property name="label">编辑</property>
                     <property name="name">m_menu2</property>
                     <property name="permission">protected</property>
                     <object class="wxMenuItem" expanded="0">
@@ -223,7 +223,7 @@
                         <property name="help"></property>
                         <property name="id">ID_MENU_EDIT_STATION</property>
                         <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">Edit Station</property>
+                        <property name="label">编辑I/O站点</property>
                         <property name="name">menuEditStation</property>
                         <property name="permission">none</property>
                         <property name="shortcut"></property>
@@ -238,7 +238,7 @@
                         <property name="help"></property>
                         <property name="id">ID_MENU_EDIT_IO_NODE</property>
                         <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">Edit IO</property>
+                        <property name="label">编辑数据点</property>
                         <property name="name">menuEditIoNode</property>
                         <property name="permission">none</property>
                         <property name="shortcut"></property>
@@ -253,7 +253,7 @@
                         <property name="help"></property>
                         <property name="id">ID_MENU_EDIT_ACTION</property>
                         <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">Edit Action</property>
+                        <property name="label">编辑动作</property>
                         <property name="name">menuEditAction</property>
                         <property name="permission">none</property>
                         <property name="shortcut"></property>
@@ -12417,7 +12417,7 @@
                                                                         <property name="resize">Resizable</property>
                                                                         <property name="show">1</property>
                                                                         <property name="size"></property>
-                                                                        <property name="style">wxTR_DEFAULT_STYLE|wxTR_LINES_AT_ROOT</property>
+                                                                        <property name="style"></property>
                                                                         <property name="subclass">CustomTreeCtrl; wx.lib.agw.customtreectrl</property>
                                                                         <property name="toolbar_pane">0</property>
                                                                         <property name="tooltip"></property>
