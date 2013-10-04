@@ -4,16 +4,19 @@
 from MyStatusDisplay import *
 from mySerial.mySerial import *
 from MyCanStationDaemon import *
+from MyAction import *
 from MyConfiguration import *
 
 
 class RuntimeManagement():
     def __init__(self):
         self.statusDisplayMgmt = StatusDisplayManagement()
+        self.actionMgmt = ActionManagement()
         self.serialHandle = None
         self.stationDaemonMgmt = None
         self.canProxy = None
         self.buildCanStationManagement()
+
 
     def doRun(self):
         print "RuntimeManagement run"

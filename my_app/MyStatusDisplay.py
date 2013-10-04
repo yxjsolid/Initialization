@@ -39,6 +39,7 @@ class StatusDisplayManagement():
         return
 
     def displayUpdateCheck(self, interval):
+        #print "displayUpdateCheck"
         for p in self.statusDisplayPanel:
             p.doStatusUpdate()
 
@@ -63,6 +64,7 @@ class statusDisplayView():
 
     def doUpdateStatus(self, index, nodeObj):
         statusInfo = nodeObj.board.getBoardPortStatus(nodeObj, nodeObj.port)
+        #print "doUpdateStatus", statusInfo
         self.viewCtrl.SetCellValue(index, 1, statusInfo)
 
     def getDisplaySize(self):

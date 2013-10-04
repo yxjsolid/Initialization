@@ -65,6 +65,8 @@ class TransporterLayoutCfg():
         self.conditionObj = conditionObj
         self.conditionVal = conditionVal
 
+    def dumpInfo(self):
+        print "TransporterLayoutCfg"
 
 class ButtonLayoutCfg():
     def __init__(self, pos, resourceDict):
@@ -86,6 +88,8 @@ class ButtonLayoutCfg():
     def updatePos(self, dx, dy):
         self.pos = (self.pos[0] + dx, self.pos[1] + dy)
 
+    def dumpInfo(self):
+        print "ButtonLayoutCfg"
 
 class GuiStatusDisplayLayoutCfg():
     def __init__(self, pos, colSetting, nodeList):
@@ -178,6 +182,22 @@ class CfgContainer():
 
     def testDump(self, pickle, file):
         print "test guiCfg"
+
+
+
+        print "test statusDisplayCfgList"
+        pickle.dump(self.guiCfg.statusDisplayCfgList, file)
+
+        print "test buttonLayoutCfgList"
+
+        for cfg in self.guiCfg.buttonLayoutCfgList:
+            cfg.dumpInfo()
+            pickle.dump(cfg, file)
+
+
+        pickle.dump(self.guiCfg.buttonLayoutCfgList, file)
+
+
         pickle.dump(self.guiCfg, file)
 
         print "test IoNodeCfg"

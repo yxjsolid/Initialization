@@ -164,7 +164,7 @@ class ActionGroupViewControl():
     #def onCanStationItemSelChanged(self, event):
     def onActionGrpItemSelected(self, event):
         actGrp = self.getCurrentEditObj()
-        print "onActionGrpItemSelected"
+        #print "onActionGrpItemSelected"
         self.updateToolStatus(1)
 
         self.parentEditor.actionViewCtrl.updateActionView(actGrp, True)
@@ -296,7 +296,7 @@ class ActionViewControl():
 
         while True:
             index = actionList.GetNextItem(index)
-            print "onEditActionUpdate", index
+            #print "onEditActionUpdate", index
             if index == -1:
                 break
 

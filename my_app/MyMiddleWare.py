@@ -13,7 +13,7 @@ import pickle
 from MiddleWare_IO_Station import *
 from MiddleWare_Edit_IO import *
 from MiddleWare_Action import *
-
+import shutil
 mydata = wxPythonInAction.Chapter_15.data.tree
 
 def dumpModuleObj(module, pad=0):
@@ -57,6 +57,7 @@ class MyFrame(MainBase.FrameBase):
         return
 
     def doRun(self):
+        #wx.GetApp().initRuntime()
         wx.GetApp().getRuntime().doRun()
         return
 
@@ -93,8 +94,11 @@ class MyFrame(MainBase.FrameBase):
 
     def onSave(self):
         print "onSave"
-        saveFile = open(self.saveFileName, "w")
 
+        #copyFiles(d,backdir)
+
+        shutil.copyfile(self.saveFileName, "save_autoback.txt")
+        saveFile = open(self.saveFileName, "w")
         cfgObj = wx.GetApp().getConfigure()
 
         #cfgObj.testDump(pickle, saveFile)
@@ -107,6 +111,7 @@ class MyFrame(MainBase.FrameBase):
         print "onLoad"
         saveFile = open(self.saveFileName, "r")
         cfgObj = pickle.load(saveFile)
+
         wx.GetApp().setConfigure(cfgObj)
         wx.GetApp().initRuntime()
 

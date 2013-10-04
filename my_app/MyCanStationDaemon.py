@@ -161,6 +161,8 @@ class CanStationDaemon():
             return
 
         event.set()
+
+        #print board.getBoardTypeStr(), boardId, canFrame.getCMDBoardStatus()
         board.updateBoardStatus(canFrame.getCMDBoardStatus())
         board.updateIoStatus(canFrame.getCmdData())
 
