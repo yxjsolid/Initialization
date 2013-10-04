@@ -502,6 +502,9 @@ class Panel_Edit_IO_Node(MainBase.Panel_Edit_IO_Node_Base):
         stationCfg = cfgObj.stationCfg
         self.buildChoice(stationCfg)
 
+        self.offInfoTxt.SetValue(DEFAULT_OFF_STATUS_INFO)
+        self.onInfoTxt.SetValue(DEFAULT_ON_STATUS_INFO)
+
         if self.onEditListItem != -1:
             self.onEditUpdate()
 

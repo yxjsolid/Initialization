@@ -753,14 +753,14 @@ class Panel_Edit_IO_Node_Base ( wx.Panel ):
 		fgSizer68121.SetFlexibleDirection( wx.BOTH )
 		fgSizer68121.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 		
-		self.m_staticText42121 = wx.StaticText( self.m_panel171, wx.ID_ANY, _(u"关状态信息:"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText42121 = wx.StaticText( self.m_panel171, wx.ID_ANY, _(u"断开状态信息:"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText42121.Wrap( -1 )
 		fgSizer68121.Add( self.m_staticText42121, 1, wx.ALL, 5 )
 		
 		self.offInfoTxt = wx.TextCtrl( self.m_panel171, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		fgSizer68121.Add( self.offInfoTxt, 0, wx.ALL|wx.EXPAND, 5 )
 		
-		self.m_staticText43121 = wx.StaticText( self.m_panel171, wx.ID_ANY, _(u"开状态信息:"), wx.DefaultPosition, wx.Size( -1,-1 ), 0 )
+		self.m_staticText43121 = wx.StaticText( self.m_panel171, wx.ID_ANY, _(u"闭合状态信息:"), wx.DefaultPosition, wx.Size( -1,-1 ), 0 )
 		self.m_staticText43121.Wrap( -1 )
 		fgSizer68121.Add( self.m_staticText43121, 0, wx.ALIGN_CENTER|wx.ALL, 5 )
 		

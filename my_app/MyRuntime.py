@@ -24,7 +24,7 @@ class RuntimeManagement():
         self.openCanProxy()
 
         self.stationDaemonMgmt.startStatusCheck()
-        self.statusDisplayMgmt.displayUpdateCheck(0.2)
+        self.statusDisplayMgmt.displayUpdateCheck(0.5)
 
     def openSerial(self):
         self.serialHandle = SerialHandler(Port=3)

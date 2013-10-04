@@ -161,7 +161,8 @@ STR_BOARD_STATUS_OK             = u"正常"
 
 
 
-
+DEFAULT_ON_STATUS_INFO = u"闭合"
+DEFAULT_OFF_STATUS_INFO = u"断开"
 
 
 

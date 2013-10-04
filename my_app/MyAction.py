@@ -126,4 +126,10 @@ class ActionTimeDelay(ActionBase):
         return
 
     def getActionDetail(self):
-        return u"等待: [%d]秒" % (self.delayTime)
+        return u"等待: [%d]秒" % self.delayTime
+
+    def doAction(self):
+
+        self.timeDelayEvent = threading.Event()
+        self.timeDelayEvent.wait(self.delayTime)
+        self.timeDelayEvent = None
