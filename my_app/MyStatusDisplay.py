@@ -10,6 +10,7 @@ from MyWidgetLibrary import *
 from MyDraggablePanel import *
 from MyConfiguration import *
 
+
 class StatusDisplayManagement():
     def __init__(self):
         self.statusDisplayPanel = []

@@ -43,8 +43,10 @@ class IoNode():
         self.onOffFlag = flag
         stationDaemonMgmt = globalGetRuntime().stationDaemonMgmt
         stationDaemonMgmt.doIoNodeOutput(self)
-
         return
+
+    def getOnOffStatus(self):
+        return self.board.isPortOn(self.port)
 
 
 class IoNodeCategory():

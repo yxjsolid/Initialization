@@ -41,11 +41,12 @@ class StationConfiguration():
             station.onLoadInit()
 
 
-
 class TransporterLayoutCfg():
     def __init__(self, pos):
         self.pos = (pos[0], pos[1])
 
+        self.conditionObj = None
+        self.conditionVal = None
         #self.operationOn = None
         #self.operationOff = None
         return
@@ -55,8 +56,14 @@ class TransporterLayoutCfg():
 
     def createSprite(self):
         sprite = AnimateTansporterSprite(initPos=(self.pos[0], self.pos[1]), width=400, height=60)
+        sprite.conditionObj = self.conditionObj
+        sprite.conditionVal = self.conditionVal
         sprite.guiCfg = self
         return sprite
+
+    def updatePrivate(self, conditionObj, conditionVal):
+        self.conditionObj = conditionObj
+        self.conditionVal = conditionVal
 
 
 class ButtonLayoutCfg():

@@ -57,31 +57,28 @@ class specialSprite_transport(pygame.sprite.LayeredUpdates):
         self.color = color
 
         self.addComponent()
-       
 
     def addComponent(self):
 
         x,y = self.initPos
-        r = self.height/2
-        center1 = (x+r, y+r)
-        center2 = (x+self.width-r, y+r)
+        r = self.height / 2
+        center1 = (x + r, y + r)
+        center2 = (x + self.width - r, y + r)
 
         print center1, center2
 
-        rect = pygame.Rect(x + r, y, self.width - r*2, self.height)
+        rect = pygame.Rect(x + r, y, self.width - r * 2, self.height)
         
-        comp1 = AnimateMotorSprite("comp1",BLUE, center1, r, 1)
-        comp2 = StaticRectSprite("comp2",red, rect)   
-        comp3 = AnimateMotorSprite("comp3",WHITE, center2, r, 1)
+        comp1 = AnimateMotorSprite("comp1", BLUE, center1, r, 1)
+        comp2 = StaticRectSprite("comp2", red, rect)
+        comp3 = AnimateMotorSprite("comp3", WHITE, center2, r, 1)
         #comp4 = StaticLineSprite("comp4",WHITE, rect)    
         
         self.add(comp1,layer=2)
         self.add(comp2,layer=1)
         self.add(comp3,layer=2)
-        #self.add(comp4,layer=2)   
-       
-  
-        for item in  self.sprites():
+        #self.add(comp4,layer=2)
+        for item in self.sprites():
             print item.name
         
         #self.move_to_front(comp1)
@@ -886,8 +883,8 @@ class AnimateTansporterSprite(DragSprite):
         self.updateInterval = updateInterval
         self.isActive = 0
 
-        self.attribute = None   #bind to control the animation
-        self.attrCondition = None
+        self.conditionObj = None   #bind to control the animation
+        self.conditionVal = None
         self.animateActive = 0
 
         self.addComponent()
@@ -896,17 +893,17 @@ class AnimateTansporterSprite(DragSprite):
 
     def addComponent(self):
         pad = self.pad
-        x,y = (pad, pad)
-        width = self.width - pad*2
-        height = self.height - pad*2
+        x, y = (pad, pad)
+        width = self.width - pad * 2
+        height = self.height - pad * 2
         width = self.width 
         height = self.height 
 
-        r = height/2
-        center1 = (x+r, y+r)
-        center2 = (x+width-r, y+r)
+        r = height / 2
+        center1 = (x + r, y + r)
+        center2 = (x + width - r, y + r)
 
-        rect = pygame.Rect(x + r, y, width - r*2, height)
+        rect = pygame.Rect(x + r, y, width - r * 2, height)
         
         comp1 = AnimateMotorSprite("comp1", BLUE, center1, r, 1)
         comp2 = StaticRectSprite("comp2", WHITE, rect)
@@ -939,14 +936,14 @@ class AnimateTansporterSprite(DragSprite):
             self.image.blit(compent.image, compent.rect)        
 
     def checkAnimate(self):
-        if self.attribute:
-            if self.attribute.value == self.attrCondition:
+        if self.conditionObj is not None:
+            if self.conditionObj.getOnOffStatus() == self.conditionVal:
                 self.animateActive = 1
                 return
 
         self.animateActive = 0
 
-    def animate(self,current_time):
+    def animate(self, current_time):
 
         return
         # if self.attribute:
@@ -991,10 +988,11 @@ class AnimateTansporterSprite(DragSprite):
         Panel_AnimationCondition_Setting(window, self, self.onDeviceAnimationSettingDone)
         window.windowPopup()
 
-    def onDeviceAnimationSettingDone(self, attribute, attrCondition):
-        self.attribute = attribute   #bind to control the animation
-        self.attrCondition = attrCondition
+    def onDeviceAnimationSettingDone(self, confitionObj, conditionVal):
+        self.conditionObj = confitionObj   #bind to control the animation
+        self.conditionVal = conditionVal
 
+        self.guiCfg.updatePrivate(confitionObj, conditionVal)
         return
 
     def onProcessOperation(self):

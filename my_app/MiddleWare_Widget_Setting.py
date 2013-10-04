@@ -80,10 +80,10 @@ class Panel_ButtonSetting(MainBase.Panel_ButtonSetting_Base):
 
 
 class Panel_AnimationCondition_Setting(MainBase.Panel_AnimationCondition_Setting_Base):
-    def __init__(self, window, opener, callbackFn):
+    def __init__(self, window, onEditSprite, callbackFn):
         MainBase.Panel_AnimationCondition_Setting_Base.__init__(self, window.frame)
         self.window = window
-        self.opener = opener
+        self.onEditSprite = onEditSprite
         self.callbackFn = callbackFn
         self.setApplyBtnEnabled(0)
         self.conditionObj = None
@@ -94,10 +94,10 @@ class Panel_AnimationCondition_Setting(MainBase.Panel_AnimationCondition_Setting
         self.applyBtn.Enable(enabled)
 
     def onLoadUpdate(self):
-        self.attribute = self.opener.attribute
-        attrCondition = self.opener.attrCondition
+        self.conditionObj = self.onEditSprite.conditionObj
+        conditionVal = self.onEditSprite.conditionVal
 
-        if self.attribute and not attrCondition:
+        if self.conditionObj and not conditionVal:
             self.radioTrue.SetValue(False)
             self.radioFalse.SetValue(True)
 
@@ -137,7 +137,7 @@ class Panel_AnimationCondition_Setting(MainBase.Panel_AnimationCondition_Setting
         self.window.closeWindow()
 
     def onApply(self, event):
-        self.callbackFn(self.attribute, self.getCondition())
+        self.callbackFn(self.conditionObj, self.getCondition())
         self.closeWindow()
         return
 
