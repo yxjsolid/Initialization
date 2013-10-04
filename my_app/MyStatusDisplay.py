@@ -87,20 +87,12 @@ class statusDisplayView():
             self.viewCtrl.SetColSize(1, self.colSetting[1])
 
         self.viewCtrl.SetCellValue(row, 0, nodeObj.name)
-        self.viewCtrl.SetCellValue(row, 1, u"关闭关闭关闭关闭关闭关闭关闭关闭关闭关闭")
+        self.viewCtrl.SetCellValue(row, 1, nodeObj.getPortStatusStr())
         #self.viewCtrl.SetCellValue(1, 2, nodeObj.name)
         #self.viewCtrl.SetCellValue(0, 3, u"关闭")
 
-
     def gridInsertStatusIoNode(self, index, ioNode):
-        """ ref SetStringItem """
         rowCnt = self.viewCtrl.GetNumberRows()
-
-        #self.viewCtrl.AppendRows()
-
-        print "rowCnt = ", rowCnt
-
-
         if index > rowCnt + 1:
             print "error"
             return

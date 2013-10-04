@@ -20,6 +20,10 @@ class IoNode():
         self.port = 0
         self.onOffFlag = 0
 
+    def onLoadInit(self):
+
+        return
+
     def getIoInfoStr(self):
         info = ""
 
@@ -48,6 +52,9 @@ class IoNode():
     def getOnOffStatus(self):
         return self.board.isPortOn(self.port)
 
+    def getPortStatusStr(self):
+        return self.board.getBoardPortStatus(self, self.port)
+
 
 class IoNodeCategory():
     def __init__(self):
@@ -55,6 +62,10 @@ class IoNodeCategory():
         self.name = EDIT_IO_NODE_LABEL_GROUP_DEFAULT
         self.ioNodeList = []
         return
+
+    def onLoadInit(self):
+        for ioNode in self.ioNodeList:
+            ioNode.onLoadInit()
 
     def removeIoNode(self, nodeObj):
         self.ioNodeList.remove(nodeObj)

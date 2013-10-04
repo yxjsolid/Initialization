@@ -22504,7 +22504,7 @@
                 </object>
             </object>
         </object>
-        <object class="Panel" expanded="0">
+        <object class="Panel" expanded="1">
             <property name="aui_managed">0</property>
             <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
@@ -22520,7 +22520,7 @@
             <property name="minimum_size"></property>
             <property name="name">Panel_Status_Display_Base</property>
             <property name="pos"></property>
-            <property name="size">-1,-1</property>
+            <property name="size">247,208</property>
             <property name="subclass"></property>
             <property name="tooltip"></property>
             <property name="window_extra_style"></property>
@@ -22556,7 +22556,7 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxFlexGridSizer" expanded="0">
+            <object class="wxFlexGridSizer" expanded="1">
                 <property name="cols">0</property>
                 <property name="flexible_direction">wxBOTH</property>
                 <property name="growablecols">0</property>

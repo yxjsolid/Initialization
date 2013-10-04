@@ -156,6 +156,13 @@ class IoNodeConfiguration():
     def getOutputIoCategoryList(self):
         return self.outputIoCategoryList
 
+    def onLoadInit(self):
+        for ioNodeCate in self.inputIoCategoryList:
+            ioNodeCate.onLoadInit()
+
+        for ioNodeCate in self.outputIoCategoryList:
+            ioNodeCate.onLoadInit()
+
 
 class CfgContainer():
     def __init__(self):
@@ -191,5 +198,11 @@ class CfgContainer():
     def setActionGroupCfg(self, actionGroupList):
         self.actionGroupCfg.setActionGroupList(actionGroupList)
 
+    def onCfgLoadInit(self):
+        self.stationCfg.onLoadInit()
+        self.IoNodeCfg.onLoadInit()
+        #self.stationCfg.dumpStationCfg()
+
     def onCfgLoadUpdate(self, hmiPanel):
+        self.onCfgLoadInit()
         self.guiCfg.onCfgLoadUpdate(hmiPanel)

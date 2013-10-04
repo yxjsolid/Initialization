@@ -225,6 +225,7 @@ class DeviceIoBoard():
     def onLoadInit(self):
         self.IoStatus = 0xff
         self.outputStatus = 0xff
+        self.boardStatus = DeviceIoBoard.BOARD_STATUS_INIT
 
     def dumpInfo(self):
         print self.getBoardTypeStr(), " id:",self.boardId, "status:%x" % self.outputStatus, "IO:%x" % self.IoStatus

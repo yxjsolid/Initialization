@@ -2616,7 +2616,7 @@ class ConfirmDIALOG ( wx.Dialog ):
 class Panel_Status_Display_Base ( wx.Panel ):
 	
 	def __init__( self, parent ):
-		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( -1,-1 ), style = wx.STATIC_BORDER )
+		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 247,208 ), style = wx.STATIC_BORDER )
 		
 		fgSizer61 = wx.FlexGridSizer( 0, 0, 0, 0 )
 		fgSizer61.AddGrowableCol( 0 )
@@ -2657,7 +2657,6 @@ class Panel_Status_Display_Base ( wx.Panel ):
 		
 		self.SetSizer( fgSizer61 )
 		self.Layout()
-		fgSizer61.Fit( self )
 	
 	def __del__( self ):
 		pass
