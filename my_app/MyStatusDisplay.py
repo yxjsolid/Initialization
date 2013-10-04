@@ -228,7 +228,7 @@ class Panel_Edit_Status_Display(MainBase.Panel_Edit_Status_Display_Base):
 
     def onApply(self, event):
         colSetting = self.viewCtrl.getColumnSetting()
-        panelCfg = GuiStatusDisplayCfg(self.popupPos, colSetting, self.nodeList)
+        panelCfg = GuiStatusDisplayLayoutCfg(self.popupPos, colSetting, self.nodeList)
         cfg = globalGetCfg()
         cfg.appendStatusDisplayCfg(panelCfg)
 

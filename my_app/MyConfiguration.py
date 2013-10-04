@@ -1,4 +1,5 @@
 import wx
+from MySprite import *
 
 
 def globalGetCfg():
@@ -45,7 +46,46 @@ class StationConfiguration():
             station.onLoadInit()
 
 
-class GuiStatusDisplayCfg():
+
+class TransporterLayoutCfg():
+    def __init__(self, pos):
+        self.pos = (pos[0], pos[1])
+
+        #self.operationOn = None
+        #self.operationOff = None
+        return
+
+    def updatePos(self, dx, dy):
+        self.pos = (self.pos[0] + dx, self.pos[1] + dy)
+
+    def createSprite(self):
+        sprite = AnimateTansporterSprite(initPos=(self.pos[0], self.pos[1]), width=400, height=60)
+        sprite.guiCfg = self
+        return sprite
+
+
+class ButtonLayoutCfg():
+    def __init__(self, pos, resourceDict):
+        self.pos = (pos[0], pos[1])
+        self.resourceDict = resourceDict
+
+        self.operationOn = None
+        self.operationOff = None
+
+        return
+
+    def createSprite(self):
+        sprite = ButtonSprite(initPos=(self.pos[0], self.pos[1]), dicts=self.resourceDict)
+        sprite.operationOn = self.operationOn
+        sprite.operationOff = self.operationOff
+        sprite.guiCfg = self
+        return sprite
+
+    def updatePos(self, dx, dy):
+        self.pos = (self.pos[0] + dx, self.pos[1] + dy)
+
+
+class GuiStatusDisplayLayoutCfg():
     def __init__(self, pos, colSetting, nodeList):
         self.pos = pos
         self.colSetting = colSetting
@@ -61,6 +101,7 @@ class GuiStatusDisplayCfg():
 class GuiLayoutConfiguration():
     def __init__(self):
         self.statusDisplayCfgList = []
+        self.buttonLayoutCfgList = []
         return
 
     def appendStatusDisplayCfg(self, cfg):
@@ -68,6 +109,32 @@ class GuiLayoutConfiguration():
 
     def getStatusDisplayCfg(self):
         return self.statusDisplayCfgList
+
+    def appendButtonLayoutCfg(self, cfg):
+        self.buttonLayoutCfgList.append(cfg)
+
+    def getButtonLayoutCfg(self):
+        return self.buttonLayoutCfgList
+
+    def appendWidgetLayoutCfg(self, cfg):
+        self.buttonLayoutCfgList.append(cfg)
+        return
+
+    def onCfgLoadUpdateStatusDiaplay(self, hmiPanel):
+        statusDisplayMgmt = globalGetRuntime().statusDisplayMgmt
+        statusDisplayMgmt.onCfgLoadUpdate(hmiPanel, self.statusDisplayCfgList)
+
+    def onCfgLoadUpdateButtonLayout(self, hmiPanel):
+
+        for btnCfg in self.getButtonLayoutCfg():
+            sprite = btnCfg.createSprite()
+            hmiPanel.addSpriteToPanel(sprite)
+
+        return
+
+    def onCfgLoadUpdate(self, hmiPanel):
+        self.onCfgLoadUpdateStatusDiaplay(hmiPanel)
+        self.onCfgLoadUpdateButtonLayout(hmiPanel)
 
 
 class IoNodeConfiguration():
@@ -121,3 +188,6 @@ class CfgContainer():
 
     def setActionGroupCfg(self, actionGroupList):
         self.actionGroupCfg.setActionGroupList(actionGroupList)
+
+    def onCfgLoadUpdate(self, hmiPanel):
+        self.guiCfg.onCfgLoadUpdate(hmiPanel)

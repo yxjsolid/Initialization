@@ -140,13 +140,17 @@ ACTION_TYPE_DELAY_NAME = u"延时等待"
 ACTION_TYPE_SET_INTERNAL_NAME = u"内部变量设置"
 ACTION_DETAIL_STR_FORMAT = u"%s   输出:[%s]"
 
+LABEL_BUTTON_ACTION_BIND = u"按钮动作绑定"
+
+
+
 rescoure_dir = r".\image\\"
 
-btn_red_up = rescoure_dir + r"red_up.png"
-btn_red_down = rescoure_dir + "red_down.png"
+btn_red_off = rescoure_dir + r"red_up.png"
+btn_red_on = rescoure_dir + "red_down.png"
 
-btn_green_up = rescoure_dir + "green_up.png"
-btn_green_down = rescoure_dir + "green_down.png"
+btn_green_off = rescoure_dir + "green_up.png"
+btn_green_on = rescoure_dir + "green_down.png"
 
 btn_on = rescoure_dir + "btn_on.png"
 btn_off = rescoure_dir + "btn_off.png"

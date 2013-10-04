@@ -7,7 +7,6 @@ from PIL import Image
 from MyGlobal import *
 import MyMiddleWare
 
-
 pygame.font.init()
 try:
     regular_font_file = os.path.join(os.path.dirname(__file__), "Vera.ttf")
@@ -459,15 +458,13 @@ tXL5PwzOC4njj4K3gavA8cazczYacLd+p/+6y8mfAgwAsRuLfp/zVLMAAAAASUVORK5CYII="""))
             self.update_time = current_time + 10
 
 
-
-
 class Sprite_Button(test_Drag_Sprite):
     def __init__(self, color, initial_position, speed, border):
         test_Drag_Sprite.__init__(self, color, initial_position, speed, border)
         self.imageResource = []
 
-        self.loadImgResource(btn_red_up)
-        self.loadImgResource(btn_red_down)
+        self.loadImgResource(btn_red_off)
+        self.loadImgResource(btn_red_on)
         self.setCurrentResource(0)
 
     def loadImgResource(self, file):
@@ -591,31 +588,31 @@ class Sprite_Animate(test_Drag_Sprite):
 class __MouseMixin:
 
     def onLeftUp(self, event):
-        print "onLeftUp"
+        #print "onLeftUp"
         pass
 
     def onLeftDown(self, event):
-        print "onLeftDown"
+        #print "onLeftDown"
         pass
 
     def onLeftDClick(self, event):
-        print "onLeftDClick"
+        #print "onLeftDClick"
         pass
 
     def onRightUp(self, event):
-        print "onRightUp"
+        #print "onRightUp"
         pass
 
     def onRightDown(self, event):
-        print "onRightDown"
+        #print "onRightDown"
         pass
 
     def onDragging(self, event):
-        print "onDragging"
+        #print "onDragging"
         pass
 
     def onMouseEnter(self, event):
-        print "onMouseEnter"
+        #print "onMouseEnter"
         pass
 
     def OnMouseHandler(self, event):
@@ -639,6 +636,8 @@ class __MouseMixin:
 
 
 class DragSprite(__MouseMixin, pygame.sprite.Sprite):
+    SPRITE_BUTTON, SPRITE_TRANSPORTER = range(2)
+
     def __init__(self, parent=None):
         pygame.sprite.Sprite.__init__(self)
         self.is_select = 0
@@ -694,7 +693,9 @@ class DragSprite(__MouseMixin, pygame.sprite.Sprite):
 
     def update(self, current_time):
         return
-   
+
+
+
 def drawBoader(image, rect):
     #rect = image.get_rect()
     pad = 2
@@ -890,6 +891,7 @@ class AnimateTansporterSprite(DragSprite):
 
         self.addComponent()
         self.drawSelf(0)
+        self.guiCfg = None
 
     def addComponent(self):
         pad = self.pad
@@ -969,7 +971,7 @@ class AnimateTansporterSprite(DragSprite):
         self.rect.center = center
 
     def onRightUp(self, event):
-        print "onRightUp"
+        #print "onRightUp"
         self.PopupDeviceSetupMenu()
         event.Skip(False)
         pass
@@ -1012,6 +1014,15 @@ class AnimateTansporterSprite(DragSprite):
 
         self.onProcessOperation()
         return
+
+    def move(self, pos):
+        dx = pos[0] - self.lastPos[0]
+        dy = pos[1] - self.lastPos[1]
+        DragSprite.move(self, pos)
+        # dx = pos[0] - self.lastPos[0]
+        # dy = pos[1] - self.lastPos[1]
+        self.guiCfg.updatePos(dx, dy)
+
 
 class SwitchButtonSprite(DragSprite):
     def __init__(self, color, initPos, width, height,speed, border):
@@ -1075,8 +1086,10 @@ class SwitchButtonSprite(DragSprite):
 
 
 class ButtonSprite(DragSprite):
-        def __init__(self, parent=None, initPos=(0,0), width=25, height=50, dicts=None):
+        def __init__(self, parent=None, initPos=(0,0), width=50, height=50, dicts=None):
             DragSprite.__init__(self, parent)
+            self.type = DragSprite.SPRITE_BUTTON
+            self.resourceCfgDict = dicts
             self.imageResource = {}
             self.status = 0
             self.index = 0
@@ -1090,7 +1103,9 @@ class ButtonSprite(DragSprite):
             self.operationOn = None
             self.operationOff = None
 
-            self.operationDic = {"on":self.getOperationOnItem, "off":self.getOperationOffItem}
+            self.operationDic = {"on": self.getOperationOnItem, "off": self.getOperationOffItem}
+            self.guiCfg = None
+
 
             for dic in dicts:
                 self.loadImgResource(dic)
@@ -1188,7 +1203,7 @@ class ButtonSprite(DragSprite):
 
         def onBeginButtonSetting(self, event):
             print "onButtonSetting"
-            window = MyPopupWindow(self.parent, size=wx.DefaultSize, title="setting")
+            window = MyPopupWindow(self.parent, size=wx.DefaultSize, title=LABEL_BUTTON_ACTION_BIND)
 
             MyMiddleWare.Panel_ButtonSetting(window.frame, self, self.onButtonSettingDone)
             window.windowPopup()
@@ -1196,6 +1211,9 @@ class ButtonSprite(DragSprite):
         def onButtonSettingDone(self, operOn, operOff):
             self.operationOn = operOn
             self.operationOff = operOff
+
+            self.guiCfg.operationOn = operOn
+            self.guiCfg.operationOff = operOff
             return
 
         def onProcessOperation(self):
@@ -1214,3 +1232,14 @@ class ButtonSprite(DragSprite):
 
             self.onProcessOperation()
             return
+
+
+        def move(self, pos):
+            dx = pos[0] - self.lastPos[0]
+            dy = pos[1] - self.lastPos[1]
+            DragSprite.move(self, pos)
+            # dx = pos[0] - self.lastPos[0]
+            # dy = pos[1] - self.lastPos[1]
+            self.guiCfg.updatePos(dx, dy)
+
+

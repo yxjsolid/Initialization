@@ -112,17 +112,16 @@ class MyFrame(MainBase.FrameBase):
 
 
         self.viewPanel_sub.onEditUpdate()
+        self.onCfgLoadUpdate(cfgObj)
 
-        self.onCfgLoadUpdate()
-
-    def onCfgLoadUpdate(self):
-        cfg = globalGetCfg()
-
-        stationcfg = cfg.stationCfg
+    def onCfgLoadUpdate(self, cfgObj):
+        stationcfg = cfgObj.stationCfg
         stationcfg.onLoadInit()
         stationcfg.dumpStationCfg()
 
-        self.viewPanel_sub.onCfgLoadUpdate()
+        cfgObj.onCfgLoadUpdate(self.viewPanel_sub.myHMIPanel)
+
+        # self.viewPanel_sub.onCfgLoadUpdate()
 
     def onMenuBtnClicked(self, event):
         eventId = event.GetId()

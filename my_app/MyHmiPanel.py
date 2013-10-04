@@ -63,7 +63,7 @@ class MyHmiPanel(wx.Panel):
 
     def addSpriteToPanel(self, sprite):
         sprite.parent = self
-        self.rootSpriteGroup.add(sprite,layer=12)
+        self.rootSpriteGroup.add(sprite, layer=12)
 
     def addTestSprite(self):
         for color, location, speed in [([255, 0, 0], [50, 50], [2,3]),
@@ -210,25 +210,24 @@ class MyHmiPanel(wx.Panel):
             return
 
         if event.LeftDown():
-            print "LeftDown",(event.GetX(),event.GetY())
+            #print "LeftDown",(event.GetX(),event.GetY())
             self.onSelectSprite(event, onMouseObj)
         elif event.LeftUp():
-            print "left up"
+            #print "left up"
+            pass
 
         elif event.RightUp():
-            print "RightUp"
+            #print "RightUp"
             self.onSelectSprite(event, onMouseObj)
         elif event.RightDown():
-            print "RightDown",(event.GetX(),event.GetY())
+            #print "RightDown",(event.GetX(),event.GetY())
             self.onSelectSprite(event, onMouseObj)
 
         elif event.Dragging() and event.LeftIsDown():
-            print "left Dragging", (event.GetX(),event.GetY())
+            #print "left Dragging", (event.GetX(),event.GetY())
 
             if self.selectedSprite:
                 self.selectedSprite.move((event.GetX(),event.GetY()))
-
-
 
     def OnPaint(self, event):
         self.Redraw()
@@ -243,8 +242,8 @@ class MyHmiPanel(wx.Panel):
         # call the Redraw() method
         # (Otherwise wx seems to call Draw between quitting Pygame and destroying the frame)
         # This may or may not be necessary now that Pygame is just drawing to surfaces
-        self.Unbind(event = wx.EVT_PAINT, handler = self.OnPaint)
-        self.Unbind(event = wx.EVT_TIMER, handler = self.Update, source = self.timer)
+        self.Unbind(event=wx.EVT_PAINT, handler=self.OnPaint)
+        self.Unbind(event=wx.EVT_TIMER, handler=self.Update, source=self.timer)
 
     def OnContextMenu(self, event):
      # only do this part the first time so the events are only bound once
@@ -258,27 +257,10 @@ class MyHmiPanel(wx.Panel):
 
         if not hasattr(self, "popupID1"):
             self.popupID1 = wx.NewId()
-            self.popupID2 = wx.NewId()
-            self.popupID3 = wx.NewId()
-            self.popupID4 = wx.NewId()
-            self.popupID5 = wx.NewId()
-            self.popupID6 = wx.NewId()
-            self.popupID7 = wx.NewId()
-            self.popupID8 = wx.NewId()
-            self.popupID9 = wx.NewId()
             self.popUpAddHmi = wx.NewId()
             self.popUpAddStatuaDisp = wx.NewId()
 
-
             self.Bind(wx.EVT_MENU, self.OnPopupOne, id=self.popupID1)
-            self.Bind(wx.EVT_MENU, self.OnPopupTwo, id=self.popupID2)
-            self.Bind(wx.EVT_MENU, self.OnPopupThree, id=self.popupID3)
-            self.Bind(wx.EVT_MENU, self.OnPopupFour, id=self.popupID4)
-            self.Bind(wx.EVT_MENU, self.OnPopupFive, id=self.popupID5)
-            self.Bind(wx.EVT_MENU, self.OnPopupSix, id=self.popupID6)
-            self.Bind(wx.EVT_MENU, self.OnPopupSeven, id=self.popupID7)
-            self.Bind(wx.EVT_MENU, self.OnPopupEight, id=self.popupID8)
-            self.Bind(wx.EVT_MENU, self.OnPopupNine, id=self.popupID9)
 
             self.Bind(wx.EVT_MENU, self.onAddHmiWidget, id=self.popUpAddHmi)
             self.Bind(wx.EVT_MENU, self.onAddStatusDisp, id=self.popUpAddStatuaDisp)
@@ -292,60 +274,19 @@ class MyHmiPanel(wx.Panel):
         # add some other items
         menu.Append(self.popUpAddHmi, HMI_POPUP_MENU_ADD_OBJ)
         menu.Append(self.popUpAddStatuaDisp, HMI_POPUP_MENU_ADD_STATUS_DISP)
-        menu.Append(self.popupID2, "Two")
-        menu.Append(self.popupID3, "Three")
-        menu.Append(self.popupID4, "Four")
-        menu.Append(self.popupID5, "Five")
-        menu.Append(self.popupID6, "Six")
-        # make a submenu
-        sm = wx.Menu()
-        sm.Append(self.popupID8, "sub item 1")
-        sm.Append(self.popupID9, "sub item 1")
-        menu.AppendMenu(self.popupID7, "Test Submenu", sm)
 
-
-        # Popup the menu.  If an item is selected then its handler
-        # will be called before PopupMenu returns.
         self.PopupMenu(menu)
-
         menu.Destroy()
 
-
     def onAddHmiWidget(self, event):
-        popupAddHmiWindow(self)
+        popupAddHmiWindow(self, self.popupPosition)
 
     def onAddStatusDisp(self, event):
 # wx.CommandEvent
         popupAddStatusDisplay(self, self.popupPosition)
 
     def OnPopupOne(self, event):
-     self.log.WriteText("Popup one\n")
-
-    def OnPopupTwo(self, event):
-     self.log.WriteText("Popup two\n")
-
-    def OnPopupThree(self, event):
-     self.log.WriteText("Popup three\n")
-
-    def OnPopupFour(self, event):
-     self.log.WriteText("Popup four\n")
-
-    def OnPopupFive(self, event):
-     self.log.WriteText("Popup five\n")
-
-    def OnPopupSix(self, event):
-     self.log.WriteText("Popup six\n")
-
-    def OnPopupSeven(self, event):
-     self.log.WriteText("Popup seven\n")
-
-    def OnPopupEight(self, event):
-     self.log.WriteText("Popup eight\n")
-
-    def OnPopupNine(self, event):
-     self.log.WriteText("Popup nine\n")
-
-
+        self.log.WriteText("Popup one\n")
 
 
 class MyResizeWidget(wx.PyPanel):

@@ -7,11 +7,14 @@ import wx
 class MyDraggable(wx.Panel):
     def __init__(self, parent, pos, size):
         wx.Panel.__init__(self, parent, pos=pos, size=size)
+        #wx.Frame.__init__(self, parent, pos=pos, size=size, style = wx.RESIZE_BORDER)
         self.SetBackgroundColour(wx.CYAN)
         self.child = None
         self.Bind(wx.EVT_LEFT_DOWN, self.OnClick)
         self.Bind(wx.EVT_LEFT_UP, self.OnRelease)
         self.Bind(wx.EVT_MOTION, self.OnMouseMove)
+
+        self.Show()
 
     def addChildPanel(self, child):
         self.SetSizeHintsSz(wx.DefaultSize, wx.DefaultSize)

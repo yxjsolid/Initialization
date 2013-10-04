@@ -97,7 +97,7 @@ class ViewSelectPanel(wx.Panel):
             self.tree.SelectItem(item)
 
     def OnRightUp(self, event):
-        pt = event.GetPosition();
+        pt = event.GetPosition()
         item, flags = self.tree.HitTest(pt)
         if item:        
             self.log.WriteText("OnRightUp: %s (manually starting label edit)\n"
@@ -146,8 +146,8 @@ class ViewSelectPanel(wx.Panel):
         event.Skip()
 
     def OnSize(self, event):
-        w,h = self.GetClientSizeTuple()
-        print "onSize"
+        w, h = self.GetClientSizeTuple()
+        #print "onSize"
         self.tree.SetDimensions(0, 0, w, h)
 
     def OnItemExpanded(self, event):
@@ -223,13 +223,13 @@ class ViewSelectPanel(wx.Panel):
         container.Layout()
 
 
-    def onCfgLoadUpdate(self):
-        statusCfgList = globalGetCfg().getStatusDisplayCfg()
-        statusDisplayMgmt = globalGetRuntime().statusDisplayMgmt
-        statusDisplayMgmt.onCfgLoadUpdate(self.myHMIPanel, statusCfgList)
-
-
-        pass
+    # def onCfgLoadUpdate(self):
+    #     statusCfgList = globalGetCfg().getStatusDisplayCfg()
+    #     statusDisplayMgmt = globalGetRuntime().statusDisplayMgmt
+    #     statusDisplayMgmt.onCfgLoadUpdate(self.myHMIPanel, statusCfgList)
+    #
+    #
+    #     pass
 
 
     def onEditUpdate(self):
